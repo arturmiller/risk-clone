@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Connected-path queries correctly identify reachable territories through friendly chains
 **Plans:** 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Project setup, map data JSON, Pydantic schema, NetworkX graph wrapper, and map/graph tests
+- [x] 01-01-PLAN.md — Project setup, map data JSON, Pydantic schema, NetworkX graph wrapper, and map/graph tests
 - [ ] 01-02-PLAN.md — Game state models, territory distribution, army placement, and setup tests
 
 ### Phase 2: Game Engine
@@ -85,7 +85,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Planning | - |
+| 1. Foundation | 1/2 | In Progress | - |
 | 2. Game Engine | 0/TBD | Not started | - |
 | 3. Web UI and Game Setup | 0/TBD | Not started | - |
 | 4. Easy and Medium Bots | 0/TBD | Not started | - |

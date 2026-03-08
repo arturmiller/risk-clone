@@ -27,7 +27,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Map & Visualization
 
-- [ ] **MAPV-01**: SVG map displays all 42 territories with correct adjacencies
+- [x] **MAPV-01**: SVG map displays all 42 territories with correct adjacencies
 - [ ] **MAPV-02**: Territories are colored by owning player
 - [ ] **MAPV-03**: Army count is displayed on each territory
 - [ ] **MAPV-04**: Territories are clickable for game actions (attack source/target, fortify)
@@ -92,7 +92,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ENGI-07 | Phase 2 | Pending |
 | ENGI-08 | Phase 2 | Pending |
 | ENGI-09 | Phase 2 | Pending |
-| MAPV-01 | Phase 1 | Pending |
+| MAPV-01 | Phase 1 | Complete |
 | MAPV-02 | Phase 3 | Pending |
 | MAPV-03 | Phase 3 | Pending |
 | MAPV-04 | Phase 3 | Pending |
