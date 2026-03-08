@@ -10,8 +10,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Game Setup
 
 - [ ] **SETUP-01**: Player can select number of players (2-6)
-- [ ] **SETUP-02**: Territories are randomly distributed among all players
-- [ ] **SETUP-03**: Initial armies are placed according to classic Risk rules
+- [x] **SETUP-02**: Territories are randomly distributed among all players
+- [x] **SETUP-03**: Initial armies are placed according to classic Risk rules
 
 ### Game Engine
 
@@ -81,8 +81,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SETUP-01 | Phase 3 | Pending |
-| SETUP-02 | Phase 1 | Pending |
-| SETUP-03 | Phase 1 | Pending |
+| SETUP-02 | Phase 1 | Complete |
+| SETUP-03 | Phase 1 | Complete |
 | ENGI-01 | Phase 2 | Pending |
 | ENGI-02 | Phase 2 | Pending |
 | ENGI-03 | Phase 2 | Pending |

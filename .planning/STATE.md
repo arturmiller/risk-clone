@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-08T06:45:58Z"
-last_activity: 2026-03-08 -- Completed plan 01-01 (map data and graph infrastructure)
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-08T06:50:53Z"
+last_activity: 2026-03-08 -- Completed plan 01-02 (game state and setup)
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 10
+  completed_plans: 2
+  percent: 20
 ---
 
 # Project State
@@ -25,29 +25,29 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-08 -- Completed plan 01-01 (map data and graph infrastructure)
+Phase: 1 of 5 (Foundation) -- COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase Complete
+Last activity: 2026-03-08 -- Completed plan 01-02 (game state and setup)
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4min
-- Total execution time: 0.07 hours
+- Total plans completed: 2
+- Average duration: 3min
+- Total execution time: 0.10 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 - Foundation | 1 | 4min | 4min |
+| 1 - Foundation | 2 | 6min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4min)
-- Trend: First plan
+- Last 5 plans: 01-01 (4min), 01-02 (2min)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -62,6 +62,9 @@ Recent decisions affecting current work:
 - Pydantic v2 model_validator ensures continent territories exactly cover master list
 - MapGraph precomputes continent lookups for O(1) queries
 - Python 3.13 selected via pyenv (3.12+ required)
+- Round-robin territory deal after shuffle ensures max 1 territory difference between players
+- Optional seeded RNG on setup_game enables deterministic testing and replay
+- TerritoryState rebuilt (not mutated) on army increment for Pydantic immutability
 
 ### Pending Todos
 
@@ -75,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-08T06:45:58Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-foundation/01-01-SUMMARY.md
+Last session: 2026-03-08T06:50:05Z
+Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
+Resume file: .planning/phases/01-foundation/01-02-SUMMARY.md

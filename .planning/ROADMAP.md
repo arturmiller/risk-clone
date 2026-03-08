@@ -12,7 +12,7 @@ This roadmap delivers a browser-based Risk game with AI opponents in 5 phases. W
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Territory data model, adjacency graph, and game state structures
+- [x] **Phase 1: Foundation** - Territory data model, adjacency graph, and game state structures
 - [ ] **Phase 2: Game Engine** - Turn FSM, combat resolution, card system, and victory detection
 - [ ] **Phase 3: Web UI and Game Setup** - Browser client, interactive SVG map, WebSocket server, and player setup
 - [ ] **Phase 4: Easy and Medium Bots** - First two AI difficulty tiers validating the bot framework
@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2 plans
 Plans:
 - [x] 01-01-PLAN.md — Project setup, map data JSON, Pydantic schema, NetworkX graph wrapper, and map/graph tests
-- [ ] 01-02-PLAN.md — Game state models, territory distribution, army placement, and setup tests
+- [x] 01-02-PLAN.md — Game state models, territory distribution, army placement, and setup tests
 
 ### Phase 2: Game Engine
 **Goal**: A complete, rules-correct Risk game engine that can run a full game from setup to victory using programmatic inputs
@@ -85,7 +85,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/2 | In Progress | - |
+| 1. Foundation | 2/2 | Complete | 2026-03-08 |
 | 2. Game Engine | 0/TBD | Not started | - |
 | 3. Web UI and Game Setup | 0/TBD | Not started | - |
 | 4. Easy and Medium Bots | 0/TBD | Not started | - |
