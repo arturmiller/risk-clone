@@ -30,7 +30,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **MAPV-01**: SVG map displays all 42 territories with correct adjacencies
 - [x] **MAPV-02**: Territories are colored by owning player
 - [x] **MAPV-03**: Army count is displayed on each territory
-- [ ] **MAPV-04**: Territories are clickable for game actions (attack source/target, fortify)
+- [x] **MAPV-04**: Territories are clickable for game actions (attack source/target, fortify)
 - [x] **MAPV-05**: Current turn phase and active player are clearly indicated
 - [x] **MAPV-06**: Game log shows event history (attacks, conquests, card trades, eliminations)
 - [x] **MAPV-07**: Continent bonus information is displayed on the map
@@ -95,7 +95,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAPV-01 | Phase 1 | Complete |
 | MAPV-02 | Phase 3 | Complete |
 | MAPV-03 | Phase 3 | Complete |
-| MAPV-04 | Phase 3 | Pending |
+| MAPV-04 | Phase 3 | Complete |
 | MAPV-05 | Phase 3 | Complete |
 | MAPV-06 | Phase 3 | Complete |
 | MAPV-07 | Phase 3 | Complete |
