@@ -106,10 +106,13 @@ class TestHumanWebSocketAgentChooseAttack:
 
         asyncio.ensure_future(provide_input())
         await asyncio.to_thread(agent.choose_attack, two_player_state)
-        assert len(sent) >= 1
-        assert sent[0]["type"] == "request_input"
-        assert sent[0]["input_type"] == "choose_attack"
-        assert "valid_sources" in sent[0]
+        assert len(sent) >= 2
+        # First message is intermediate state update
+        assert sent[0]["type"] == "game_state"
+        # Second message is the request_input
+        assert sent[1]["type"] == "request_input"
+        assert sent[1]["input_type"] == "choose_attack"
+        assert "valid_sources" in sent[1]
 
 
 class TestHumanWebSocketAgentChooseReinforcement:

@@ -103,6 +103,7 @@ function appendGameLog(eventMsg) {
 // --- Format game event into readable text ---
 function formatGameEvent(event, details) {
     var playerName = function(idx) {
+        if (idx === undefined || idx === null) return 'Unknown';
         return PLAYER_NAMES[idx] || ('Player ' + (idx + 1));
     };
 
@@ -114,13 +115,19 @@ function formatGameEvent(event, details) {
                    ', lost: ' + (details.attacker_losses || 0) + ' att / ' + (details.defender_losses || 0) + ' def)';
 
         case 'conquest':
-            return playerName(details.player) + ' conquered ' + (details.territory || details.target) + '!';
+            // Server sends attacker/attacker_name, not player
+            var conquererName = details.attacker_name || playerName(details.attacker);
+            return conquererName + ' conquered ' + (details.territory || details.target) + '!';
 
         case 'card_trade':
-            return playerName(details.player) + ' traded cards for ' + (details.armies || '?') + ' armies';
+            var traderName = details.player_name || playerName(details.player);
+            return traderName + ' traded cards';
 
         case 'elimination':
-            return playerName(details.eliminator) + ' eliminated ' + playerName(details.eliminated) + '!';
+            // Server sends eliminated_player/eliminated_name/by_player
+            var eliminatorName = playerName(details.by_player);
+            var eliminatedName = details.eliminated_name || playerName(details.eliminated_player);
+            return eliminatorName + ' eliminated ' + eliminatedName + '!';
 
         case 'reinforcement':
             return playerName(details.player) + ' placed ' + (details.armies || '?') + ' reinforcement armies';

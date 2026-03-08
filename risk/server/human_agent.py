@@ -13,7 +13,7 @@ from risk.models.actions import (
 )
 from risk.models.cards import Card, CardType
 from risk.models.game_state import GameState
-from risk.server.messages import RequestInputMessage
+from risk.server.messages import RequestInputMessage, state_to_message
 
 
 class HumanWebSocketAgent:
@@ -79,6 +79,10 @@ class HumanWebSocketAgent:
         mg = self._map_graph
         player_idx = state.current_player_index
 
+        # Send current state so client sees results of previous attack
+        if mg is not None:
+            self._send(state_to_message(state, mg, "Attack phase - select a territory to attack from"))
+
         # Compute valid attack sources
         valid_sources: list[str] = []
         if mg is not None:
@@ -112,7 +116,12 @@ class HumanWebSocketAgent:
 
     def choose_fortify(self, state: GameState) -> FortifyAction | None:
         """Request fortify decision from human player."""
+        mg = self._map_graph
         player_idx = state.current_player_index
+
+        # Send current state so client sees updated map for fortify phase
+        if mg is not None:
+            self._send(state_to_message(state, mg, "Fortify phase - move armies between territories"))
 
         valid_sources = [
             name for name, ts in state.territories.items()

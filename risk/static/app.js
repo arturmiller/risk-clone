@@ -14,11 +14,15 @@ let reinforcementsRemaining = 0;
 let reinforcementPlacements = {};
 
 const PLAYER_COLORS = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6', '#e67e22'];
-const PLAYER_NAMES = ['Player 1 (You)', 'Player 2', 'Player 3', 'Player 4', 'Player 5', 'Player 6'];
+const PLAYER_NAMES = ['You', 'Bot 1', 'Bot 2', 'Bot 3', 'Bot 4', 'Bot 5'];
 const PHASE_NAMES = {1: 'Reinforce', 2: 'Attack', 3: 'Fortify'};
 
 // Adjacency data loaded from server for client-side target computation
 let adjacencyMap = {};
+
+// Message queue for messages received before map is loaded
+let mapReady = false;
+let messageQueue = [];
 
 // --- DOM references ---
 const setupScreen = document.getElementById('setup-screen');
@@ -39,16 +43,25 @@ startBtn.addEventListener('click', function() {
     ws = new WebSocket(protocol + '//' + window.location.host + '/ws');
 
     ws.onopen = function() {
+        // Reset map readiness for new game
+        mapReady = false;
+        messageQueue = [];
+        mapLoaded = false;
+
         ws.send(JSON.stringify({type: 'start_game', num_players: numPlayers}));
         setupScreen.style.display = 'none';
         gameBoard.style.display = 'flex';
-        loadMap().then(function() {
-            // Map loaded and ready for interaction
-        });
-        // Load adjacency data for client-side target computation
-        fetch('/api/map-data')
+
+        // Load adjacency data and SVG map, then flush queued messages
+        var adjacencyLoaded = fetch('/api/map-data')
             .then(function(r) { return r.json(); })
             .then(function(data) { buildAdjacencyMap(data); });
+
+        var mapDone = loadMap();
+
+        Promise.all([mapDone, adjacencyLoaded]).then(function() {
+            flushMessageQueue();
+        });
     };
 
     ws.onmessage = handleMessage;
@@ -75,6 +88,16 @@ function buildAdjacencyMap(mapData) {
 function handleMessage(event) {
     var msg = JSON.parse(event.data);
 
+    // Queue messages until the SVG map is loaded and ready
+    if (!mapReady) {
+        messageQueue.push(msg);
+        return;
+    }
+
+    processMessage(msg);
+}
+
+function processMessage(msg) {
     switch (msg.type) {
         case 'game_state':
             gameState = msg.state;
@@ -102,6 +125,15 @@ function handleMessage(event) {
             showGameOver(msg);
             break;
     }
+}
+
+function flushMessageQueue() {
+    mapReady = true;
+    var queued = messageQueue.slice();
+    messageQueue = [];
+    queued.forEach(function(msg) {
+        processMessage(msg);
+    });
 }
 
 // --- Action sending ---
@@ -451,6 +483,8 @@ function showGameOver(msg) {
         validTargets = [];
         reinforcementsRemaining = 0;
         reinforcementPlacements = {};
+        mapReady = false;
+        messageQueue = [];
 
         overlay.style.display = 'none';
         gameBoard.style.display = 'none';

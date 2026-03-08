@@ -97,6 +97,13 @@ class GameManager:
         cards: dict[int, list[Card]] = {i: [] for i in range(num_players)}
         state = state.model_copy(update={"deck": deck, "cards": cards})
 
+        # Update player names: human is "You", bots are "Bot 1", "Bot 2", etc.
+        new_players = list(state.players)
+        new_players[0] = new_players[0].model_copy(update={"name": "You"})
+        for i in range(1, num_players):
+            new_players[i] = new_players[i].model_copy(update={"name": f"Bot {i}"})
+        state = state.model_copy(update={"players": new_players})
+
         # Send initial state
         self._send_sync(state_to_message(state, mg, "Game started!"))
 
