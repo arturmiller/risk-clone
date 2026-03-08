@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- Setup Screen (visible by default) -->
+  <div id="setup-screen">
+    <div class="setup-container">
+      <h1 class="setup-title">Risk</h1>
+      <div class="setup-form">
+        <label for="player-count">Number of Players</label>
+        <select id="player-count">
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+        <button id="start-btn">Start Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Board (hidden by default) -->
+  <div id="game-board" style="display:none">
+    <div id="map-area">
+      <div id="map-container">
+        <!-- SVG map will be loaded here via fetch -->
+      </div>
+      <div id="dice-controls">
+        <span class="dice-label">Attack dice:</span>
+        <label><input type="radio" name="attack-dice" value="1"> 1</label>
+        <label><input type="radio" name="attack-dice" value="2"> 2</label>
+        <label><input type="radio" name="attack-dice" value="3" checked> 3</label>
+      </div>
+    </div>
+
+    <div id="sidebar">
+      <!-- Phase prompt banner -->
+      <div id="phase-banner">Your Turn: Place reinforcements</div>
+
+      <!-- Turn info -->
+      <div id="turn-info">
+        <div id="current-player">
+          <span id="player-color-indicator" class="color-indicator"></span>
+          <span id="player-name">Player 1</span>
+        </div>
+        <div id="turn-number">Turn 1</div>
+      </div>
+
+      <!-- Phase stepper -->
+      <div id="phase-stepper">
+        <div class="phase-step active" data-phase="reinforce">Reinforce</div>
+        <div class="phase-step" data-phase="attack">Attack</div>
+        <div class="phase-step" data-phase="fortify">Fortify</div>
+      </div>
+
+      <!-- Continent bonuses -->
+      <div id="continent-info">
+        <h3>Continents</h3>
+        <ul id="continent-list">
+          <li data-continent="North America"><span class="continent-name">North America</span> <span class="continent-bonus">(+5)</span> <span class="continent-control">0/9</span></li>
+          <li data-continent="South America"><span class="continent-name">South America</span> <span class="continent-bonus">(+2)</span> <span class="continent-control">0/4</span></li>
+          <li data-continent="Europe"><span class="continent-name">Europe</span> <span class="continent-bonus">(+5)</span> <span class="continent-control">0/7</span></li>
+          <li data-continent="Africa"><span class="continent-name">Africa</span> <span class="continent-bonus">(+3)</span> <span class="continent-control">0/6</span></li>
+          <li data-continent="Asia"><span class="continent-name">Asia</span> <span class="continent-bonus">(+7)</span> <span class="continent-control">0/12</span></li>
+          <li data-continent="Australia"><span class="continent-name">Australia</span> <span class="continent-bonus">(+2)</span> <span class="continent-control">0/4</span></li>
+        </ul>
+      </div>
+
+      <!-- Action buttons -->
+      <div id="action-buttons">
+        <button id="end-attack-btn" class="action-btn" style="display:none">End Attack Phase</button>
+        <button id="skip-fortify-btn" class="action-btn" style="display:none">Skip Fortify</button>
+      </div>
+
+      <!-- Game log -->
+      <div id="game-log-container">
+        <h3>Game Log</h3>
+        <div id="game-log">
+          <!-- Log entries appended here as <div class="log-entry"> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Move Armies Prompt (modal overlay, hidden) -->
+  <div id="move-armies-prompt" style="display:none">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Move Armies</h3>
+      <p id="move-armies-text">How many armies to move?</p>
+      <input type="number" id="move-armies-input" min="1" value="1">
+      <button id="move-armies-confirm" class="action-btn">Confirm</button>
+    </div>
+  </div>
+
+  <!-- Card Trade Panel (hidden) -->
+  <div id="card-trade-panel" style="display:none">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3>Trade Cards</h3>
+      <div id="card-hand">
+        <!-- Card elements will be added dynamically -->
+      </div>
+      <button id="trade-cards-btn" class="action-btn" disabled>Trade Selected (0/3)</button>
+      <button id="skip-trade-btn" class="action-btn">Skip Trade</button>
+    </div>
+  </div>
+
+  <!-- Game Over Overlay (hidden) -->
+  <div id="game-over" style="display:none">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content game-over-content">
+      <h2 id="game-over-message">You Win!</h2>
+      <button id="new-game-btn" class="action-btn">New Game</button>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+  <script src="/static/map.js"></script>
+  <script src="/static/sidebar.js"></script>
+</body>
+</html>
