@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from risk.models.map_schema import MapData
+from risk.engine.map_graph import MapGraph
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "risk" / "data"
@@ -18,3 +19,9 @@ def map_data() -> MapData:
     with open(classic_path) as f:
         raw = json.load(f)
     return MapData.model_validate(raw)
+
+
+@pytest.fixture
+def map_graph(map_data: MapData) -> MapGraph:
+    """Build a MapGraph from the classic Risk map data."""
+    return MapGraph(map_data)
