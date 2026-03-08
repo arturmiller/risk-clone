@@ -44,7 +44,7 @@ Plans:
   3. Card system works end-to-end: cards earned on conquest turns, sets traded for escalating bonus armies, forced trade at 5+ cards, eliminated player's cards transfer to eliminator
   4. A full game can run to completion (one player controls all 42 territories) via programmatic moves without UI
   5. Fortification correctly validates connected friendly paths and allows army movement only along them
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 Plans:
 - [x] 02-01-PLAN.md — Card/action models, extended GameState, PlayerAgent protocol, reinforcements, and card system
 - [ ] 02-02-PLAN.md — Combat resolution (single roll + blitz) and fortification with path validation
@@ -90,7 +90,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-03-08 |
-| 2. Game Engine | 1/3 | In Progress | - |
+| 2. Game Engine | 2/3 | In Progress|  |
 | 3. Web UI and Game Setup | 0/TBD | Not started | - |
 | 4. Easy and Medium Bots | 0/TBD | Not started | - |
 | 5. Hard Bot and AI Simulation | 0/TBD | Not started | - |
