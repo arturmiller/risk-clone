@@ -249,10 +249,14 @@ class TestAttackPhase:
         adj = mg.neighbors(all_t[0])
         target = [a for a in adj if a != all_t[0]][0]
 
+        # Give player 1 two territories so elimination doesn't trigger victory
+        second_enemy = [t for t in all_t if t != all_t[0] and t != target][0]
+
         territories = {}
         for t in all_t:
             territories[t] = TerritoryState(owner=0, armies=10)
         territories[target] = TerritoryState(owner=1, armies=1)
+        territories[second_enemy] = TerritoryState(owner=1, armies=5)
 
         deck = create_deck(all_t)
         state = GameState(
