@@ -60,7 +60,12 @@ Plans:
   3. Player can click territories to perform game actions (select attack source/target, select fortify source/target)
   4. Current turn phase and active player are clearly indicated, and a game log shows attack results, conquests, card trades, and eliminations
   5. Continent bonus information is visible on or near the map
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 03-01-PLAN.md — Server infrastructure: FastAPI app, WebSocket messages, HumanWebSocketAgent, GameManager
+- [ ] 03-02-PLAN.md — SVG world map asset and HTML/CSS layout (setup screen, game board, sidebar)
+- [ ] 03-03-PLAN.md — Frontend JavaScript: WebSocket client, map interaction, sidebar updates
+- [ ] 03-04-PLAN.md — Integration tests, end-to-end wiring, and human verification
 
 ### Phase 4: Easy and Medium Bots
 **Goal**: AI opponents provide a fun game experience at two difficulty levels, validating the bot framework for the Hard bot
@@ -91,6 +96,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-03-08 |
 | 2. Game Engine | 2/3 | In Progress|  |
-| 3. Web UI and Game Setup | 0/TBD | Not started | - |
+| 3. Web UI and Game Setup | 0/4 | Not started | - |
 | 4. Easy and Medium Bots | 0/TBD | Not started | - |
 | 5. Hard Bot and AI Simulation | 0/TBD | Not started | - |
