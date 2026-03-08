@@ -28,12 +28,12 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Map & Visualization
 
 - [x] **MAPV-01**: SVG map displays all 42 territories with correct adjacencies
-- [ ] **MAPV-02**: Territories are colored by owning player
-- [ ] **MAPV-03**: Army count is displayed on each territory
+- [x] **MAPV-02**: Territories are colored by owning player
+- [x] **MAPV-03**: Army count is displayed on each territory
 - [ ] **MAPV-04**: Territories are clickable for game actions (attack source/target, fortify)
 - [ ] **MAPV-05**: Current turn phase and active player are clearly indicated
 - [ ] **MAPV-06**: Game log shows event history (attacks, conquests, card trades, eliminations)
-- [ ] **MAPV-07**: Continent bonus information is displayed on the map
+- [x] **MAPV-07**: Continent bonus information is displayed on the map
 
 ### AI Bots
 
@@ -93,12 +93,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ENGI-08 | Phase 2 | Complete |
 | ENGI-09 | Phase 2 | Complete |
 | MAPV-01 | Phase 1 | Complete |
-| MAPV-02 | Phase 3 | Pending |
-| MAPV-03 | Phase 3 | Pending |
+| MAPV-02 | Phase 3 | Complete |
+| MAPV-03 | Phase 3 | Complete |
 | MAPV-04 | Phase 3 | Pending |
 | MAPV-05 | Phase 3 | Pending |
 | MAPV-06 | Phase 3 | Pending |
-| MAPV-07 | Phase 3 | Pending |
+| MAPV-07 | Phase 3 | Complete |
 | BOTS-01 | Phase 4 | Pending |
 | BOTS-02 | Phase 4 | Pending |
 | BOTS-03 | Phase 5 | Pending |
