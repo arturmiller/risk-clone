@@ -1,7 +1,9 @@
 """FastAPI application with WebSocket endpoint for Risk game."""
 
+import asyncio
 import json
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
@@ -53,13 +55,13 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
     """WebSocket endpoint for game communication."""
     await websocket.accept()
 
+    # Capture the running event loop now -- this is the correct loop to use
+    # from the game thread for scheduling async sends and queue operations.
+    loop = asyncio.get_running_loop()
+
     manager = GameManager()
     map_data = load_map(_map_path)
     map_graph = MapGraph(map_data)
-
-    async def send_message(msg: dict) -> None:
-        """Send a JSON message to the client."""
-        await websocket.send_json(msg)
 
     try:
         while True:
@@ -71,7 +73,8 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 manager.setup(
                     num_players=num_players,
                     map_graph=map_graph,
-                    send_callback=lambda msg: _schedule_send(websocket, msg),
+                    send_callback=lambda msg: _schedule_send(loop, websocket, msg),
+                    loop=loop,
                 )
                 manager.start_game()
 
@@ -82,20 +85,21 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
         manager.cancel_game()
 
 
-def _schedule_send(websocket: WebSocket, msg: dict) -> None:
+def _schedule_send(
+    loop: asyncio.AbstractEventLoop,
+    websocket: WebSocket,
+    msg: dict[str, Any],
+) -> None:
     """Schedule an async send from a sync context (game thread).
 
-    This is called from the game thread, so we use the websocket's
-    event loop to schedule the actual async send.
+    This is called from the game thread, so we use the captured event
+    loop to schedule the actual async send via run_coroutine_threadsafe.
     """
-    import asyncio
     try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            asyncio.run_coroutine_threadsafe(
-                websocket.send_json(msg), loop
-            )
-        else:
-            loop.run_until_complete(websocket.send_json(msg))
-    except RuntimeError:
-        pass  # Connection closed
+        future = asyncio.run_coroutine_threadsafe(
+            websocket.send_json(msg), loop
+        )
+        # Wait for the send to complete to ensure ordering
+        future.result(timeout=5.0)
+    except Exception:
+        pass  # Connection closed or timeout

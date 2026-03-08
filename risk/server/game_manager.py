@@ -40,12 +40,17 @@ class GameManager:
         num_players: int,
         map_graph: MapGraph,
         send_callback: Callable[[dict[str, Any]], Any],
+        loop: asyncio.AbstractEventLoop | None = None,
+        bot_delay: float | None = None,
     ) -> None:
         """Create agents for a new game. Human is always player 0."""
-        loop = asyncio.get_event_loop()
+        if loop is None:
+            loop = asyncio.get_event_loop()
         self._map_graph = map_graph
         self._send_callback = send_callback
         self._cancel_flag.clear()
+        if bot_delay is not None:
+            self.BOT_DELAY = bot_delay
 
         rng = random.Random()
 
@@ -191,9 +196,19 @@ class GameManager:
             self._send_sync(event.model_dump(mode="json"))
 
     def handle_player_action(self, data: dict[str, Any]) -> None:
-        """Route player action data to the human agent's input queue."""
+        """Route player action data to the human agent's input queue.
+
+        Merges the inner 'data' dict with 'action_type' so the agent
+        can check both data fields and the action type.
+        """
         if self.human_agent is not None:
-            self.human_agent.receive_input(data.get("data", data))
+            inner = dict(data.get("data", {}))
+            action_type = data.get("action_type", "")
+            # Map action_type to 'action' key so agent choose_* methods
+            # can check data.get("action") consistently
+            if "action" not in inner and action_type:
+                inner["action"] = action_type
+            self.human_agent.receive_input(inner)
 
     def cancel_game(self) -> None:
         """Signal the game loop to stop."""

@@ -103,7 +103,7 @@ class HumanWebSocketAgent:
         return AttackAction(
             source=data["source"],
             target=data["target"],
-            num_dice=data["num_dice"],
+            num_dice=data.get("num_dice") or data.get("dice", 3),
         )
 
     def choose_blitz(self, state: GameState) -> BlitzAction | None:
@@ -152,7 +152,7 @@ class HumanWebSocketAgent:
         self._send(msg.model_dump(mode="json"))
 
         data = self._wait_for_input()
-        if data.get("action") == "skip":
+        if data.get("action") in ("skip", "end_phase"):
             return None
 
         # Parse cards from client data
