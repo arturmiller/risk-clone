@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Game Setup
 
-- [ ] **SETUP-01**: Player can select number of players (2-6)
+- [x] **SETUP-01**: Player can select number of players (2-6)
 - [x] **SETUP-02**: Territories are randomly distributed among all players
 - [x] **SETUP-03**: Initial armies are placed according to classic Risk rules
 
@@ -31,8 +31,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **MAPV-02**: Territories are colored by owning player
 - [x] **MAPV-03**: Army count is displayed on each territory
 - [ ] **MAPV-04**: Territories are clickable for game actions (attack source/target, fortify)
-- [ ] **MAPV-05**: Current turn phase and active player are clearly indicated
-- [ ] **MAPV-06**: Game log shows event history (attacks, conquests, card trades, eliminations)
+- [x] **MAPV-05**: Current turn phase and active player are clearly indicated
+- [x] **MAPV-06**: Game log shows event history (attacks, conquests, card trades, eliminations)
 - [x] **MAPV-07**: Continent bonus information is displayed on the map
 
 ### AI Bots
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | Phase 3 | Pending |
+| SETUP-01 | Phase 3 | Complete |
 | SETUP-02 | Phase 1 | Complete |
 | SETUP-03 | Phase 1 | Complete |
 | ENGI-01 | Phase 2 | Complete |
@@ -96,8 +96,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAPV-02 | Phase 3 | Complete |
 | MAPV-03 | Phase 3 | Complete |
 | MAPV-04 | Phase 3 | Pending |
-| MAPV-05 | Phase 3 | Pending |
-| MAPV-06 | Phase 3 | Pending |
+| MAPV-05 | Phase 3 | Complete |
+| MAPV-06 | Phase 3 | Complete |
 | MAPV-07 | Phase 3 | Complete |
 | BOTS-01 | Phase 4 | Pending |
 | BOTS-02 | Phase 4 | Pending |

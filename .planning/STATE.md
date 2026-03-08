@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-03-08T11:14:11.600Z"
-last_activity: 2026-03-08 -- Completed plan 03-02 (SVG map and HTML/CSS layout)
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-08T11:15:26Z"
+last_activity: 2026-03-08 -- Completed plan 03-01 (server backend infrastructure)
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 9
-  completed_plans: 6
-  percent: 67
+  completed_plans: 7
+  percent: 78
 ---
 
 # Project State
@@ -26,18 +26,18 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 3 of 5 (Web UI and Game Setup)
-Plan: 2 of 3 in current phase
-Status: Plan 03-02 Complete
-Last activity: 2026-03-08 -- Completed plan 03-02 (SVG map and HTML/CSS layout)
+Plan: 2 of 3 in current phase (03-01 and 03-02 complete)
+Status: Plan 03-01 Complete
+Last activity: 2026-03-08 -- Completed plan 03-01 (server backend infrastructure)
 
-Progress: [███████░░░] 67%
+Progress: [████████░░] 78%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 4min
-- Total execution time: 0.37 hours
+- Total execution time: 0.44 hours
 
 **By Phase:**
 
@@ -45,9 +45,10 @@ Progress: [███████░░░] 67%
 |-------|-------|-------|----------|
 | 1 - Foundation | 2 | 6min | 3min |
 | 2 - Game Engine | 3 | 13min | 4.3min |
+| 3 - Web UI (partial) | 2 | 7min | 3.5min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (4min), 02-02 (3min), 02-03 (6min), 03-02 (3min)
+- Last 5 plans: 02-02 (3min), 02-03 (6min), 03-02 (3min), 03-01 (4min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -81,6 +82,9 @@ Recent decisions affecting current work:
 - Schematic rectangle-based SVG territory shapes for clarity and clickability over geographic accuracy
 - Dark theme (bg #1a1a2e) with high-contrast UI for game board
 - SVG territories use data-territory attributes matching classic.json names exactly
+- asyncio.Queue with run_coroutine_threadsafe for sync/async bridge between game thread and WebSocket
+- Turn-level event detection via state diffing rather than per-action hooks (avoids engine modification)
+- Human auto-defends with max dice and does not use blitz (per context decisions)
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-08T11:13:36Z
-Stopped at: Completed 03-02-PLAN.md
-Resume file: .planning/phases/03-web-ui-and-game-setup/03-02-SUMMARY.md
+Last session: 2026-03-08T11:15:26Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: .planning/phases/03-web-ui-and-game-setup/03-01-SUMMARY.md
