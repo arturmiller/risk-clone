@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-03-08T11:21:01Z"
-last_activity: 2026-03-08 -- Completed plan 03-03 (frontend JS logic)
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-03-08T12:38:00Z"
+last_activity: 2026-03-08 -- Completed plan 03-04 (integration testing and end-to-end wiring)
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 8
-  percent: 89
+  total_plans: 10
+  completed_plans: 9
+  percent: 90
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** AI bots that provide a challenging and fun single-player experience, with the hardest difficulty playing at human-competitive level.
-**Current focus:** Phase 3 Complete -- Ready for Phase 4
+**Current focus:** Phase 3 Complete (including integration plan 04) -- Ready for Phase 4
 
 ## Current Position
 
 Phase: 3 of 5 (Web UI and Game Setup) -- COMPLETE
-Plan: 3 of 3 in current phase (all complete)
-Status: Phase 03 Complete
-Last activity: 2026-03-08 -- Completed plan 03-03 (frontend JS logic)
+Plan: 4 of 4 in current phase (all complete)
+Status: Phase 03 Complete (integration verified)
+Last activity: 2026-03-08 -- Completed plan 03-04 (integration testing and end-to-end wiring)
 
-Progress: [█████████░] 89%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 3.6min
-- Total execution time: 0.49 hours
+- Total plans completed: 9
+- Average duration: 3.9min
+- Total execution time: 0.58 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [█████████░] 89%
 |-------|-------|-------|----------|
 | 1 - Foundation | 2 | 6min | 3min |
 | 2 - Game Engine | 3 | 13min | 4.3min |
-| 3 - Web UI | 3 | 10min | 3.3min |
+| 3 - Web UI | 4 | 18min | 4.5min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (6min), 03-02 (3min), 03-01 (4min), 03-03 (3min)
-- Trend: Stable
+- Last 5 plans: 03-02 (3min), 03-01 (4min), 03-03 (3min), 03-04 (8min)
+- Trend: Stable (integration plan longer as expected)
 
 *Updated after each plan completion*
 
@@ -88,6 +88,9 @@ Recent decisions affecting current work:
 - Client-side adjacency computation from /api/map-data avoids server round-trips for target highlighting
 - Reinforcement placement uses local tracking with modal number input, sends full placements dict when complete
 - Event listeners cloned-and-replaced to prevent duplicate handler accumulation on modals
+- WebSocket messages queued until SVG map loaded to prevent race condition on game start
+- Intermediate game_state sent before each attack/fortify request_input for real-time visual feedback
+- Player names "You" and "Bot N" set server-side in GameManager for clarity
 
 ### Pending Todos
 
@@ -100,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-08T11:21:01Z
-Stopped at: Completed 03-03-PLAN.md
-Resume file: .planning/phases/03-web-ui-and-game-setup/03-03-SUMMARY.md
+Last session: 2026-03-08T12:38:00Z
+Stopped at: Completed 03-04-PLAN.md
+Resume file: .planning/phases/03-web-ui-and-game-setup/03-04-SUMMARY.md
