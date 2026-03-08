@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
 from risk.engine.map_graph import MapGraph, load_map
 from risk.server.game_manager import GameManager
@@ -17,8 +17,9 @@ if _static_dir.is_dir():
     from fastapi.staticfiles import StaticFiles
     app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
 
-# Map data path
+# Map data paths
 _map_path = Path(__file__).resolve().parent.parent / "data" / "classic.json"
+_svg_path = Path(__file__).resolve().parent.parent / "data" / "classic_map.svg"
 
 
 @app.get("/")
@@ -32,6 +33,19 @@ async def root() -> HTMLResponse:
         "<p>Frontend not yet built. Connect via WebSocket at /ws</p>"
         "</body></html>"
     )
+
+
+@app.get("/api/map")
+async def get_map() -> FileResponse:
+    """Serve the SVG map file."""
+    return FileResponse(str(_svg_path), media_type="image/svg+xml")
+
+
+@app.get("/api/map-data")
+async def get_map_data() -> JSONResponse:
+    """Serve the classic.json map data for client-side adjacency lookups."""
+    data = json.loads(_map_path.read_text())
+    return JSONResponse(content=data)
 
 
 @app.websocket("/ws")
