@@ -22,8 +22,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **ENGI-05**: Player earns territory card when capturing at least one territory per turn
 - [x] **ENGI-06**: Player can trade card sets for bonus armies (escalating global sequence)
 - [x] **ENGI-07**: Player must trade cards if holding 5+ cards at start of turn
-- [ ] **ENGI-08**: Eliminated player's cards transfer to the eliminator
-- [ ] **ENGI-09**: Game ends when one player controls all 42 territories
+- [x] **ENGI-08**: Eliminated player's cards transfer to the eliminator
+- [x] **ENGI-09**: Game ends when one player controls all 42 territories
 
 ### Map & Visualization
 
@@ -90,8 +90,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ENGI-05 | Phase 2 | Complete |
 | ENGI-06 | Phase 2 | Complete |
 | ENGI-07 | Phase 2 | Complete |
-| ENGI-08 | Phase 2 | Pending |
-| ENGI-09 | Phase 2 | Pending |
+| ENGI-08 | Phase 2 | Complete |
+| ENGI-09 | Phase 2 | Complete |
 | MAPV-01 | Phase 1 | Complete |
 | MAPV-02 | Phase 3 | Pending |
 | MAPV-03 | Phase 3 | Pending |

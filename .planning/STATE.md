@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-03-08T07:24:00Z"
-last_activity: 2026-03-08 -- Completed plan 02-02 (combat resolution and fortification)
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-03-08T07:32:32Z"
+last_activity: 2026-03-08 -- Completed plan 02-03 (turn engine and game runner)
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 4
-  percent: 40
+  completed_plans: 5
+  percent: 50
 ---
 
 # Project State
@@ -25,29 +25,29 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: 2 of 5 (Game Engine) -- IN PROGRESS
-Plan: 2 of 3 in current phase
-Status: Plan 02-02 Complete
-Last activity: 2026-03-08 -- Completed plan 02-02 (combat resolution and fortification)
+Phase: 2 of 5 (Game Engine) -- COMPLETE
+Plan: 3 of 3 in current phase
+Status: Phase 02 Complete
+Last activity: 2026-03-08 -- Completed plan 02-03 (turn engine and game runner)
 
-Progress: [████░░░░░░] 40%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 3min
-- Total execution time: 0.22 hours
+- Total plans completed: 5
+- Average duration: 4min
+- Total execution time: 0.32 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 - Foundation | 2 | 6min | 3min |
-| 2 - Game Engine | 2 | 7min | 3.5min |
+| 2 - Game Engine | 3 | 13min | 4.3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4min), 01-02 (2min), 02-01 (4min), 02-02 (3min)
+- Last 5 plans: 01-02 (2min), 02-01 (4min), 02-02 (3min), 02-03 (6min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -74,6 +74,10 @@ Recent decisions affecting current work:
 - CombatResult is a Pydantic BaseModel in combat.py (not cards.py) since it's combat-specific
 - Blitz reuses execute_attack in a loop rather than duplicating combat logic
 - Fortify uses map_graph.connected_territories for path validation, not just adjacency
+- RandomAgent uses advantage-based attack selection for reliable game completion
+- map_graph injected into RandomAgent by run_game rather than constructor parameter
+- max_turns=5000 safety valve prevents infinite loops in game runner
+- Card trade always accepted by RandomAgent when valid set available
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-08T07:24:00Z
-Stopped at: Completed 02-02-PLAN.md
-Resume file: .planning/phases/02-game-engine/02-02-SUMMARY.md
+Last session: 2026-03-08T07:32:32Z
+Stopped at: Completed 02-03-PLAN.md
+Resume file: .planning/phases/02-game-engine/02-03-SUMMARY.md
