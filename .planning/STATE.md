@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 2 context gathered
-last_updated: "2026-03-08T06:58:05.845Z"
-last_activity: 2026-03-08 -- Completed plan 01-02 (game state and setup)
+status: in_progress
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-08T07:17:00Z"
+last_activity: 2026-03-08 -- Completed plan 02-01 (data models and reinforcement/card system)
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 20
+  total_plans: 3
+  completed_plans: 3
+  percent: 30
 ---
 
 # Project State
@@ -21,32 +21,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** AI bots that provide a challenging and fun single-player experience, with the hardest difficulty playing at human-competitive level.
-**Current focus:** Phase 1: Foundation
+**Current focus:** Phase 2: Game Engine
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation) -- COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase Complete
-Last activity: 2026-03-08 -- Completed plan 01-02 (game state and setup)
+Phase: 2 of 5 (Game Engine) -- IN PROGRESS
+Plan: 1 of 3 in current phase
+Status: Plan 02-01 Complete
+Last activity: 2026-03-08 -- Completed plan 02-01 (data models and reinforcement/card system)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [███░░░░░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 3min
-- Total execution time: 0.10 hours
+- Total execution time: 0.17 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 - Foundation | 2 | 6min | 3min |
+| 2 - Game Engine | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4min), 01-02 (2min)
+- Last 5 plans: 01-01 (4min), 01-02 (2min), 02-01 (4min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -65,6 +66,11 @@ Recent decisions affecting current work:
 - Round-robin territory deal after shuffle ensures max 1 territory difference between players
 - Optional seeded RNG on setup_game enables deterministic testing and replay
 - TerritoryState rebuilt (not mutated) on army increment for Pydantic immutability
+- CardType uses Python enum with auto() for INFANTRY, CAVALRY, ARTILLERY, WILD
+- All new GameState fields have defaults for Phase 1 backwards compatibility
+- PlayerAgent uses typing.Protocol (structural subtyping) not ABC
+- Escalation formula: index into [4,6,8,10,12,15] then 15+5*(n-5) for higher trades
+- Card deck is unshuffled on creation; caller shuffles with their RNG for determinism
 
 ### Pending Todos
 
@@ -72,12 +78,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Research flag: Card trading edge cases (Phase 2) -- reference official Hasbro rules PDF before implementation
 - Research flag: Hard bot heuristic tuning (Phase 5) -- plan for AI-vs-AI batch testing infrastructure
 - Gap: SVG map asset needs to be sourced or created (Phase 3)
 
 ## Session Continuity
 
-Last session: 2026-03-08T06:58:05.839Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-game-engine/02-CONTEXT.md
+Last session: 2026-03-08T07:17:00Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: .planning/phases/02-game-engine/02-01-SUMMARY.md

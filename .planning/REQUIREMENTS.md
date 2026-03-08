@@ -15,13 +15,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Game Engine
 
-- [ ] **ENGI-01**: Player receives reinforcements at turn start (territory count/3 + continent bonuses, minimum 3)
+- [x] **ENGI-01**: Player receives reinforcements at turn start (territory count/3 + continent bonuses, minimum 3)
 - [ ] **ENGI-02**: Player can attack adjacent enemy territory with 1-3 dice vs 1-2 dice
 - [ ] **ENGI-03**: Player can use blitz mode to auto-resolve combat until one side is eliminated
 - [ ] **ENGI-04**: Player can fortify by moving armies along connected friendly path at end of turn
-- [ ] **ENGI-05**: Player earns territory card when capturing at least one territory per turn
-- [ ] **ENGI-06**: Player can trade card sets for bonus armies (escalating global sequence)
-- [ ] **ENGI-07**: Player must trade cards if holding 5+ cards at start of turn
+- [x] **ENGI-05**: Player earns territory card when capturing at least one territory per turn
+- [x] **ENGI-06**: Player can trade card sets for bonus armies (escalating global sequence)
+- [x] **ENGI-07**: Player must trade cards if holding 5+ cards at start of turn
 - [ ] **ENGI-08**: Eliminated player's cards transfer to the eliminator
 - [ ] **ENGI-09**: Game ends when one player controls all 42 territories
 
@@ -83,13 +83,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SETUP-01 | Phase 3 | Pending |
 | SETUP-02 | Phase 1 | Complete |
 | SETUP-03 | Phase 1 | Complete |
-| ENGI-01 | Phase 2 | Pending |
+| ENGI-01 | Phase 2 | Complete |
 | ENGI-02 | Phase 2 | Pending |
 | ENGI-03 | Phase 2 | Pending |
 | ENGI-04 | Phase 2 | Pending |
-| ENGI-05 | Phase 2 | Pending |
-| ENGI-06 | Phase 2 | Pending |
-| ENGI-07 | Phase 2 | Pending |
+| ENGI-05 | Phase 2 | Complete |
+| ENGI-06 | Phase 2 | Complete |
+| ENGI-07 | Phase 2 | Complete |
 | ENGI-08 | Phase 2 | Pending |
 | ENGI-09 | Phase 2 | Pending |
 | MAPV-01 | Phase 1 | Complete |
