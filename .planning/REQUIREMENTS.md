@@ -80,35 +80,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | — | Pending |
-| SETUP-02 | — | Pending |
-| SETUP-03 | — | Pending |
-| ENGI-01 | — | Pending |
-| ENGI-02 | — | Pending |
-| ENGI-03 | — | Pending |
-| ENGI-04 | — | Pending |
-| ENGI-05 | — | Pending |
-| ENGI-06 | — | Pending |
-| ENGI-07 | — | Pending |
-| ENGI-08 | — | Pending |
-| ENGI-09 | — | Pending |
-| MAPV-01 | — | Pending |
-| MAPV-02 | — | Pending |
-| MAPV-03 | — | Pending |
-| MAPV-04 | — | Pending |
-| MAPV-05 | — | Pending |
-| MAPV-06 | — | Pending |
-| MAPV-07 | — | Pending |
-| BOTS-01 | — | Pending |
-| BOTS-02 | — | Pending |
-| BOTS-03 | — | Pending |
-| BOTS-04 | — | Pending |
+| SETUP-01 | Phase 3 | Pending |
+| SETUP-02 | Phase 1 | Pending |
+| SETUP-03 | Phase 1 | Pending |
+| ENGI-01 | Phase 2 | Pending |
+| ENGI-02 | Phase 2 | Pending |
+| ENGI-03 | Phase 2 | Pending |
+| ENGI-04 | Phase 2 | Pending |
+| ENGI-05 | Phase 2 | Pending |
+| ENGI-06 | Phase 2 | Pending |
+| ENGI-07 | Phase 2 | Pending |
+| ENGI-08 | Phase 2 | Pending |
+| ENGI-09 | Phase 2 | Pending |
+| MAPV-01 | Phase 1 | Pending |
+| MAPV-02 | Phase 3 | Pending |
+| MAPV-03 | Phase 3 | Pending |
+| MAPV-04 | Phase 3 | Pending |
+| MAPV-05 | Phase 3 | Pending |
+| MAPV-06 | Phase 3 | Pending |
+| MAPV-07 | Phase 3 | Pending |
+| BOTS-01 | Phase 4 | Pending |
+| BOTS-02 | Phase 4 | Pending |
+| BOTS-03 | Phase 5 | Pending |
+| BOTS-04 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23
+- Mapped to phases: 23
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-08*
-*Last updated: 2026-03-08 after initial definition*
+*Last updated: 2026-03-08 after roadmap creation*
