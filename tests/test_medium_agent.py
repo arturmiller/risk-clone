@@ -135,7 +135,6 @@ class TestDifficultyWiring:
 # BOTS-02: MediumAgent reinforce strategy
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(reason="MediumAgent not yet implemented", strict=False)
 class TestMediumAgentReinforce:
     def test_reinforce_places_on_border_of_top_continent(self):
         """Given bot owns 3/4 of Australia, all armies placed on an Australia border territory."""

@@ -103,8 +103,19 @@ class MediumAgent:
                     )
                 ]
                 if cont_borders:
-                    # Pick the border territory in that continent with fewest armies
-                    target = min(cont_borders, key=lambda t: state.territories[t].armies)
+                    # Prefer territories that face outside the continent (cross-continent-facing)
+                    cont_terrs = mg.continent_territories(top_continent)
+                    external_borders = [
+                        t for t in cont_borders
+                        if any(
+                            n not in cont_terrs
+                            for n in mg.neighbors(t)
+                            if state.territories[n].owner != player
+                        )
+                    ]
+                    # Use external-facing borders if any exist, otherwise any continent border
+                    final_candidates = external_borders if external_borders else cont_borders
+                    target = min(final_candidates, key=lambda t: state.territories[t].armies)
                     return ReinforcePlacementAction(placements={target: armies})
 
             # Fallback: any border territory
