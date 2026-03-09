@@ -49,6 +49,26 @@ function updateMap(state) {
     }
 }
 
+// --- Render army labels with optional staging overlay ---
+// overlays is a plain object: { "Alaska": 3 } means 3 extra staged armies not yet confirmed.
+// Shows "N+M" format when staged > 0, plain "N" otherwise.
+function renderArmyLabels(overlays) {
+    if (!gameState || !gameState.territories) return;
+    overlays = overlays || {};
+    var container = document.getElementById('map-container');
+    for (var name in gameState.territories) {
+        var label = container.querySelector('[data-army-label="' + name + '"]');
+        if (!label) continue;
+        var base = gameState.territories[name].armies;
+        var staged = overlays[name] || 0;
+        if (staged > 0) {
+            label.textContent = base + '+' + staged;
+        } else {
+            label.textContent = base;
+        }
+    }
+}
+
 // --- Highlight valid source territories ---
 function highlightValidSources(sources) {
     clearHighlights();
