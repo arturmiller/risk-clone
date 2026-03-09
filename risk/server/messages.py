@@ -58,6 +58,7 @@ class StartGameMessage(BaseModel):
 
     type: Literal["start_game"] = "start_game"
     num_players: int = Field(ge=2, le=6)
+    difficulty: str = "easy"
 
 
 class PlayerActionMessage(BaseModel):

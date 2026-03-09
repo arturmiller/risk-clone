@@ -10,6 +10,7 @@ from risk.engine.cards import create_deck
 from risk.engine.map_graph import MapGraph
 from risk.engine.setup import setup_game
 from risk.engine.turn import execute_turn
+from risk.bots.medium import MediumAgent
 from risk.game import RandomAgent
 from risk.models.cards import Card, TurnPhase
 from risk.models.game_state import GameState, PlayerState
@@ -30,10 +31,16 @@ class GameManager:
     def __init__(self) -> None:
         self.agents: dict[int, Any] = {}
         self.human_agent: HumanWebSocketAgent | None = None
+        self._num_players: int = 0
         self._map_graph: MapGraph | None = None
         self._cancel_flag = threading.Event()
         self._send_callback: Callable[[dict[str, Any]], None] | None = None
         self._game_thread: threading.Thread | None = None
+
+    @property
+    def _agents(self) -> dict[int, Any]:
+        """Bot agents only (players 1+). Used for testing and inspection."""
+        return {i: agent for i, agent in self.agents.items() if i != 0}
 
     def setup(
         self,
@@ -42,6 +49,7 @@ class GameManager:
         send_callback: Callable[[dict[str, Any]], Any],
         loop: asyncio.AbstractEventLoop | None = None,
         bot_delay: float | None = None,
+        difficulty: str = "easy",
     ) -> None:
         """Create agents for a new game. Human is always player 0."""
         if loop is None:
@@ -49,8 +57,12 @@ class GameManager:
         self._map_graph = map_graph
         self._send_callback = send_callback
         self._cancel_flag.clear()
+        self._num_players = num_players
         if bot_delay is not None:
             self.BOT_DELAY = bot_delay
+
+        if difficulty not in ("easy", "medium"):
+            difficulty = "easy"
 
         rng = random.Random()
 
@@ -63,7 +75,10 @@ class GameManager:
 
         # Create bot agents for remaining players
         for i in range(1, num_players):
-            bot = RandomAgent(rng=random.Random())
+            if difficulty == "medium":
+                bot = MediumAgent(rng=random.Random())
+            else:
+                bot = RandomAgent(rng=random.Random())
             bot._map_graph = map_graph
             self.agents[i] = bot
 
