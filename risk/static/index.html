@@ -21,6 +21,11 @@
           <option value="5">5</option>
           <option value="6">6</option>
         </select>
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty">
+          <option value="easy" selected>Easy</option>
+          <option value="medium">Medium</option>
+        </select>
         <button id="start-btn">Start Game</button>
       </div>
     </div>
@@ -75,6 +80,7 @@
 
       <!-- Action buttons -->
       <div id="action-buttons">
+        <button id="confirm-reinforce-btn" class="action-btn" style="display:none">Confirm Placements</button>
         <button id="end-attack-btn" class="action-btn" style="display:none">End Attack Phase</button>
         <button id="skip-fortify-btn" class="action-btn" style="display:none">Skip Fortify</button>
       </div>

@@ -29,6 +29,8 @@ const setupScreen = document.getElementById('setup-screen');
 const gameBoard = document.getElementById('game-board');
 const startBtn = document.getElementById('start-btn');
 const playerCountSelect = document.getElementById('player-count');
+const difficultySelect = document.getElementById('difficulty');
+const confirmReinforceBtn = document.getElementById('confirm-reinforce-btn');
 const endAttackBtn = document.getElementById('end-attack-btn');
 const skipFortifyBtn = document.getElementById('skip-fortify-btn');
 const moveArmiesPrompt = document.getElementById('move-armies-prompt');
@@ -48,7 +50,7 @@ startBtn.addEventListener('click', function() {
         messageQueue = [];
         mapLoaded = false;
 
-        ws.send(JSON.stringify({type: 'start_game', num_players: numPlayers}));
+        ws.send(JSON.stringify({type: 'start_game', num_players: numPlayers, difficulty: difficultySelect.value}));
         setupScreen.style.display = 'none';
         gameBoard.style.display = 'flex';
 
@@ -153,6 +155,7 @@ function enableInputMode(msg) {
     selectedSource = null;
 
     // Hide action buttons by default
+    confirmReinforceBtn.style.display = 'none';
     endAttackBtn.style.display = 'none';
     skipFortifyBtn.style.display = 'none';
 
@@ -257,13 +260,12 @@ function handleReinforcementClick(territoryName) {
         moveArmiesPrompt.style.display = 'none';
 
         if (reinforcementsRemaining <= 0) {
-            // All placed, send to server
-            sendAction('reinforce', {placements: reinforcementPlacements});
-            currentInputType = null;
-            clearHighlights();
-            hideBanner();
+            // All placed — show confirm button instead of auto-sending
+            showBanner('All reinforcements placed. Confirm to proceed to Attack phase.');
+            confirmReinforceBtn.style.display = 'block';
         } else {
             showBanner('Place ' + reinforcementsRemaining + ' reinforcements - click your territories');
+            confirmReinforceBtn.style.display = 'none';
         }
     });
 
@@ -453,6 +455,14 @@ skipFortifyBtn.addEventListener('click', function() {
     selectedSource = null;
     clearHighlights();
     skipFortifyBtn.style.display = 'none';
+});
+
+confirmReinforceBtn.addEventListener('click', function() {
+    sendAction('reinforce', {placements: reinforcementPlacements});
+    currentInputType = null;
+    clearHighlights();
+    hideBanner();
+    confirmReinforceBtn.style.display = 'none';
 });
 
 // --- Game over ---
