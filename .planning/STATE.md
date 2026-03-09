@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 04-06-PLAN.md
-last_updated: "2026-03-09T21:20:41.059Z"
+stopped_at: Completed 04-07-PLAN.md
+last_updated: "2026-03-09T21:24:11.537Z"
 last_activity: 2026-03-08 -- Completed plan 03-04 (integration testing and end-to-end wiring)
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 16
-  completed_plans: 15
+  completed_plans: 16
   percent: 90
 ---
 
@@ -58,6 +58,7 @@ Progress: [█████████░] 90%
 | Phase 04-easy-and-medium-bots P04 | 12 | 2 tasks | 0 files |
 | Phase 04-easy-and-medium-bots P05 | 1 | 2 tasks | 2 files |
 | Phase 04-easy-and-medium-bots P06 | 1 | 2 tasks | 2 files |
+| Phase 04-easy-and-medium-bots P07 | 2 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,7 @@ Recent decisions affecting current work:
 - [Phase 04-easy-and-medium-bots]: external_borders filter prefers territories whose enemy neighbor is outside cont_terrs, correctly selecting Indonesia (borders Siam outside Australia) over Western Australia in reinforce scenario
 - [Phase 04-easy-and-medium-bots]: renderArmyLabels reads gameState from module scope (same page scope), no parameter passing needed for base counts
 - [Phase 04-easy-and-medium-bots]: renderArmyLabels({}) called on confirm-reinforce and on input mode reset to ensure clean slate
+- [Phase 04-easy-and-medium-bots]: Bot agents (RandomAgent, MediumAgent) return min_armies from choose_advance_armies for conservative play; delta approach in turn.py reconciles engine's default num_dice commit with player-chosen count
 
 ### Pending Todos
 
@@ -119,6 +121,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T21:20:37.295Z
-Stopped at: Completed 04-06-PLAN.md
+Last session: 2026-03-09T21:24:11.530Z
+Stopped at: Completed 04-07-PLAN.md
 Resume file: None
