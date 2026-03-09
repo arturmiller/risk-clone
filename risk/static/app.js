@@ -163,6 +163,7 @@ function enableInputMode(msg) {
         case 'choose_reinforcement_placement':
             reinforcementsRemaining = msg.armies || 0;
             reinforcementPlacements = {};
+            renderArmyLabels({});
             showBanner('Place ' + reinforcementsRemaining + ' reinforcements - click your territories');
             highlightValidSources(msg.valid_sources || getOwnedTerritories());
             updateActionButtons('choose_reinforcement_placement');
@@ -258,6 +259,8 @@ function handleReinforcementClick(territoryName) {
         reinforcementsRemaining -= count;
 
         moveArmiesPrompt.style.display = 'none';
+
+        renderArmyLabels(reinforcementPlacements);
 
         if (reinforcementsRemaining <= 0) {
             // All placed — show confirm button instead of auto-sending
@@ -458,6 +461,7 @@ skipFortifyBtn.addEventListener('click', function() {
 });
 
 confirmReinforceBtn.addEventListener('click', function() {
+    renderArmyLabels({});
     sendAction('reinforce', {placements: reinforcementPlacements});
     currentInputType = null;
     clearHighlights();
