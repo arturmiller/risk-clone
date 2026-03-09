@@ -46,3 +46,9 @@ class ReinforcePlacementAction(BaseModel):
     """Place reinforcement armies on owned territories."""
 
     placements: dict[str, int]
+
+
+class AdvanceArmiesAction(BaseModel):
+    """How many armies to advance into a just-conquered territory."""
+
+    armies: int = Field(ge=1)

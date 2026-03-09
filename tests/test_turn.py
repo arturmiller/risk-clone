@@ -78,6 +78,11 @@ class SimpleAgent:
             return self._card_trade_fn(state, cards, forced)
         return None
 
+    def choose_advance_armies(
+        self, state: GameState, source: str, target: str, min_armies: int, max_armies: int
+    ) -> int:
+        return min_armies
+
     def choose_defender_dice(
         self, state: GameState, territory: str, max_dice: int
     ) -> int:

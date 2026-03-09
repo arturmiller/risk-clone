@@ -202,6 +202,38 @@ def execute_attack_phase(
         if conquered:
             state = state.model_copy(update={"conquered_this_turn": True})
 
+            # Determine advance bounds
+            min_armies = action.num_dice   # must move at least as many as dice used
+            # source armies after combat (attacker lost some, hasn't moved yet at engine level)
+            source_armies_now = state.territories[action.source].armies
+            max_armies = source_armies_now - 1  # must leave 1 in source
+
+            # Clamp: if somehow min > max (shouldn't happen with valid attack), use min
+            if max_armies < min_armies:
+                max_armies = min_armies
+
+            # Ask the agent how many to advance
+            armies_to_advance = agent.choose_advance_armies(  # type: ignore[union-attr]
+                state, action.source, action.target, min_armies, max_armies
+            )
+            armies_to_advance = max(min_armies, min(max_armies, armies_to_advance))
+
+            # Re-apply the advance: the engine already moved `action.num_dice` armies
+            # into the target in execute_attack. We need to correct for the actual chosen amount.
+            # Recalculate by adjusting the territories directly.
+            if armies_to_advance != action.num_dice:
+                delta = armies_to_advance - action.num_dice
+                new_territories = dict(state.territories)
+                src_ts = new_territories[action.source]
+                tgt_ts = new_territories[action.target]
+                new_territories[action.source] = TerritoryState(
+                    owner=src_ts.owner, armies=src_ts.armies - delta
+                )
+                new_territories[action.target] = TerritoryState(
+                    owner=tgt_ts.owner, armies=tgt_ts.armies + delta
+                )
+                state = state.model_copy(update={"territories": new_territories})
+
             # Check if defender was eliminated
             target_prev_owner = None
             # We need to figure out who used to own the target

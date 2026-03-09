@@ -78,8 +78,14 @@ def execute_attack(
     player_index: int,
     rng: random.Random,
     defender_dice: int | None = None,
+    armies_to_move: int | None = None,
 ) -> tuple[GameState, CombatResult, bool]:
-    """Execute a single attack round. Returns (new_state, result, conquered)."""
+    """Execute a single attack round. Returns (new_state, result, conquered).
+
+    armies_to_move: number of armies to advance into a conquered territory.
+        If None, defaults to action.num_dice (minimum per Risk rules).
+        Callers can pass the player's chosen count; bots pass None to use minimum.
+    """
     validate_attack(state, map_graph, action, player_index)
 
     target_ts = state.territories[action.target]
@@ -99,7 +105,7 @@ def execute_attack(
 
     if conquered:
         # Territory conquered: transfer ownership, move armies
-        armies_moved = action.num_dice
+        armies_moved = armies_to_move if armies_to_move is not None else action.num_dice
         new_source_armies -= armies_moved
         new_territories[action.source] = TerritoryState(
             owner=source_ts.owner, armies=new_source_armies

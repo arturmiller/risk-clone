@@ -285,6 +285,12 @@ class MediumAgent:
                         return TradeCardsAction(cards=[cards[i], cards[j], cards[k]])
         return None
 
+    def choose_advance_armies(
+        self, state: GameState, source: str, target: str, min_armies: int, max_armies: int
+    ) -> int:
+        """Advance minimum armies into captured territory (conservative play)."""
+        return min_armies
+
     def choose_defender_dice(
         self, state: GameState, territory: str, max_dice: int
     ) -> int:
