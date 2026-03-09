@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-09T20:04:31.422Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-03-09T20:08:35.264Z"
 last_activity: 2026-03-08 -- Completed plan 03-04 (integration testing and end-to-end wiring)
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
   percent: 90
 ---
 
@@ -54,6 +54,7 @@ Progress: [█████████░] 90%
 *Updated after each plan completion*
 | Phase 04-easy-and-medium-bots P01 | 2 | 2 tasks | 2 files |
 | Phase 04-easy-and-medium-bots P02 | 2 | 2 tasks | 2 files |
+| Phase 04-easy-and-medium-bots P03 | 4 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,8 @@ Recent decisions affecting current work:
 - [Phase 04-easy-and-medium-bots]: xfail(strict=False) at class level for test stubs so Wave 0 suite exits 0 before MediumAgent implementation
 - [Phase 04-easy-and-medium-bots]: MediumAgent never mutates per-turn state on self; all strategy computed fresh from GameState each call
 - [Phase 04-easy-and-medium-bots]: run_game() changed from isinstance(agent, RandomAgent) to hasattr(agent, '_map_graph') for duck-typing injection
+- [Phase 04-easy-and-medium-bots]: difficulty field uses str (not Literal) in StartGameMessage for backwards compatibility
+- [Phase 04-easy-and-medium-bots]: _agents property on GameManager returns only bot agents (players 1+) for clean test assertions
 
 ### Pending Todos
 
@@ -109,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T20:04:27.530Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-09T20:08:35.259Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
