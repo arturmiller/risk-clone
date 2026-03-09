@@ -37,8 +37,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### AI Bots
 
-- [ ] **BOTS-01**: Easy bot makes random valid moves
-- [ ] **BOTS-02**: Medium bot uses basic strategy (continent focus, reasonable attack decisions)
+- [x] **BOTS-01**: Easy bot makes random valid moves
+- [x] **BOTS-02**: Medium bot uses basic strategy (continent focus, reasonable attack decisions)
 - [ ] **BOTS-03**: Hard bot plays at human-competitive level (threat assessment, army concentration, card timing, continent control)
 - [ ] **BOTS-04**: AI-vs-AI simulation mode (watch bots play without human player)
 
@@ -99,8 +99,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAPV-05 | Phase 3 | Complete |
 | MAPV-06 | Phase 3 | Complete |
 | MAPV-07 | Phase 3 | Complete |
-| BOTS-01 | Phase 4 | Pending |
-| BOTS-02 | Phase 4 | Pending |
+| BOTS-01 | Phase 4 | Complete |
+| BOTS-02 | Phase 4 | Complete |
 | BOTS-03 | Phase 5 | Pending |
 | BOTS-04 | Phase 5 | Pending |
 

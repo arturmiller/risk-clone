@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Phase 4 context gathered
-last_updated: "2026-03-09T19:42:31.861Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-09T20:01:20.293Z"
 last_activity: 2026-03-08 -- Completed plan 03-04 (integration testing and end-to-end wiring)
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 13
+  completed_plans: 10
   percent: 90
 ---
 
@@ -52,6 +52,7 @@ Progress: [█████████░] 90%
 - Trend: Stable (integration plan longer as expected)
 
 *Updated after each plan completion*
+| Phase 04-easy-and-medium-bots P01 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current work:
 - WebSocket messages queued until SVG map loaded to prevent race condition on game start
 - Intermediate game_state sent before each attack/fortify request_input for real-time visual feedback
 - Player names "You" and "Bot N" set server-side in GameManager for clarity
+- [Phase 04-easy-and-medium-bots]: risk/bots/__init__.py forward-imports MediumAgent; ImportError expected until plan 02 creates medium.py
+- [Phase 04-easy-and-medium-bots]: xfail(strict=False) at class level for test stubs so Wave 0 suite exits 0 before MediumAgent implementation
 
 ### Pending Todos
 
@@ -103,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T19:42:31.848Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-easy-and-medium-bots/04-CONTEXT.md
+Last session: 2026-03-09T20:01:20.286Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
