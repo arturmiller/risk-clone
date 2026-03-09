@@ -165,9 +165,9 @@ def run_game(
     """
     num_players = len(agents)
 
-    # Inject map_graph into RandomAgents
+    # Inject map_graph into any agent that accepts it (duck-typing, future-proofs for Hard bot)
     for agent in agents.values():
-        if isinstance(agent, RandomAgent):
+        if hasattr(agent, '_map_graph'):
             agent._map_graph = map_graph
 
     # Setup initial state
