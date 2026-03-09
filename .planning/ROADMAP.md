@@ -75,7 +75,12 @@ Plans:
   1. Easy bot makes valid moves each turn (reinforces, attacks sometimes, fortifies) without crashing or stalling the game
   2. Medium bot visibly pursues continent control, reinforces borders, and attacks when it has favorable odds
   3. A human player can play a full game against 1-5 bots (any mix of Easy/Medium) from setup to victory or defeat in the browser
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 04-01-PLAN.md — Wave 0: test scaffold (test stubs + risk/bots/ package skeleton)
+- [ ] 04-02-PLAN.md — MediumAgent implementation (TDD, continent-aware strategy) + run_game() injection update
+- [ ] 04-03-PLAN.md — Full-stack difficulty wiring: StartGameMessage, GameManager, app.py, index.html, app.js
+- [ ] 04-04-PLAN.md — Test suite gate + human verification checkpoint
 
 ### Phase 5: Hard Bot and AI Simulation
 **Goal**: The Hard bot plays at human-competitive level, delivering the project's core value, and users can watch bot-only games
@@ -97,5 +102,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Foundation | 2/2 | Complete    | 2026-03-08 |
 | 2. Game Engine | 3/3 | Complete | 2026-03-08 |
 | 3. Web UI and Game Setup | 4/4 | Complete | 2026-03-08 |
-| 4. Easy and Medium Bots | 0/TBD | Not started | - |
+| 4. Easy and Medium Bots | 0/4 | Not started | - |
 | 5. Hard Bot and AI Simulation | 0/TBD | Not started | - |
