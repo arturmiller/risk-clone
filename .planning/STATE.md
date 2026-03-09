@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-09T20:01:20.293Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-09T20:04:31.422Z"
 last_activity: 2026-03-08 -- Completed plan 03-04 (integration testing and end-to-end wiring)
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 13
-  completed_plans: 10
+  completed_plans: 11
   percent: 90
 ---
 
@@ -53,6 +53,7 @@ Progress: [█████████░] 90%
 
 *Updated after each plan completion*
 | Phase 04-easy-and-medium-bots P01 | 2 | 2 tasks | 2 files |
+| Phase 04-easy-and-medium-bots P02 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,8 @@ Recent decisions affecting current work:
 - Player names "You" and "Bot N" set server-side in GameManager for clarity
 - [Phase 04-easy-and-medium-bots]: risk/bots/__init__.py forward-imports MediumAgent; ImportError expected until plan 02 creates medium.py
 - [Phase 04-easy-and-medium-bots]: xfail(strict=False) at class level for test stubs so Wave 0 suite exits 0 before MediumAgent implementation
+- [Phase 04-easy-and-medium-bots]: MediumAgent never mutates per-turn state on self; all strategy computed fresh from GameState each call
+- [Phase 04-easy-and-medium-bots]: run_game() changed from isinstance(agent, RandomAgent) to hasattr(agent, '_map_graph') for duck-typing injection
 
 ### Pending Todos
 
@@ -106,6 +109,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T20:01:20.286Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-09T20:04:27.530Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
