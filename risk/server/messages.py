@@ -28,6 +28,7 @@ class RequestInputMessage(BaseModel):
     valid_sources: list[str] | None = None
     valid_targets: list[str] | None = None
     armies: int | None = None
+    max_armies: int | None = None
     forced: bool | None = None
     cards: list[dict[str, Any]] | None = None
     max_dice: int | None = None

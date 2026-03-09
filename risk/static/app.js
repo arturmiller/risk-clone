@@ -194,6 +194,32 @@ function enableInputMode(msg) {
             // Human does not use blitz per project decisions
             sendAction('no_blitz', {});
             break;
+
+        case 'choose_advance_armies': {
+            var minArmies = msg.armies || 1;
+            var maxArmies = msg.max_armies || minArmies;
+            var source = (msg.valid_sources && msg.valid_sources[0]) || '';
+            var target = (msg.valid_targets && msg.valid_targets[0]) || '';
+            moveArmiesText.textContent = 'Advance armies from ' + source + ' into ' + target +
+                ' (min: ' + minArmies + ')';
+            moveArmiesInput.min = minArmies;
+            moveArmiesInput.max = maxArmies;
+            moveArmiesInput.value = minArmies;
+            moveArmiesPrompt.style.display = 'block';
+
+            var newConfirm = moveArmiesConfirm.cloneNode(true);
+            moveArmiesConfirm.parentNode.replaceChild(newConfirm, moveArmiesConfirm);
+
+            newConfirm.addEventListener('click', function() {
+                var count = parseInt(moveArmiesInput.value, 10);
+                if (count < minArmies) count = minArmies;
+                if (count > maxArmies) count = maxArmies;
+                sendAction('advance_armies', { armies: count });
+                moveArmiesPrompt.style.display = 'none';
+                currentInputType = null;
+            });
+            break;
+        }
     }
 }
 

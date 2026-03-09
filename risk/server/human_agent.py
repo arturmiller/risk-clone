@@ -114,6 +114,31 @@ class HumanWebSocketAgent:
         """Human uses regular attacks with dice control, not blitz."""
         return None
 
+    def choose_advance_armies(
+        self,
+        state: GameState,
+        source: str,
+        target: str,
+        min_armies: int,
+        max_armies: int,
+    ) -> int:
+        """Prompt human to choose how many armies to advance into captured territory."""
+        msg = RequestInputMessage(
+            input_type="choose_advance_armies",
+            valid_sources=[source],
+            valid_targets=[target],
+            armies=min_armies,
+            max_armies=max_armies,
+        )
+        self._send(msg.model_dump(mode="json"))
+
+        data = self._wait_for_input()
+        try:
+            count = int(data.get("armies", min_armies))
+        except (TypeError, ValueError):
+            count = min_armies
+        return max(min_armies, min(max_armies, count))
+
     def choose_fortify(self, state: GameState) -> FortifyAction | None:
         """Request fortify decision from human player."""
         mg = self._map_graph
