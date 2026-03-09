@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Territory data model, adjacency graph, and game state structures
 - [x] **Phase 2: Game Engine** - Turn FSM, combat resolution, card system, and victory detection
 - [x] **Phase 3: Web UI and Game Setup** - Browser client, interactive SVG map, WebSocket server, and player setup
-- [ ] **Phase 4: Easy and Medium Bots** - First two AI difficulty tiers validating the bot framework
+- [x] **Phase 4: Easy and Medium Bots** - First two AI difficulty tiers validating the bot framework (completed 2026-03-09)
 - [ ] **Phase 5: Hard Bot and AI Simulation** - Human-competitive AI and bot-vs-bot observation mode
 
 ## Phase Details
@@ -75,7 +75,7 @@ Plans:
   1. Easy bot makes valid moves each turn (reinforces, attacks sometimes, fortifies) without crashing or stalling the game
   2. Medium bot visibly pursues continent control, reinforces borders, and attacks when it has favorable odds
   3. A human player can play a full game against 1-5 bots (any mix of Easy/Medium) from setup to victory or defeat in the browser
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [ ] 04-01-PLAN.md — Wave 0: test scaffold (test stubs + risk/bots/ package skeleton)
 - [ ] 04-02-PLAN.md — MediumAgent implementation (TDD, continent-aware strategy) + run_game() injection update
@@ -102,5 +102,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Foundation | 2/2 | Complete    | 2026-03-08 |
 | 2. Game Engine | 3/3 | Complete | 2026-03-08 |
 | 3. Web UI and Game Setup | 4/4 | Complete | 2026-03-08 |
-| 4. Easy and Medium Bots | 3/4 | In Progress|  |
+| 4. Easy and Medium Bots | 4/4 | Complete   | 2026-03-09 |
 | 5. Hard Bot and AI Simulation | 0/TBD | Not started | - |
