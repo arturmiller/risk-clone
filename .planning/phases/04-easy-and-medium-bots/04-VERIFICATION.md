@@ -1,24 +1,14 @@
 ---
 phase: 04-easy-and-medium-bots
-verified: 2026-03-09T21:30:00Z
-status: gaps_found
-score: 14/15 automated truths verified
-gaps:
-  - id: GAP-01
-    truth: "Reinforcement units placed are visible on the territory (e.g. shows '4+3' while placing)"
-    status: failed
-    evidence: "Units placed during reinforcement phase are not shown on the territory — no pending-placement indicator in the UI"
-  - id: GAP-02
-    truth: "After winning an attack the attacker is prompted to choose how many units to move into the captured territory (min = dice used, max = attackers - 1)"
-    status: failed
-    evidence: "No movement prompt shown after capturing a territory — units are moved automatically without player choice"
+verified: 2026-03-09T22:00:00Z
+status: human_needed
+score: 17/17 automated truths verified
 re_verification:
   previous_status: gaps_found
-  previous_score: 12/15
+  previous_score: 14/15
   gaps_closed:
-    - "MediumAgent reinforces on border of highest-scoring continent (test_reinforce_places_on_border_of_top_continent now PASSED, no xfail)"
-    - "test_reinforce_places_on_border_of_top_continent converted to regular passing test (xfail removed from TestMediumAgentReinforce)"
-    - "Full test suite passes with zero xfails: 220 passed, 13 xpassed, 0 xfailed, exit 0"
+    - "GAP-01: renderArmyLabels(overlays) added to map.js; app.js calls it in 3 locations (placement confirm, confirm-reinforce click, input mode reset) — N+M staging display now live"
+    - "GAP-02: choose_advance_armies wired end-to-end — AdvanceArmiesAction in actions.py, armies_to_move param in combat.py, agent call in turn.py, HumanWebSocketAgent sends request_input, app.js choose_advance_armies case shows move-armies-prompt modal, bots return min_armies"
   gaps_remaining: []
   regressions: []
 human_verification:
@@ -31,16 +21,47 @@ human_verification:
       console errors or server tracebacks.
     why_human: >
       Visual UI presence, qualitative strategic differences between Easy and Medium bots,
-      and absence of runtime errors cannot be verified programmatically. Plan 04 required
-      human browser verification.
+      and absence of runtime errors cannot be verified programmatically.
+  - test: "Reinforcement staging labels show N+M format during placement"
+    expected: >
+      During the reinforce phase, after placing armies on a territory via the modal, the
+      territory label on the SVG map updates immediately to show e.g. "4+3" (4 existing +
+      3 staged). Placing more armies on a second territory updates that label too. After
+      clicking Confirm Placements the labels revert to base counts immediately (before the
+      server game_state arrives).
+    why_human: >
+      SVG DOM mutation during the reinforcement phase must be observed in a live browser;
+      cannot be verified by static code analysis.
+  - test: "Post-conquest advance armies modal appears for human player"
+    expected: >
+      After winning an attack that captures a territory, the "Move armies" modal appears
+      with the label "Advance armies from [Source] into [Target] (min: N)". The input min
+      is set to the number of dice used in the winning attack. The input max is set to
+      source armies minus 1. After confirming a value, the map shows the chosen armies in
+      the captured territory. Bots (Easy/Medium) do not pause for this prompt.
+    why_human: >
+      The modal appearance, correct min/max values, and resulting map update must be
+      observed in a live browser session after a real conquest event.
 ---
 
 # Phase 4: Easy and Medium Bots — Verification Report
 
 **Phase Goal:** AI opponents provide a fun game experience at two difficulty levels, validating the bot framework for the Hard bot.
 **Verified:** 2026-03-09
-**Status:** human_needed
-**Re-verification:** Yes — after gap closure (plan 05)
+**Status:** human_needed (all automated checks pass; 3 items require browser testing)
+**Re-verification:** Yes — after gap closure (plans 06 and 07)
+
+---
+
+## Re-verification Summary
+
+Both gaps from the previous verification were closed by plans 06 and 07:
+
+- **GAP-01 (Reinforcement staging display):** `renderArmyLabels(overlays)` added to `risk/static/map.js` (line 55). Three call sites wired in `risk/static/app.js`: after placement modal confirm (line 289), on confirm-reinforce click (line 490), and on reinforcement input mode reset (line 166).
+
+- **GAP-02 (Post-conquest advance armies prompt):** `AdvanceArmiesAction` added to `risk/models/actions.py`. `execute_attack` in `risk/engine/combat.py` accepts `armies_to_move` parameter (default `None` falls back to `action.num_dice`). `execute_attack_phase` in `risk/engine/turn.py` calls `agent.choose_advance_armies` after conquest and applies a delta adjustment. `HumanWebSocketAgent.choose_advance_armies` sends `request_input` with `input_type='choose_advance_armies'`. `app.js` handles the `choose_advance_armies` case in `enableInputMode` using the existing move-armies-prompt modal. `RandomAgent` and `MediumAgent` both have `choose_advance_armies` returning `min_armies`.
+
+Full test suite: **220 passed, 13 xpassed, 0 failures** — no regressions.
 
 ---
 
@@ -50,23 +71,26 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | Test file exists with all 5 test classes | VERIFIED | `tests/test_medium_agent.py` — 17 tests across TestMapLoads, TestDifficultyWiring, TestMediumAgentReinforce, TestMediumAgentAttack, TestMediumAgentFortify, TestFullGameIntegration |
-| 2 | `risk/bots/` package is importable | VERIFIED | `risk/bots/__init__.py` imports MediumAgent from `risk.bots.medium` |
-| 3 | MediumAgent implements all 6 PlayerAgent protocol methods | VERIFIED | `risk/bots/medium.py` lines 70–293: choose_reinforcement_placement, choose_attack, choose_blitz, choose_fortify, choose_card_trade, choose_defender_dice |
-| 4 | MediumAgent reinforces on border of highest-scoring continent | VERIFIED | `test_reinforce_places_on_border_of_top_continent` is PASSED (no xfail marker). Two-tier external_borders logic in medium.py lines 107–118 correctly selects Indonesia (borders Siam outside Australia) over New Guinea/Western Australia. |
-| 5 | MediumAgent attacks into top continent with favorable odds, or completes continent despite slight disadvantage | VERIFIED | XPASS: test_attack_targets_top_continent, test_attack_completes_continent |
-| 6 | MediumAgent fortifies from interior toward border, leaving at least 1 army at source | VERIFIED | XPASS: test_fortify_moves_toward_border, test_fortify_skips_no_surplus, test_fortify_leaves_at_least_one_army |
+| 1 | Test file exists with all test classes | VERIFIED | `tests/test_medium_agent.py` — 17 tests across 6 classes |
+| 2 | `risk/bots/` package is importable | VERIFIED | `risk/bots/__init__.py` imports MediumAgent |
+| 3 | MediumAgent implements all 6 PlayerAgent protocol methods | VERIFIED | `risk/bots/medium.py`: all 6 methods present, now 7 including choose_advance_armies |
+| 4 | MediumAgent reinforces on border of highest-scoring continent | VERIFIED | Two-tier external_borders logic in medium.py lines 107–118; test_reinforce_places_on_border_of_top_continent PASSED |
+| 5 | MediumAgent attacks into top continent with favorable odds | VERIFIED | XPASS: test_attack_targets_top_continent, test_attack_completes_continent |
+| 6 | MediumAgent fortifies from interior toward border | VERIFIED | XPASS: test_fortify_moves_toward_border, test_fortify_skips_no_surplus, test_fortify_leaves_at_least_one_army |
 | 7 | run_game() injects map_graph into MediumAgent via duck-typing | VERIFIED | `risk/game.py` line 170: `if hasattr(agent, '_map_graph'):` |
-| 8 | MediumAgent completes a full game without stalling or crashing | VERIFIED | XPASS: test_full_game_medium_bot, test_full_game_medium_bot_no_stall (max_turns=500) |
+| 8 | MediumAgent completes a full game without stalling or crashing | VERIFIED | XPASS: test_full_game_medium_bot, test_full_game_medium_bot_no_stall |
 | 9 | StartGameMessage accepts difficulty field with default 'easy' | VERIFIED | `risk/server/messages.py` line 61: `difficulty: str = "easy"` |
-| 10 | GameManager.setup() creates RandomAgent for easy, MediumAgent for medium | VERIFIED | XPASS: all 3 TestDifficultyWiring tests. `risk/server/game_manager.py` lines 78–81 |
-| 11 | Browser setup screen shows Difficulty dropdown with Easy and Medium options | VERIFIED | `risk/static/index.html` lines 25–27: `<select id="difficulty">` with Easy/Medium options |
-| 12 | Clicking Start Game sends difficulty value in WebSocket start_game message | VERIFIED | `risk/static/app.js` line 53: `difficulty: difficultySelect.value` included in send |
-| 13 | Full test suite passes (no regressions) | VERIFIED | `python -m pytest tests/ -q`: 220 passed, 13 xpassed, 0 xfailed, 6 warnings — exit 0 |
-| 14 | All xfail markers removed from TestMediumAgentReinforce (tests converted to passing) | VERIFIED | TestMediumAgentReinforce class has no xfail decorator. test_reinforce_places_on_border_of_top_continent, test_reinforce_fallback_any_border, test_reinforce_fallback_random all show as PASSED. |
-| 15 | Human browser verification: Easy/Medium games play correctly | NEEDS HUMAN | Cannot verify visual behavior, strategic AI differences, or absence of runtime errors programmatically. |
+| 10 | GameManager.setup() creates RandomAgent for easy, MediumAgent for medium | VERIFIED | XPASS: all 3 TestDifficultyWiring tests; `risk/server/game_manager.py` lines 78–81 |
+| 11 | Browser setup screen shows Difficulty dropdown | VERIFIED | `risk/static/index.html` lines 25–27: `<select id="difficulty">` with Easy/Medium options |
+| 12 | Clicking Start Game sends difficulty value in WebSocket message | VERIFIED | `risk/static/app.js` line 53: `difficulty: difficultySelect.value` |
+| 13 | Full test suite passes (no regressions) | VERIFIED | 220 passed, 13 xpassed, 0 xfailed, exit 0 |
+| 14 | All xfail markers removed from TestMediumAgentReinforce | VERIFIED | No xfail decorator on TestMediumAgentReinforce; tests pass as PASSED |
+| 15 | renderArmyLabels(overlays) added to map.js showing N+M staging format | VERIFIED | `risk/static/map.js` line 55: `function renderArmyLabels(overlays)` — shows "base+staged" when staged > 0 |
+| 16 | app.js calls renderArmyLabels in 3 locations for staging feedback | VERIFIED | Lines 166 (input reset), 289 (after placement confirm), 490 (confirm-reinforce click) |
+| 17 | choose_advance_armies wired end-to-end across engine, server, and frontend | VERIFIED | actions.py AdvanceArmiesAction; combat.py armies_to_move param; turn.py agent call + delta; human_agent.py sends request_input; app.js handles input_type='choose_advance_armies'; bots return min_armies |
+| 18 | Human browser verification: Easy/Medium games, staging labels, and advance prompt work correctly | NEEDS HUMAN | Cannot verify visual behavior, runtime errors, or modal interaction programmatically |
 
-**Score:** 14/15 automated truths verified, 1 truth needs human
+**Score:** 17/17 automated truths verified, 1 truth (3 sub-tests) needs human
 
 ---
 
@@ -75,14 +99,19 @@ human_verification:
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
 | `risk/bots/__init__.py` | bots package init exporting MediumAgent | VERIFIED | Exists, imports and re-exports MediumAgent |
-| `risk/bots/medium.py` | MediumAgent with continent-aware strategy and external_borders fix | VERIFIED | Exists, 293 lines, all 6 protocol methods substantively implemented, external_borders two-tier selection at lines 107–118 |
-| `risk/game.py` | run_game() with hasattr duck-typing injection | VERIFIED | `if hasattr(agent, '_map_graph'):` — wired correctly |
-| `tests/test_medium_agent.py` | All 17 tests passing, no xfails on TestMediumAgentReinforce | VERIFIED | 4 PASSED + 13 XPASS, 0 XFAIL, 0 failures. TestMediumAgentReinforce class has no xfail decorator. |
-| `risk/server/messages.py` | StartGameMessage with difficulty field | VERIFIED | Line 61: `difficulty: str = "easy"` |
-| `risk/server/game_manager.py` | setup() with difficulty param and MediumAgent import | VERIFIED | Lines 13, 52, 78–81: import, param, and conditional instantiation |
+| `risk/bots/medium.py` | MediumAgent with continent-aware strategy, external_borders fix, choose_advance_armies | VERIFIED | 299 lines; all 7 protocol methods implemented including choose_advance_armies at line 288 |
+| `risk/game.py` | run_game() with hasattr duck-typing; RandomAgent.choose_advance_armies | VERIFIED | `if hasattr(agent, '_map_graph'):` at line 170; choose_advance_armies at line 139 returning min_armies |
+| `tests/test_medium_agent.py` | All 17 tests passing, no xfails on TestMediumAgentReinforce | VERIFIED | 4 PASSED + 13 XPASS, 0 XFAIL, 0 failures |
+| `risk/server/messages.py` | StartGameMessage with difficulty field; RequestInputMessage with max_armies | VERIFIED | Line 61: `difficulty: str = "easy"`; line 31: `max_armies: int | None = None` |
+| `risk/server/game_manager.py` | setup() with difficulty param and MediumAgent import | VERIFIED | Lines 13, 52, 78–81 |
 | `risk/server/app.py` | WebSocket handler parsing difficulty | VERIFIED | Lines 73, 79: `difficulty = data.get("difficulty", "easy")` passed to setup |
+| `risk/server/human_agent.py` | choose_advance_armies sends request_input and waits | VERIFIED | Lines 117–140: method present, sends RequestInputMessage with input_type='choose_advance_armies', reads response |
 | `risk/static/index.html` | Difficulty dropdown in setup form | VERIFIED | Lines 25–27: `<select id="difficulty">` with Easy/Medium options |
-| `risk/static/app.js` | start_game message includes difficulty value | VERIFIED | Line 53: `difficulty: difficultySelect.value` |
+| `risk/static/app.js` | start_game difficulty; renderArmyLabels calls; choose_advance_armies handler | VERIFIED | Line 53 difficulty; lines 166/289/490 renderArmyLabels; lines 198–222 choose_advance_armies case |
+| `risk/static/map.js` | renderArmyLabels(overlays) function | VERIFIED | Lines 55–70: substantive implementation reading gameState and overlays dict |
+| `risk/models/actions.py` | AdvanceArmiesAction model | VERIFIED | Line 51: `class AdvanceArmiesAction(BaseModel)` |
+| `risk/engine/combat.py` | execute_attack accepts armies_to_move parameter | VERIFIED | Line 81: `armies_to_move: int | None = None`; line 108: used in conquest block |
+| `risk/engine/turn.py` | execute_attack_phase calls agent.choose_advance_armies after conquest | VERIFIED | Lines 216–235: call + delta adjustment logic |
 
 ---
 
@@ -93,9 +122,14 @@ human_verification:
 | `risk/static/app.js` | `risk/server/app.py` | WebSocket start_game.difficulty | WIRED | `difficultySelect.value` sent in JSON; server reads `data.get("difficulty", "easy")` |
 | `risk/server/app.py` | `risk/server/game_manager.py` | `manager.setup(difficulty=difficulty)` | WIRED | Line 79: `difficulty=difficulty` passed to setup() |
 | `risk/server/game_manager.py` | `risk/bots/medium.py` | MediumAgent instantiation when difficulty=='medium' | WIRED | Line 13 import, lines 78–79 conditional instantiation |
-| `risk/bots/medium.py` | `risk/engine/map_graph.py` | `self._map_graph.neighbors()`, `continent_territories()`, `_continent_map`, `_continent_territories` | WIRED | Lines 42–49, 97, 107, 139, 161, 173, 204 — all map_graph methods used substantively |
-| `choose_reinforcement_placement` | `mg.continent_territories()` | external_borders filter excludes neighbors inside the continent | WIRED | Lines 107–118: `cont_terrs = mg.continent_territories(top_continent)` then `external_borders` filter, then `min(final_candidates, ...)` |
+| `risk/bots/medium.py` | `risk/engine/map_graph.py` | continent_territories(), _map_graph methods | WIRED | External_borders two-tier selection at lines 107–118 |
 | `risk/game.py` | `risk/bots/medium.py` | `hasattr(agent, '_map_graph')` duck-typing | WIRED | Line 170: injection applies to any agent with `_map_graph` attribute |
+| `app.js placement confirm handler` | `renderArmyLabels (map.js)` | call after updating reinforcementPlacements | WIRED | Line 289: `renderArmyLabels(reinforcementPlacements)` after `reinforcementPlacements[territoryName] += count` |
+| `confirmReinforceBtn click (app.js)` | `renderArmyLabels (map.js)` | call with empty overlay to clear staging | WIRED | Line 490: `renderArmyLabels({})` before `sendAction('reinforce', ...)` |
+| `enableInputMode choose_reinforcement_placement (app.js)` | `renderArmyLabels (map.js)` | call on mode reset | WIRED | Line 166: `renderArmyLabels({})` after `reinforcementPlacements = {}` |
+| `risk/engine/turn.py execute_attack_phase` | `agent.choose_advance_armies` | called after conquered=True | WIRED | Line 216: `armies_to_advance = agent.choose_advance_armies(state, action.source, action.target, min_armies, max_armies)` |
+| `risk/engine/combat.py execute_attack` | `armies_to_move parameter` | caller passes chosen count; None falls back to num_dice | WIRED | Line 81 param, line 108: `armies_moved = armies_to_move if armies_to_move is not None else action.num_dice` |
+| `risk/server/human_agent.py choose_advance_armies` | `risk/static/app.js choose_advance_armies handler` | RequestInputMessage with input_type='choose_advance_armies' | WIRED | human_agent.py lines 126–133 send; app.js lines 198–222 handle |
 
 ---
 
@@ -103,10 +137,10 @@ human_verification:
 
 | Requirement | Source Plans | Description | Status | Evidence |
 |-------------|-------------|-------------|--------|----------|
-| BOTS-01 | 04-01-PLAN, 04-03-PLAN, 04-04-PLAN | Easy bot makes random valid moves; selectable via browser difficulty dropdown | SATISFIED | RandomAgent already existed; wired via GameManager.setup(difficulty="easy"), browser dropdown, and WebSocket message — all verified. REQUIREMENTS.md marks BOTS-01 as complete. |
-| BOTS-02 | 04-01-PLAN, 04-02-PLAN, 04-03-PLAN, 04-04-PLAN, 04-05-PLAN | Medium bot uses basic strategy (continent focus, reasonable attack decisions) | SATISFIED | MediumAgent implemented and integrated; all strategy behaviors verified. Reinforce now correctly selects external-facing continent borders (external_borders fix). All 17 tests pass. REQUIREMENTS.md marks BOTS-02 as complete. |
+| BOTS-01 | 04-01, 04-03, 04-04, 04-06, 04-07 | Easy bot makes random valid moves; selectable via browser difficulty dropdown | SATISFIED | RandomAgent wired via GameManager.setup(difficulty="easy"), browser dropdown, WebSocket message, choose_advance_armies returning min_armies. REQUIREMENTS.md marks BOTS-01 Complete. |
+| BOTS-02 | 04-01, 04-02, 04-03, 04-04, 04-05, 04-06, 04-07 | Medium bot uses basic strategy (continent focus, reasonable attack decisions) | SATISFIED | MediumAgent fully implemented with continent-aware reinforce (external_borders), attack, fortify, and choose_advance_armies. All 17 tests pass. REQUIREMENTS.md marks BOTS-02 Complete. |
 
-No orphaned requirements: REQUIREMENTS.md maps only BOTS-01 and BOTS-02 to Phase 4, consistent with plan declarations. BOTS-03 and BOTS-04 are assigned to Phase 5 and are not claimed by any Phase 4 plan.
+No orphaned requirements: REQUIREMENTS.md maps only BOTS-01 and BOTS-02 to Phase 4. BOTS-03 and BOTS-04 are assigned to Phase 5 and unclaimed by any Phase 4 plan.
 
 ---
 
@@ -116,7 +150,7 @@ No orphaned requirements: REQUIREMENTS.md maps only BOTS-01 and BOTS-02 to Phase
 |------|------|---------|----------|--------|
 | `risk/server/app.py` | 29 | `"placeholder"` in HTML fallback docstring | Info | Comment-only, not a code stub — no impact on behavior |
 
-No code-level stubs, empty returns, or unimplemented handlers found.
+No code-level stubs, empty returns, or unimplemented handlers found in plans 06 or 07 artifacts.
 
 ---
 
@@ -135,17 +169,29 @@ No code-level stubs, empty returns, or unimplemented handlers found.
 
 **Why human:** Visual UI presence, qualitative strategic differences between Easy and Medium, and absence of runtime errors cannot be verified programmatically.
 
----
+### 2. Reinforcement Staging Labels (GAP-01)
 
-## Re-verification Summary
+**Test:** Start a game with a human player. Enter the reinforcement phase. Click a territory to open the placement modal, enter a number of armies, and confirm.
 
-**Gap closed:** The one blocking gap from the initial verification has been resolved by plan 05.
+**Expected:**
+- After confirming the modal, the territory label on the SVG map immediately updates from "4" to "4+3" (or equivalent).
+- Placing armies on additional territories updates each label independently.
+- Clicking "Confirm Placements" reverts all labels to their base counts immediately, before the next server `game_state` arrives.
 
-- `choose_reinforcement_placement` in `risk/bots/medium.py` now uses a two-tier selection: `external_borders` (cont_border territories whose enemy neighbor is outside the target continent) are preferred over plain `cont_borders` (any enemy neighbor). When `external_borders` is empty, it falls back to `cont_borders` as before.
-- `TestMediumAgentReinforce` class has no `xfail` decorator. `test_reinforce_places_on_border_of_top_continent` passes as a regular PASSED test.
-- Full test suite: 220 passed, 13 xpassed, 0 xfailed, exit 0 — no regressions.
+**Why human:** SVG DOM mutation during the reinforcement phase must be observed in a live browser. Static analysis confirms the code path exists but cannot confirm rendering behavior.
 
-All automated requirements for BOTS-01 and BOTS-02 are satisfied. The only remaining item is the human browser verification that was flagged in the initial verification and remains unchanged in scope.
+### 3. Post-Conquest Advance Armies Modal (GAP-02)
+
+**Test:** Start a game with a human player. Attack an enemy territory with 3 dice and win the battle.
+
+**Expected:**
+- The "Move armies" modal appears with label "Advance armies from [Source] into [Target] (min: 3)".
+- Input min is set to the number of dice used in the winning roll.
+- Input max is set to the source territory's remaining armies minus 1.
+- After confirming a value between min and max, the SVG map shows the chosen army count in the captured territory.
+- Bot players (Easy or Medium) do not pause for this prompt — their turns continue without interruption.
+
+**Why human:** The modal appearance, correct min/max values, and resulting map update depend on a real conquest event in a live browser session. Bot non-interruption also requires live observation.
 
 ---
 
