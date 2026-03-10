@@ -1,8 +1,8 @@
-"""Test stubs for HardAgent (BOTS-03 strategy behaviors).
+"""Tests for HardAgent (BOTS-03/BOTS-04 strategy behaviors and batch validation).
 
-Wave 0: All HardAgent tests are marked xfail(strict=False) until Plan 02 implements
-the strategic logic. The skeleton class uses fallback behavior, so these tests will
-xfail until real strategy is implemented.
+Covers reinforcement concentration, continent-completing attacks, opponent blocking,
+card timing, threat assessment, army advancement, full-game integration, and
+statistical batch validation (Hard vs Medium, Hard vs Random).
 """
 
 import pathlib
@@ -349,16 +349,18 @@ class TestHardAdvance:
 
 class TestHardFullGame:
     def test_completes_game_without_crash(self):
-        """Run a full game with HardAgent -- verify it finishes without exception."""
-        rng = random.Random(42)
-        hard = HardAgent(rng=random.Random(0))
-        random_agent = RandomAgent(rng=random.Random(1))
-        agents = {0: hard, 1: random_agent}
-
-        final = run_game(MAP_GRAPH, agents, rng, max_turns=5000)
-
-        winners = [p for p in final.players if p.is_alive]
-        assert len(winners) == 1, "Game should produce exactly 1 winner"
+        """Run 5 games with 4 players (1 Hard + 3 Random) with different seeds."""
+        for seed in range(5):
+            rng = random.Random(seed)
+            agents = {
+                0: HardAgent(rng=random.Random(seed * 10)),
+                1: RandomAgent(rng=random.Random(seed * 10 + 1)),
+                2: RandomAgent(rng=random.Random(seed * 10 + 2)),
+                3: RandomAgent(rng=random.Random(seed * 10 + 3)),
+            }
+            final = run_game(MAP_GRAPH, agents, rng, max_turns=2000)
+            winners = [p for p in final.players if p.is_alive]
+            assert len(winners) == 1, f"Seed {seed}: game should produce exactly 1 winner"
 
     def test_hard_vs_random_wins(self):
         """Hard should beat RandomAgent most of the time (>70% of 20 games)."""
@@ -376,6 +378,7 @@ class TestHardFullGame:
             if winner == 0:
                 hard_wins += 1
 
+        print(f"\nHard vs Random: {hard_wins}/{num_games} wins ({hard_wins*100//num_games}%)")
         assert hard_wins >= 14, (
             f"Hard bot won only {hard_wins}/{num_games} games vs Random -- expected >= 70%"
         )
@@ -405,6 +408,7 @@ class TestHardBatch:
             if winner == 0:
                 hard_wins += 1
 
+        print(f"\nHard vs Medium batch: {hard_wins}/{num_games} wins ({hard_wins}%)")
         assert hard_wins >= 55, (
             f"Hard bot won only {hard_wins}/100 games vs Medium -- expected >= 55%"
         )
