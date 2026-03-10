@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-10T19:58:26.365Z"
-last_activity: 2026-03-10 -- Completed plan 05-01 (HardAgent skeleton and test stubs)
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-03-10T20:04:57.108Z"
+last_activity: 2026-03-10 -- Completed plan 05-03 (AI simulation mode)
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 20
-  completed_plans: 17
-  percent: 85
+  completed_plans: 18
+  percent: 90
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 5 of 5 (Hard Bot and AI Simulation)
-Plan: 1 of 4 in current phase (complete)
+Plan: 3 of 4 in current phase (complete)
 Status: Executing Phase 05
-Last activity: 2026-03-10 -- Completed plan 05-01 (HardAgent skeleton and test stubs)
+Last activity: 2026-03-10 -- Completed plan 05-03 (AI simulation mode)
 
-Progress: [████████░░] 85%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [████████░░] 85%
 | Phase 04-easy-and-medium-bots P06 | 1 | 2 tasks | 2 files |
 | Phase 04-easy-and-medium-bots P07 | 2 | 2 tasks | 9 files |
 | Phase 05-hard-bot-and-ai-simulation P01 | 4 | 2 tasks | 4 files |
+| Phase 05 P03 | 4 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,9 @@ Recent decisions affecting current work:
 - [Phase 05-hard-bot-and-ai-simulation]: HardAgent skeleton uses simple fallback logic (random placement, no attacks) so it is immediately usable in tests without crashing
 - [Phase 05-hard-bot-and-ai-simulation]: ATTACK_PROBABILITIES embedded as module-level constant dict keyed by (attacker_dice, defender_dice) tuples
 - [Phase 05-hard-bot-and-ai-simulation]: Test stubs use class-level xfail(strict=False) matching Phase 04 pattern for Wave 0 suite exit 0
+- [Phase 05]: Simulation loop (_run_simulation_loop) is separate method from _run_game_loop for clarity
+- [Phase 05]: Bot naming in simulation uses 1-indexed 'Bot 1' through 'Bot N' since no human player
+- [Phase 05]: isSimulation flag in app.js controls UI state; request_input messages ignored as safety guard in simulation mode
 
 ### Pending Todos
 
@@ -125,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T19:58:26.359Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-03-10T20:04:57.097Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None
