@@ -72,7 +72,6 @@ def _make_state(
 # BOTS-03: HardAgent reinforce strategy
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=False, reason="HardAgent strategic reinforce not yet implemented")
 class TestHardReinforce:
     def test_concentrates_armies(self):
         """Verify all armies placed on 1-2 territories (not spread across many)."""
@@ -118,7 +117,6 @@ class TestHardReinforce:
 # BOTS-03: HardAgent attack strategy
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=False, reason="HardAgent strategic attack not yet implemented")
 class TestHardAttack:
     def test_prioritizes_continent_completion(self):
         """Verify attacks territory that completes a continent."""
@@ -195,7 +193,6 @@ class TestHardAttack:
 # BOTS-03: HardAgent card timing
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=False, reason="HardAgent strategic card timing not yet implemented")
 class TestHardCardTiming:
     def test_holds_cards_when_safe(self):
         """Verify does NOT trade at 3 cards when escalation is low."""
@@ -259,7 +256,6 @@ class TestHardCardTiming:
 # BOTS-03: HardAgent threat assessment
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=False, reason="HardAgent threat assessment not yet implemented")
 class TestHardThreat:
     def test_identifies_dangerous_opponent(self):
         """Verify threat scores rank opponents correctly."""
@@ -300,7 +296,6 @@ class TestHardThreat:
 # BOTS-03: HardAgent advance armies
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=False, reason="HardAgent strategic advance not yet implemented")
 class TestHardAdvance:
     def test_advances_more_into_exposed_territory(self):
         """Verify advances more armies when target borders enemies."""
@@ -352,7 +347,6 @@ class TestHardAdvance:
 # BOTS-03: HardAgent full game integration
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=False, reason="HardAgent strategic logic not yet implemented")
 class TestHardFullGame:
     def test_completes_game_without_crash(self):
         """Run a full game with HardAgent -- verify it finishes without exception."""
@@ -392,7 +386,6 @@ class TestHardFullGame:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.slow
-@pytest.mark.xfail(strict=False, reason="HardAgent strategic logic not yet implemented")
 class TestHardBatch:
     def test_hard_vs_medium_batch(self):
         """100-game batch: Hard wins >= 55% against Medium."""
