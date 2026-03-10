@@ -77,10 +77,10 @@ Plans:
   3. A human player can play a full game against 1-5 bots (any mix of Easy/Medium) from setup to victory or defeat in the browser
 **Plans:** 7/7 plans complete
 Plans:
-- [ ] 04-01-PLAN.md — Wave 0: test scaffold (test stubs + risk/bots/ package skeleton)
-- [ ] 04-02-PLAN.md — MediumAgent implementation (TDD, continent-aware strategy) + run_game() injection update
-- [ ] 04-03-PLAN.md — Full-stack difficulty wiring: StartGameMessage, GameManager, app.py, index.html, app.js
-- [ ] 04-04-PLAN.md — Test suite gate + human verification checkpoint
+- [x] 04-01-PLAN.md — Wave 0: test scaffold (test stubs + risk/bots/ package skeleton)
+- [x] 04-02-PLAN.md — MediumAgent implementation (TDD, continent-aware strategy) + run_game() injection update
+- [x] 04-03-PLAN.md — Full-stack difficulty wiring: StartGameMessage, GameManager, app.py, index.html, app.js
+- [x] 04-04-PLAN.md — Test suite gate + human verification checkpoint
 
 ### Phase 5: Hard Bot and AI Simulation
 **Goal**: The Hard bot plays at human-competitive level, delivering the project's core value, and users can watch bot-only games
@@ -90,7 +90,12 @@ Plans:
   1. Hard bot demonstrates observable strategic play: prioritizes continent completion, concentrates armies on borders, times card trades for maximum impact, and assesses threats from other players
   2. Hard bot wins against Medium bots significantly more often than chance in batch AI-vs-AI testing
   3. User can start an AI-vs-AI simulation (no human player) and watch bots play a full game to completion
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 05-01-PLAN.md — Wave 0: HardAgent skeleton, test stubs for BOTS-03 and BOTS-04
+- [ ] 05-02-PLAN.md — HardAgent full implementation (TDD, multi-factor heuristic strategy)
+- [ ] 05-03-PLAN.md — AI-vs-AI simulation mode (server + frontend)
+- [ ] 05-04-PLAN.md — Batch statistical validation + human verification
 
 ## Progress
 
@@ -103,4 +108,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Game Engine | 3/3 | Complete | 2026-03-08 |
 | 3. Web UI and Game Setup | 4/4 | Complete | 2026-03-08 |
 | 4. Easy and Medium Bots | 7/7 | Complete   | 2026-03-09 |
-| 5. Hard Bot and AI Simulation | 0/TBD | Not started | - |
+| 5. Hard Bot and AI Simulation | 0/4 | Planning complete | - |
