@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-03-10T20:04:57.108Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-10T20:07:02.414Z"
 last_activity: 2026-03-10 -- Completed plan 05-03 (AI simulation mode)
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 20
-  completed_plans: 18
+  completed_plans: 19
   percent: 90
 ---
 
@@ -61,6 +61,7 @@ Progress: [█████████░] 90%
 | Phase 04-easy-and-medium-bots P07 | 2 | 2 tasks | 9 files |
 | Phase 05-hard-bot-and-ai-simulation P01 | 4 | 2 tasks | 4 files |
 | Phase 05 P03 | 4 | 2 tasks | 6 files |
+| Phase 05-hard-bot-and-ai-simulation P02 | 6 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Simulation loop (_run_simulation_loop) is separate method from _run_game_loop for clarity
 - [Phase 05]: Bot naming in simulation uses 1-indexed 'Bot 1' through 'Bot N' since no human player
 - [Phase 05]: isSimulation flag in app.js controls UI state; request_input messages ignored as safety guard in simulation mode
+- [Phase 05-hard-bot-and-ai-simulation]: Win probability uses geometric approximation from per-roll expected losses rather than Monte Carlo simulation
+- [Phase 05-hard-bot-and-ai-simulation]: Block-opponent-continent uses territory count threshold (N-2 or 50%+) rather than exact all-but-1 match
+- [Phase 05-hard-bot-and-ai-simulation]: Army preservation check requires per-attack viability (3+ armies with advantage) not aggregate BSR threshold
 
 ### Pending Todos
 
@@ -129,6 +133,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T20:04:57.097Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-03-10T20:07:02.409Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
