@@ -1,11 +1,11 @@
-"""Test stubs for AI-vs-AI simulation mode (BOTS-04).
+"""Tests for AI-vs-AI simulation mode (BOTS-04).
 
-Wave 0: All simulation tests are marked xfail(strict=False) until Plan 03/04
-implement the simulation mode in GameManager and frontend.
+Verifies GameManager creates all-bot games in simulation mode,
+player names are 'Bot N' (no 'You'), and games run to completion.
 """
 
 import pathlib
-import random
+import time
 
 import pytest
 
@@ -24,7 +24,6 @@ MAP_GRAPH = MapGraph(MAP_DATA)
 # BOTS-04: Simulation mode agent creation
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=False, reason="Simulation mode not yet implemented")
 class TestSimulationMode:
     def test_simulation_creates_all_bot_agents(self):
         """GameManager in simulation mode has no human agent."""
@@ -50,6 +49,27 @@ class TestSimulationMode:
                 f"Player {idx} should be a bot in simulation mode, got {type(agent)}"
             )
 
+    def test_simulation_hard_difficulty(self):
+        """GameManager in simulation mode with hard difficulty creates HardAgents."""
+        from risk.server.game_manager import GameManager
+        from risk.bots.hard import HardAgent
+
+        sent = []
+        gm = GameManager()
+        gm.setup(
+            num_players=3,
+            map_graph=MAP_GRAPH,
+            send_callback=lambda msg: sent.append(msg),
+            difficulty="hard",
+            game_mode="simulation",
+        )
+
+        assert gm.human_agent is None
+        for idx, agent in gm.agents.items():
+            assert isinstance(agent, HardAgent), (
+                f"Player {idx} should be HardAgent, got {type(agent)}"
+            )
+
     def test_simulation_names_all_bots(self):
         """All player names are 'Bot N', not 'You'."""
         from risk.server.game_manager import GameManager
@@ -62,15 +82,12 @@ class TestSimulationMode:
             send_callback=lambda msg: sent.append(msg),
             difficulty="easy",
             game_mode="simulation",
+            bot_delay=0.0,
         )
 
-        # Start the game to get player names in state
-        # We need to inspect the state after setup -- check sent messages
-        # for game_state that includes player names
         gm.start_game()
 
         # Wait briefly for game to start and send initial state
-        import time
         time.sleep(1)
 
         # Find game_state messages
@@ -79,7 +96,7 @@ class TestSimulationMode:
 
         # Check player names -- none should be "You"
         first_state = state_msgs[0]
-        players = first_state.get("players", [])
+        players = first_state["state"]["players"]
         for p in players:
             name = p.get("name", "")
             assert name != "You", (
@@ -96,7 +113,6 @@ class TestSimulationMode:
 # BOTS-04: Simulation game completion
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=False, reason="Simulation mode not yet implemented")
 class TestSimulationCompletion:
     def test_simulation_game_completes(self):
         """A simulation game runs to game_over."""
@@ -108,15 +124,14 @@ class TestSimulationCompletion:
             num_players=2,
             map_graph=MAP_GRAPH,
             send_callback=lambda msg: sent.append(msg),
-            bot_delay=0.0,  # No delay for testing
+            bot_delay=0.0,
             difficulty="easy",
             game_mode="simulation",
         )
 
         gm.start_game()
 
-        # Wait for game to complete (bot-only games with no delay should be fast)
-        import time
+        # Wait for game to complete
         timeout = 30  # seconds
         start = time.time()
         while time.time() - start < timeout:
@@ -149,7 +164,6 @@ class TestSimulationCompletion:
 
         gm.start_game()
 
-        import time
         timeout = 30
         start = time.time()
         while time.time() - start < timeout:
@@ -164,5 +178,6 @@ class TestSimulationCompletion:
         msg = game_over_msgs[0]
         assert "winner" in msg, "game_over should include winner index"
         assert "winner_name" in msg, "game_over should include winner name"
+        assert msg["is_human_winner"] is False, "Simulation winner should not be human"
 
         gm.cancel_game()

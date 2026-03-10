@@ -10,6 +10,7 @@ from risk.engine.cards import create_deck
 from risk.engine.map_graph import MapGraph
 from risk.engine.setup import setup_game
 from risk.engine.turn import execute_turn
+from risk.bots.hard import HardAgent
 from risk.bots.medium import MediumAgent
 from risk.game import RandomAgent
 from risk.models.cards import Card, TurnPhase
@@ -34,6 +35,7 @@ class GameManager:
         self._num_players: int = 0
         self._map_graph: MapGraph | None = None
         self._cancel_flag = threading.Event()
+        self._game_mode: str = "play"
         self._send_callback: Callable[[dict[str, Any]], None] | None = None
         self._game_thread: threading.Thread | None = None
 
@@ -50,37 +52,55 @@ class GameManager:
         loop: asyncio.AbstractEventLoop | None = None,
         bot_delay: float | None = None,
         difficulty: str = "easy",
+        game_mode: str = "play",
     ) -> None:
-        """Create agents for a new game. Human is always player 0."""
+        """Create agents for a new game.
+
+        In 'play' mode, player 0 is human. In 'simulation' mode, all players
+        are bots and the human watches.
+        """
         if loop is None:
             loop = asyncio.get_event_loop()
         self._map_graph = map_graph
         self._send_callback = send_callback
         self._cancel_flag.clear()
         self._num_players = num_players
+        self._game_mode = game_mode
         if bot_delay is not None:
             self.BOT_DELAY = bot_delay
 
-        if difficulty not in ("easy", "medium"):
+        if difficulty not in ("easy", "medium", "hard"):
             difficulty = "easy"
 
-        rng = random.Random()
-
-        # Create human agent for player 0
-        human = HumanWebSocketAgent(loop)
-        human.set_map_graph(map_graph)
-        human.set_send_callback(self._send_sync)
-        self.human_agent = human
-        self.agents[0] = human
-
-        # Create bot agents for remaining players
-        for i in range(1, num_players):
-            if difficulty == "medium":
+        def _make_bot(difficulty: str, map_graph: MapGraph) -> Any:
+            """Create a bot agent based on difficulty."""
+            if difficulty == "hard":
+                bot = HardAgent(rng=random.Random())
+            elif difficulty == "medium":
                 bot = MediumAgent(rng=random.Random())
             else:
                 bot = RandomAgent(rng=random.Random())
             bot._map_graph = map_graph
-            self.agents[i] = bot
+            return bot
+
+        if game_mode == "simulation":
+            # All players are bots -- no human agent
+            self.human_agent = None
+            for i in range(num_players):
+                self.agents[i] = _make_bot(difficulty, map_graph)
+        else:
+            # Play mode: player 0 is human
+            rng = random.Random()
+
+            human = HumanWebSocketAgent(loop)
+            human.set_map_graph(map_graph)
+            human.set_send_callback(self._send_sync)
+            self.human_agent = human
+            self.agents[0] = human
+
+            # Create bot agents for remaining players
+            for i in range(1, num_players):
+                self.agents[i] = _make_bot(difficulty, map_graph)
 
     def _send_sync(self, msg: dict[str, Any]) -> None:
         """Synchronous send wrapper for use from game thread."""
@@ -89,9 +109,12 @@ class GameManager:
 
     def start_game(self) -> None:
         """Start the game loop in a background thread."""
-        self._game_thread = threading.Thread(
-            target=self._run_game_loop, daemon=True
+        target = (
+            self._run_simulation_loop
+            if self._game_mode == "simulation"
+            else self._run_game_loop
         )
+        self._game_thread = threading.Thread(target=target, daemon=True)
         self._game_thread.start()
 
     def _run_game_loop(self) -> None:
@@ -166,6 +189,75 @@ class GameManager:
             # Add delay for bot turns so human can see what's happening
             if not is_human:
                 time.sleep(self.BOT_DELAY)
+
+    def _run_simulation_loop(self) -> None:
+        """Run an all-bot game loop for simulation (watch AI) mode."""
+        mg = self._map_graph
+        if mg is None:
+            return
+
+        num_players = len(self.agents)
+        rng = random.Random()
+
+        # Setup initial state
+        state = setup_game(mg, num_players, rng)
+
+        # Initialize deck
+        deck = create_deck(mg.all_territories)
+        rng.shuffle(deck)
+        cards: dict[int, list[Card]] = {i: [] for i in range(num_players)}
+        state = state.model_copy(update={"deck": deck, "cards": cards})
+
+        # Update player names: all bots
+        new_players = list(state.players)
+        for i in range(num_players):
+            new_players[i] = new_players[i].model_copy(
+                update={"name": f"Bot {i + 1}"}
+            )
+        state = state.model_copy(update={"players": new_players})
+
+        # Send initial state
+        self._send_sync(state_to_message(state, mg, "Simulation started!"))
+
+        max_turns = 5000
+        for _turn in range(max_turns):
+            if self._cancel_flag.is_set():
+                return
+
+            old_state = state
+            player_idx = state.current_player_index
+            player_name = state.players[player_idx].name
+
+            # Send state update before turn
+            prompt = f"{player_name}'s turn..."
+            self._send_sync(state_to_message(state, mg, prompt))
+
+            # Execute turn
+            state, victory = execute_turn(state, mg, self.agents, rng)
+
+            # Detect and emit events by diffing states
+            self._emit_turn_events(old_state, state, player_idx)
+
+            # Send updated state after turn
+            if not victory:
+                next_name = state.players[state.current_player_index].name
+                prompt = f"{next_name}'s turn..."
+                self._send_sync(state_to_message(state, mg, prompt))
+
+            if victory:
+                winner_idx = next(
+                    p.index for p in state.players if p.is_alive
+                )
+                msg = GameOverMessage(
+                    winner=winner_idx,
+                    winner_name=state.players[winner_idx].name,
+                    is_human_winner=False,
+                )
+                self._send_sync(msg.model_dump(mode="json"))
+                return
+
+            # Bot delay for visual pacing
+            time.sleep(self.BOT_DELAY)
 
     def _emit_turn_events(
         self,

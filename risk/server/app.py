@@ -71,12 +71,14 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
             if msg_type == "start_game":
                 num_players = data.get("num_players", 4)
                 difficulty = data.get("difficulty", "easy")
+                game_mode = data.get("game_mode", "play")
                 manager.setup(
                     num_players=num_players,
                     map_graph=map_graph,
                     send_callback=lambda msg: _schedule_send(loop, websocket, msg),
                     loop=loop,
                     difficulty=difficulty,
+                    game_mode=game_mode,
                 )
                 manager.start_game()
 
