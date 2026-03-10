@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 04-07-PLAN.md
-last_updated: "2026-03-09T21:31:54.930Z"
-last_activity: 2026-03-08 -- Completed plan 03-04 (integration testing and end-to-end wiring)
+status: executing
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-10T19:58:26.365Z"
+last_activity: 2026-03-10 -- Completed plan 05-01 (HardAgent skeleton and test stubs)
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 16
-  completed_plans: 16
-  percent: 90
+  total_plans: 20
+  completed_plans: 17
+  percent: 85
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** AI bots that provide a challenging and fun single-player experience, with the hardest difficulty playing at human-competitive level.
-**Current focus:** Phase 3 Complete (including integration plan 04) -- Ready for Phase 4
+**Current focus:** Phase 5 in progress -- HardAgent skeleton and test stubs complete
 
 ## Current Position
 
-Phase: 3 of 5 (Web UI and Game Setup) -- COMPLETE
-Plan: 4 of 4 in current phase (all complete)
-Status: Phase 03 Complete (integration verified)
-Last activity: 2026-03-08 -- Completed plan 03-04 (integration testing and end-to-end wiring)
+Phase: 5 of 5 (Hard Bot and AI Simulation)
+Plan: 1 of 4 in current phase (complete)
+Status: Executing Phase 05
+Last activity: 2026-03-10 -- Completed plan 05-01 (HardAgent skeleton and test stubs)
 
-Progress: [█████████░] 90%
+Progress: [████████░░] 85%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [█████████░] 90%
 | Phase 04-easy-and-medium-bots P05 | 1 | 2 tasks | 2 files |
 | Phase 04-easy-and-medium-bots P06 | 1 | 2 tasks | 2 files |
 | Phase 04-easy-and-medium-bots P07 | 2 | 2 tasks | 9 files |
+| Phase 05-hard-bot-and-ai-simulation P01 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,9 @@ Recent decisions affecting current work:
 - [Phase 04-easy-and-medium-bots]: renderArmyLabels reads gameState from module scope (same page scope), no parameter passing needed for base counts
 - [Phase 04-easy-and-medium-bots]: renderArmyLabels({}) called on confirm-reinforce and on input mode reset to ensure clean slate
 - [Phase 04-easy-and-medium-bots]: Bot agents (RandomAgent, MediumAgent) return min_armies from choose_advance_armies for conservative play; delta approach in turn.py reconciles engine's default num_dice commit with player-chosen count
+- [Phase 05-hard-bot-and-ai-simulation]: HardAgent skeleton uses simple fallback logic (random placement, no attacks) so it is immediately usable in tests without crashing
+- [Phase 05-hard-bot-and-ai-simulation]: ATTACK_PROBABILITIES embedded as module-level constant dict keyed by (attacker_dice, defender_dice) tuples
+- [Phase 05-hard-bot-and-ai-simulation]: Test stubs use class-level xfail(strict=False) matching Phase 04 pattern for Wave 0 suite exit 0
 
 ### Pending Todos
 
@@ -121,6 +125,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T21:24:11.530Z
-Stopped at: Completed 04-07-PLAN.md
+Last session: 2026-03-10T19:58:26.359Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
