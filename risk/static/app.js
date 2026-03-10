@@ -13,6 +13,9 @@ let ws = null;
 let reinforcementsRemaining = 0;
 let reinforcementPlacements = {};
 
+// Simulation mode tracking
+let isSimulation = false;
+
 const PLAYER_COLORS = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6', '#e67e22'];
 const PLAYER_NAMES = ['You', 'Bot 1', 'Bot 2', 'Bot 3', 'Bot 4', 'Bot 5'];
 const PHASE_NAMES = {1: 'Reinforce', 2: 'Attack', 3: 'Fortify'};
@@ -30,6 +33,7 @@ const gameBoard = document.getElementById('game-board');
 const startBtn = document.getElementById('start-btn');
 const playerCountSelect = document.getElementById('player-count');
 const difficultySelect = document.getElementById('difficulty');
+const gameModeSelect = document.getElementById('game-mode');
 const confirmReinforceBtn = document.getElementById('confirm-reinforce-btn');
 const endAttackBtn = document.getElementById('end-attack-btn');
 const skipFortifyBtn = document.getElementById('skip-fortify-btn');
@@ -50,9 +54,22 @@ startBtn.addEventListener('click', function() {
         messageQueue = [];
         mapLoaded = false;
 
-        ws.send(JSON.stringify({type: 'start_game', num_players: numPlayers, difficulty: difficultySelect.value}));
+        var gameMode = gameModeSelect.value;
+        isSimulation = (gameMode === 'simulation');
+
+        ws.send(JSON.stringify({type: 'start_game', num_players: numPlayers, difficulty: difficultySelect.value, game_mode: gameMode}));
         setupScreen.style.display = 'none';
         gameBoard.style.display = 'flex';
+
+        // Hide human controls in simulation mode
+        if (isSimulation) {
+            document.getElementById('dice-controls').style.display = 'none';
+            confirmReinforceBtn.style.display = 'none';
+            endAttackBtn.style.display = 'none';
+            skipFortifyBtn.style.display = 'none';
+        } else {
+            document.getElementById('dice-controls').style.display = '';
+        }
 
         // Load adjacency data and SVG map, then flush queued messages
         var adjacencyLoaded = fetch('/api/map-data')
@@ -113,6 +130,8 @@ function processMessage(msg) {
             break;
 
         case 'request_input':
+            // Ignore request_input in simulation mode (safety guard)
+            if (isSimulation) break;
             currentInputType = msg.input_type;
             validSources = msg.valid_sources || [];
             validTargets = msg.valid_targets || [];
@@ -501,7 +520,9 @@ function showGameOver(msg) {
     var message = document.getElementById('game-over-message');
     var newGameBtn = document.getElementById('new-game-btn');
 
-    if (msg.is_human_winner) {
+    if (isSimulation) {
+        message.textContent = 'Game Over - ' + msg.winner_name + ' wins!';
+    } else if (msg.is_human_winner) {
         message.textContent = 'Victory! You win!';
     } else {
         message.textContent = 'Defeat! ' + msg.winner_name + ' wins.';
@@ -525,6 +546,7 @@ function showGameOver(msg) {
         reinforcementPlacements = {};
         mapReady = false;
         messageQueue = [];
+        isSimulation = false;
 
         overlay.style.display = 'none';
         gameBoard.style.display = 'none';
