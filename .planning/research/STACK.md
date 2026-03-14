@@ -1,191 +1,240 @@
-# Technology Stack
+# Stack Research
 
-**Project:** Risk Strategy Game
-**Researched:** 2026-03-08
+**Domain:** Flutter mobile board game (Risk port — Android & iOS)
+**Researched:** 2026-03-14
+**Confidence:** HIGH
+
+> This document covers the v1.1 Flutter/Dart mobile port only.
+> The v1.0 Python/FastAPI/JS stack is documented in git history.
+> The new app runs entirely on-device — no backend, no network.
+
+---
 
 ## Recommended Stack
 
-### Runtime & Language
+### Core Technologies
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Python | 3.12+ | Backend: game logic, AI bots, web server | Project requirement. 3.12 for performance improvements and type hint maturity. Avoid 3.14 (too new, ecosystem catching up). | HIGH |
-| Vanilla JS (ES6+) | N/A | Frontend interactivity | No build tooling needed. Game UI is simple enough that React/Vue would be overengineering. Keeps the project dependency-light on the frontend. | HIGH |
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| Flutter SDK | ^3.41.x (stable) | Cross-platform mobile framework | Flutter 3.41 (Feb 2026) is the current stable release. Targets Android and iOS from a single Dart codebase. Widget toolkit maps well to the turn-based game loop. The SDK bundles Dart ~3.11. |
+| Dart SDK | bundled with Flutter | Language runtime | Dart 3.x brings sound null safety, pattern matching, and records — all valuable for a complex game state machine. No separate install needed. |
 
-### Web Framework & Server
+### State Management
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| FastAPI | ~0.135 | HTTP API + WebSocket server | Native WebSocket support for real-time game state push. Async-first architecture handles concurrent bot computation without blocking UI updates. Pydantic integration provides typed game state serialization for free. Far superior to Flask for this use case (Flask needs flask-socketio and has no native async). | HIGH |
-| Uvicorn | ~0.41 | ASGI server | Standard FastAPI companion. Lightweight, fast, handles WebSocket connections natively. | HIGH |
-| Pydantic | ~2.12 | Game state models & validation | Comes with FastAPI. Use for all game state models (Territory, Player, GameState). Serialization to JSON for frontend is automatic. TypedDict alternative is weaker -- Pydantic gives validation, serialization, and documentation. | HIGH |
+| Library | Version | Purpose | Why Recommended |
+|---------|---------|---------|-----------------|
+| flutter_riverpod | ^3.3.1 | Turn-based game state management | Riverpod 3 is the current community consensus for Flutter state in 2026. `NotifierProvider` and `AsyncNotifier` fit a turn FSM directly: each provider owns a slice (current phase, player states, board). Compile-time safety prevents the "provider not found" runtime errors of the older `provider` package. Riverpod 3.0 introduces built-in mutations and offline persistence hooks. Use `@riverpod` code generation macro to reduce boilerplate. |
+| riverpod_annotation | ^3.3.1 | Code generation for Riverpod | Required companion for the `@riverpod` macro. Eliminates manual provider wiring. |
+| build_runner | ^2.x | Code generation runner | Required to run `riverpod_annotation`, `freezed`, and `json_serializable` code generation. Run with `dart run build_runner build --delete-conflicting-outputs`. |
 
-### Game State & Graph
+### Data Modeling (Immutable Game State)
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| NetworkX | ~3.6 | Territory adjacency graph | Mature, well-documented graph library. Territory map is fundamentally a graph problem (42 nodes, ~82 edges). Provides pathfinding (connected territories for fortification), subgraph operations (continent detection), and adjacency queries out of the box. Pure Python, no compiled dependencies. | HIGH |
+| Library | Version | Purpose | Why Recommended |
+|---------|---------|---------|-----------------|
+| freezed | ^3.2.5 | Immutable data classes with `copyWith` and equality | The Python game engine used Pydantic's `model_copy()` for immutable state transitions. Freezed is the Dart equivalent. Generates `copyWith`, `==`, `hashCode`, and union types. Use for `GameState`, `Territory`, `Player`, `TurnPhase` etc. Critical for Riverpod: providers only re-render when state object identity changes. |
+| freezed_annotation | ^3.x | Annotation companion for freezed | Required at runtime (not dev-only). |
+| json_serializable | ^6.13.0 | JSON serialization for save/load | Generates `fromJson`/`toJson` for all `@JsonSerializable` classes. Combine with `freezed` for full-featured model layer. Required for ObjectBox persistence and any future export features. |
+| json_annotation | ^4.x | Annotation companion for json_serializable | Required at runtime. |
 
-### Frontend Visualization
+### Map Rendering
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| SVG (inline) | N/A | Territory map rendering | Territories are polygons with fills -- SVG is the natural fit. Each territory is a `<path>` element, colorable via CSS class, clickable via JS event listeners. Resolution-independent. Canvas would require reimplementing hit detection and repainting; SVG gets this for free from the DOM. | HIGH |
-| D3.js | ~7.9 | SVG manipulation & data binding (optional) | Useful if territory coloring/transitions get complex, but may not be needed. Start without it -- vanilla JS can binddata to SVG paths. Add D3 only if you need animated transitions or complex data-driven updates. | MEDIUM |
+| Library | Version | Purpose | Why Recommended |
+|---------|---------|---------|-----------------|
+| flutter_svg | ^2.2.4 | Render the Risk world map SVG asset | The existing Risk map is an SVG. `flutter_svg` (now published by flutter.dev after the original author's death in 2024) renders SVG as a Flutter widget. Use for static map background rendering. Combine with `InteractiveViewer` for pinch-to-zoom and pan. |
+| path_parsing | ^1.1.0 | Parse SVG path data strings into Flutter `Path` objects | Maintained by the Flutter team at Google (forked from the original author's `path_drawing`). Use to convert each territory's SVG `<path d="...">` string into a Dart `Path` object at startup. These baked `Path` objects are used in `CustomPainter.hitTest()` to detect which territory the user tapped. Do NOT use `path_drawing` (3 years unmaintained). |
 
-### AI & Algorithms
+> **Map rendering architecture:** Render the SVG map image with `flutter_svg` inside `InteractiveViewer` for zoom/pan. Overlay a `CustomPaint` widget (same size) that draws territory color fills, army counts, and selection highlights using pre-parsed `Path` objects from `path_parsing`. Tap detection uses `GestureDetector` + `Path.contains(localPosition)` to identify the tapped territory. This avoids re-parsing SVG on every tap.
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| NumPy | ~2.2 | Dice simulation, probability calculations, batch operations | Vectorized dice rolls are significantly faster than Python loops when simulating attack outcomes. Use `numpy.random.Generator` (not legacy `numpy.random.randint`). Essential for Hard bot's attack outcome evaluation (Monte Carlo simulation of combat). | HIGH |
-| Custom heuristic engine | N/A | Bot decision-making (all tiers) | Risk's game tree is too large for minimax (branching factor in the hundreds). MCTS is viable but overkill for this project. The proven approach from academic literature is heuristic evaluation: score each possible action using weighted factors (continent control, border strength, army concentration, threat assessment). Easy bot = random + basic heuristics. Medium bot = good heuristics. Hard bot = tuned heuristics + Monte Carlo combat simulation. | HIGH |
+### Local Persistence (Save / Load)
 
-### Testing & Dev Tools
+| Library | Version | Purpose | Why Recommended |
+|---------|---------|---------|-----------------|
+| objectbox | ^5.2.0 | Structured save-game storage | ObjectBox 5.2 is actively maintained by objectbox.io, supports Android + iOS, and is ACID-compliant with 10x faster reads/writes than SQLite alternatives. Explicitly designed for mobile game state (has a dedicated games use-case page). Works with Dart-native objects (no SQL). Use for save slots: serialize `GameState` to JSON via `json_serializable`, store as a string entity with metadata (timestamp, player count, turn number). |
+| objectbox_flutter_libs | ^5.2.0 | Native ObjectBox library for Android/iOS | Required companion package. Download pre-built binaries via `flutter pub run objectbox:download-libs`. |
+| shared_preferences | ^2.5.4 | App settings storage | For simple, non-critical key-value settings: difficulty preference, simulation speed, last-used player count. Uses `NSUserDefaults` on iOS and `SharedPreferences` on Android. Do NOT use for save-game data (no write guarantees). |
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| pytest | ~8.x | Unit & integration testing | Standard Python test runner. Game logic is highly testable (deterministic with seeded RNG). | HIGH |
-| pytest-asyncio | ~0.25 | Async test support | Needed for testing FastAPI WebSocket endpoints and async game loop. | HIGH |
-| httpx | ~0.28 | HTTP test client | FastAPI's recommended test client (via `TestClient`). | HIGH |
+### Build & Packaging Tools (Dev Only)
 
-### Project Structure & Tooling
+| Tool | Version | Purpose | Notes |
+|------|---------|---------|-------|
+| flutter_launcher_icons | ^0.14.4 | Generate adaptive Android and iOS launcher icons from a single source image | Run via `dart run flutter_launcher_icons`. Configure in `pubspec.yaml` under `flutter_launcher_icons:`. Generates adaptive icons (Android 8+) and iOS icon sets automatically. |
+| flutter_native_splash | ^2.4.7 | Generate a native splash screen (avoids white flash on startup) | Run via `dart run flutter_native_splash:create`. Configures Android `launch_background.xml` and iOS `LaunchScreen.storyboard`. Configure in `pubspec.yaml`. |
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| uv | latest | Package management & virtual env | Faster than pip, handles lockfiles, replaces pip + pip-tools + venv. Modern Python standard. | HIGH |
-| Ruff | latest | Linting & formatting | Replaces flake8 + black + isort. Single tool, extremely fast. | HIGH |
+### Testing
 
-## Alternatives Considered
+| Library | Version | Purpose | Notes |
+|---------|---------|---------|-------|
+| flutter_test | SDK-bundled | Unit tests (game engine logic) and widget tests | Bundled with Flutter SDK, no separate install. Game engine logic (combat, cards, reinforcements, fortify, FSM) is pure Dart — test with `test()` directly. Widget tests use `WidgetTester` for UI interaction. |
+| integration_test | SDK-bundled | On-device integration tests | Bundled with Flutter SDK. Use for end-to-end game flow tests (game starts, turn completes, win is detected). Run with `flutter test integration_test/`. |
+| mocktail | ^1.0.4 | Mock dependencies in unit tests | Preferred over `mockito` in 2025-2026: no code generation needed, null-safe by default, simpler API. Use for mocking `ObjectBox` storage in unit tests. Published by felangel.dev (BLoC author). |
 
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| Web framework | FastAPI | Flask | No native async, no native WebSocket support, no built-in Pydantic. Would need flask-socketio (Socket.IO adds complexity) and manual serialization. |
-| Web framework | FastAPI | Django | Massive overkill. ORM, admin panel, template engine -- none needed for a local game. |
-| Territory graph | NetworkX | Custom adjacency dict | NetworkX is small, battle-tested, and provides pathfinding algorithms needed for fortification validation. Reinventing this is pointless. |
-| Frontend rendering | SVG | HTML Canvas | Canvas requires manual hit detection (point-in-polygon), manual redraw loops, and loses DOM event model. SVG territories are DOM elements with native click/hover events. |
-| Frontend rendering | SVG | Pixi.js / Phaser | Game engine libraries designed for sprite-based games with animation loops. Massive overkill for a static territory map with color fills. |
-| Frontend framework | Vanilla JS | React / Vue | Build tooling overhead (webpack/vite), component abstraction unnecessary for a single-page game UI. The frontend is ~3 views: map, sidebar info, action buttons. |
-| AI approach | Heuristic evaluation | Minimax | Risk's branching factor makes minimax infeasible without extreme pruning. A single turn can involve dozens of attack/fortify decisions. |
-| AI approach | Heuristic evaluation | Neural network (AlphaZero-style) | Training infrastructure, data generation, and complexity far exceed project scope. Academic papers show it works but requires thousands of GPU-hours of self-play. |
-| AI approach | Heuristic evaluation | Pure MCTS | Viable but slower to implement correctly, and heuristic bots can be just as strong for Risk with proper tuning. MCTS shines in games with simpler action spaces. |
-| Dice/random | NumPy | stdlib random | NumPy's vectorized operations make batch combat simulation (hundreds of dice rolls for Hard bot evaluation) 10-100x faster. |
-| Package manager | uv | pip + venv | uv is faster, handles lockfiles natively, and is the direction the Python ecosystem is heading. |
-
-## What NOT to Use
-
-| Technology | Why Not |
-|------------|---------|
-| Pygame | Desktop GUI library, not web-based. Project requires browser-based frontend. |
-| Socket.IO | Adds protocol complexity on top of WebSockets. FastAPI's native WebSocket support is sufficient for a single-client local game. |
-| SQLite / any database | Game state lives in memory for the duration of a game. No persistence needed (local-only, single session). If save/load is added later, JSON file serialization via Pydantic is simpler. |
-| Celery / task queues | Bot computation is fast enough to run in-process. No need for distributed task processing. |
-| Docker | Local development only. Python venv via uv is sufficient. |
-| TypeScript | Adds build step complexity. The frontend JS is small enough (~500-1000 lines) that type safety from TS doesn't justify the tooling overhead. |
-| Jinja2 / templates | Serve a single static HTML file. Game state updates via WebSocket, not page reloads. |
+---
 
 ## Installation
 
+```yaml
+# pubspec.yaml
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.41.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^3.3.1
+  riverpod_annotation: ^3.3.1
+
+  # Immutable models
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+
+  # Map rendering
+  flutter_svg: ^2.2.4
+  path_parsing: ^1.1.0
+
+  # Persistence
+  objectbox: ^5.2.0
+  objectbox_flutter_libs:
+    path: flutter_libs  # generated by download-libs command
+  shared_preferences: ^2.5.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  # Code generation
+  build_runner: ^2.4.0
+  riverpod_generator: ^2.6.0
+  freezed: ^3.2.5
+  json_serializable: ^6.13.0
+
+  # Testing
+  mocktail: ^1.0.4
+
+  # Build packaging
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
+```
+
 ```bash
-# Initialize project with uv
-uv init risk-game
-cd risk-game
+# After adding pubspec.yaml dependencies:
+flutter pub get
 
-# Core dependencies
-uv add fastapi uvicorn[standard] pydantic networkx numpy
+# Download ObjectBox native libraries (one-time per project setup)
+dart run objectbox:download-libs
 
-# Dev dependencies
-uv add --dev pytest pytest-asyncio httpx ruff
+# Run code generation (after any model change)
+dart run build_runner build --delete-conflicting-outputs
+
+# Generate launcher icons (after configuring pubspec.yaml)
+dart run flutter_launcher_icons
+
+# Generate splash screens
+dart run flutter_native_splash:create
+
+# Build Android release (AAB for Play Store)
+flutter build appbundle --release
+
+# Build iOS release (requires macOS + Xcode)
+flutter build ipa --release
 ```
 
-## Frontend Dependencies
+---
 
-No package manager needed. Either:
-- Use vanilla JS (recommended starting point)
-- Add D3.js via CDN if needed later: `<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>`
+## Alternatives Considered
 
-## Project Structure (Recommended)
+| Recommended | Alternative | When to Use Alternative |
+|-------------|-------------|-------------------------|
+| flutter_riverpod | bloc | When you have a large team requiring strict event-audit trails. BLoC is more verbose but leaves a paper trail for every state transition. Riverpod is sufficient for a single-developer game project. |
+| flutter_riverpod | provider | Never — `provider` is the older predecessor; Riverpod fixes its compile-time bugs without API regression. |
+| freezed | manual copyWith | Only for trivially small data classes with 1-2 fields. The game state has 42 territories + player state + turn phase; freezed code gen pays for itself here. |
+| objectbox | isar | Isar is faster than ObjectBox in some benchmarks but its original author abandoned it in 2024 and it is now community-maintained with uncertain roadmap. ObjectBox has active commercial backing. |
+| objectbox | hive | Hive is also community-maintained post-abandonment. ObjectBox outperforms it significantly and is better suited for structured, queryable game save data. |
+| objectbox | sqflite (SQLite) | Only if you need complex relational queries across saves. ObjectBox's object-native API is cleaner for serializing game snapshots. |
+| path_parsing | path_drawing | `path_drawing` (dnfield/flutter_path_drawing) has not been updated in 3 years. `path_parsing` is the actively maintained Flutter-team successor, forked to preserve the same API. |
+| mocktail | mockito | `mockito` requires code generation (`build_runner`) for each mock class. `mocktail` works without generation and is simpler for a game project where most mocked dependencies are storage/IO. |
+| CustomPainter + path_parsing | flutter_svg alone for interactivity | `flutter_svg` does not expose per-path hit testing. For tappable territories you must either (a) layer a custom painter for hit detection or (b) parse the SVG XML yourself. The CustomPainter overlay approach is the established community pattern. |
 
-```
-risk/
-  backend/
-    __init__.py
-    main.py              # FastAPI app, WebSocket endpoint
-    models.py            # Pydantic models (GameState, Territory, Player, etc.)
-    game/
-      __init__.py
-      engine.py          # Game rules engine (turn phases, combat resolution)
-      board.py           # Territory graph (NetworkX), map data
-      cards.py           # Territory card deck, set trading
-      combat.py          # Dice rolling, combat resolution (NumPy)
-    bots/
-      __init__.py
-      base.py            # Bot interface (abstract base class)
-      easy.py            # Random + basic heuristics
-      medium.py          # Weighted heuristics
-      hard.py            # Tuned heuristics + Monte Carlo combat eval
-      heuristics.py      # Shared evaluation functions
-  frontend/
-    index.html           # Single page app
-    style.css
-    app.js               # WebSocket client, UI controller
-    map.js               # SVG map rendering & interaction
-    map.svg              # Territory paths (42 territories)
-  tests/
-    test_engine.py
-    test_combat.py
-    test_bots.py
-    test_api.py
-  pyproject.toml
-```
+---
 
-## Key Integration Points
+## What NOT to Use
 
-### FastAPI <-> Frontend (WebSocket)
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| `flame` (Flutter game engine) | Flame is a sprite/animation engine optimized for arcade-style games with a continuous game loop. Risk is turn-based with no animation loop, and Flame's `GameWidget` replaces Flutter's widget tree, making standard UI (bottom sheets, dialogs, navigation) much harder. | Flutter's standard widget tree + CustomPainter for the map |
+| `hive` / `isar` | Both were abandoned by their original author in 2024 and are now community-maintained with uncertain long-term support. | `objectbox` |
+| `provider` (old package) | The predecessor to Riverpod. Has undetectable compile-time errors (`ProviderNotFoundException` at runtime). Riverpod was built to fix this. | `flutter_riverpod` |
+| `get` / GetX | Opinionated framework that merges routing, state, and DI. Tight coupling makes unit testing game logic difficult. | `flutter_riverpod` for state, Flutter's built-in `Navigator` for routing |
+| `dart:isolate` for bot AI | The Risk AI bots from v1.0 complete moves in <10ms each (heuristic scoring, not Monte Carlo). Running bots in an isolate adds setup/teardown overhead and complicates state sharing. Profile first; only isolate if bots freeze the UI (>16ms). | Direct synchronous execution; `compute()` only if profiling shows jank |
+| `google_maps_flutter` or any geo-map package | These are geographic maps (lat/lon coordinates, tile fetching). The Risk map is a custom fantasy/stylized world map with hardcoded territory polygons. Geo-map packages add network dependencies and irrelevant complexity. | `flutter_svg` + `CustomPainter` |
+| Remote backend / REST API | v1.1 goal is fully on-device, no server dependency. Reintroducing a backend would break the "runs anywhere" mobile requirement. | Pure Dart game engine |
 
-```python
-# Server pushes game state as JSON after each action
-@app.websocket("/ws/game/{game_id}")
-async def game_ws(websocket: WebSocket, game_id: str):
-    await websocket.accept()
-    # Send full game state on connect
-    await websocket.send_json(game.state.model_dump())
-    # Receive player actions, process, broadcast updated state
-```
+---
 
-### Pydantic <-> NetworkX (Game State)
+## Stack Patterns by Variant
 
-```python
-class Territory(BaseModel):
-    id: str
-    name: str
-    continent: str
-    owner: str | None = None
-    armies: int = 0
-    # Adjacency stored in NetworkX graph, not in model
-```
+**For turn-phase state machine (game FSM):**
+- Use a `@riverpod` `Notifier` subclass as the single source of truth for `TurnPhase`
+- Expose `phase`, `currentPlayer`, `pendingAction` as derived providers
+- Because phase transitions are synchronous, use `Notifier` (not `AsyncNotifier`)
 
-### NumPy <-> Combat Resolution
+**For bot AI execution:**
+- Execute synchronously in the Notifier's `_advanceBotTurn()` method
+- If profiling shows >16ms frame drops during AI computation, wrap in `compute()` (Flutter's isolate helper for one-shot tasks)
+- Do NOT pre-emptively isolate — the Python v1.0 bots were fast; Dart should be equivalent
 
-```python
-def simulate_combat(attackers: int, defenders: int, n_simulations: int = 10000) -> float:
-    """Monte Carlo combat outcome probability using vectorized NumPy dice rolls."""
-    rng = numpy.random.default_rng()
-    # Vectorize across all simulations simultaneously
-    attacker_dice = rng.integers(1, 7, size=(n_simulations, min(attackers, 3)))
-    defender_dice = rng.integers(1, 7, size=(n_simulations, min(defenders, 2)))
-    # ... compare sorted dice, return win probability
-```
+**For map territory tap detection:**
+- Parse all 42 territory SVG paths at app startup into a `Map<String, Path>` (territory ID → `Path`)
+- Store in a Riverpod provider initialized with `ref.watch(mapDataProvider)`
+- In `GestureDetector.onTapUp`, iterate paths and call `path.contains(localPosition)` — first match wins
+- Z-order paths largest-first to prevent small territories being masked by large neighbors
+
+**For save/load:**
+- Serialize `GameState` to JSON string using `json_serializable`
+- Store in ObjectBox as a `SaveSlot` entity: `{ id, name, timestamp, gameStateJson, turnNumber }`
+- Support 3 named save slots; show in a `showModalBottomSheet` from the game screen
+
+---
+
+## Version Compatibility
+
+| Package | Compatible With | Notes |
+|---------|-----------------|-------|
+| flutter_riverpod ^3.3.1 | riverpod_annotation ^3.3.1 | Must match major version. Riverpod 3.x is a breaking change from 2.x. |
+| freezed ^3.2.5 | freezed_annotation ^3.x | Must match major version. |
+| objectbox ^5.2.0 | objectbox_flutter_libs ^5.2.0 | Must match exactly. Mismatched native lib version causes runtime crashes. |
+| flutter_launcher_icons ^0.14.4 | flutter_native_splash ^2.4.7 | These had version conflicts in older releases (args package). Current versions are compatible. |
+| Flutter ^3.41.x | Dart ^3.11 | Dart is bundled — do not add a separate Dart SDK constraint beyond what Flutter requires. |
+
+---
 
 ## Sources
 
-- [FastAPI Releases](https://github.com/fastapi/fastapi/releases) - Version 0.135.x confirmed
-- [FastAPI WebSocket Documentation](https://fastapi.tiangolo.com/advanced/websockets/) - Native WebSocket support
-- [Pydantic v2.12 Release](https://pydantic.dev/articles/pydantic-v2-12-release) - Current stable version
-- [Uvicorn PyPI](https://pypi.org/project/uvicorn/) - Version 0.41.0
-- [NetworkX 3.6.1 Documentation](https://networkx.org/documentation/stable/tutorial.html) - Current stable, adjacency API
-- [D3.js](https://d3js.org/) - Version 7.9.0
-- [NumPy for Risk Dice Simulation](https://thepythoncodingbook.com/2022/12/30/using-python-numpy-to-improve-board-game-strategy-risk/) - Vectorized dice approach
-- [Risk AI Heuristic Evaluation](https://project.dke.maastrichtuniversity.nl/games/files/bsc/Hahn_Bsc-paper.pdf) - Academic analysis of Risk heuristics
-- [RISK AI Project (Gettysburg)](http://modelai.gettysburg.edu/2019/risk/RISK_AI_Handout.pdf) - Heuristic bot implementation guide
-- [Risk AlphaZero Paper](https://www.diva-portal.org/smash/get/diva2:1514096/FULLTEXT01.pdf) - Why neural approach is overkill for this scope
-- [SVG Interactive Maps](https://www.petercollingridge.co.uk/tutorials/svg/interactive/interactive-map/) - SVG territory interaction patterns
+- [Flutter 3.41 What's New](https://docs.flutter.dev/release/whats-new) — Flutter 3.41 stable (Feb 2026), Dart ~3.11 bundled — HIGH confidence
+- [flutter_riverpod pub.dev](https://pub.dev/packages/flutter_riverpod) — Version 3.3.1, published 5 days ago — HIGH confidence
+- [Riverpod 3.0 What's New](https://riverpod.dev/docs/whats_new) — Mutations and offline persistence features — HIGH confidence
+- [freezed pub.dev](https://pub.dev/packages/freezed) — Version 3.2.5, published 39 days ago — HIGH confidence
+- [json_serializable pub.dev](https://pub.dev/packages/json_serializable) — Version 6.13.0 (Google) — HIGH confidence
+- [flutter_svg pub.dev](https://pub.dev/packages/flutter_svg) — Version 2.2.4 (flutter.dev publisher) — HIGH confidence
+- [path_parsing pub.dev](https://pub.dev/packages/path_parsing) — Version 1.1.0, maintained by flutter.dev — HIGH confidence
+- [path_drawing unmaintained notice](https://pub.dev/packages/path_drawing) — Last updated 3 years ago; successor is path_parsing — HIGH confidence
+- [objectbox pub.dev](https://pub.dev/packages/objectbox) — Version 5.2.0, objectbox.io publisher — HIGH confidence
+- [ObjectBox game use case](https://objectbox.io/games/) — Dedicated mobile game persistence solution — MEDIUM confidence
+- [shared_preferences pub.dev](https://pub.dev/packages/shared_preferences) — Version 2.5.4 — HIGH confidence
+- [mocktail pub.dev](https://pub.dev/packages/mocktail) — Version 1.0.4, felangel.dev — HIGH confidence
+- [flutter_launcher_icons pub.dev](https://pub.dev/packages/flutter_launcher_icons) — Version 0.14.4 — HIGH confidence
+- [flutter_native_splash pub.dev](https://pub.dev/packages/flutter_native_splash) — Version 2.4.7 — HIGH confidence
+- [Riverpod vs BLoC comparison 2026](https://medium.com/@flutter-app/state-management-in-2026-is-riverpod-replacing-bloc-40e58adcb70f) — Ecosystem consensus — MEDIUM confidence
+- [Hive/Isar abandonment context](https://dinkomarinac.dev/best-local-database-for-flutter-apps-a-complete-guide/) — Maintenance concerns confirmed by multiple sources — MEDIUM confidence
+- [Flutter InteractiveViewer for game maps](https://gladimdim.org/animating-interactiveviewer-in-flutter-or-how-to-animate-map-in-your-game) — TransformationController pattern — MEDIUM confidence
+- [Interactive SVG maps in Flutter](https://www.appwriters.dev/blog/flutter-interactive-svg-maps) — Path-based hit detection pattern — MEDIUM confidence
+
+---
+
+*Stack research for: Flutter mobile Risk board game (v1.1)*
+*Researched: 2026-03-14*

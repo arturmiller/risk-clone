@@ -1,187 +1,242 @@
 # Project Research Summary
 
-**Project:** Risk Strategy Game
-**Domain:** Turn-based strategy board game with AI opponents (browser-based)
-**Researched:** 2026-03-08
+**Project:** Risk Board Game — Flutter Mobile Port (v1.1)
+**Domain:** Turn-based strategy board game, mobile (Android + iOS), on-device Dart engine
+**Researched:** 2026-03-14
 **Confidence:** HIGH
 
 ## Executive Summary
 
-This is a browser-based implementation of the classic Risk board game where a single human player competes against 1-5 AI bots of configurable difficulty. The proven approach for this type of game is a server-authoritative architecture: Python owns all game state and rules, the browser is a thin rendering layer connected via WebSocket, and the game loop is driven by an explicit finite state machine (FSM) that manages turn phases. The technology choices are straightforward and high-confidence -- FastAPI for the async server, SVG for the territory map, NetworkX for the adjacency graph, and NumPy for vectorized dice simulation.
+This project is a mobile port of an existing, working Python/FastAPI + vanilla JS Risk board game. The v1.1 goal is to eliminate the client-server architecture entirely and deliver a fully on-device Flutter app for Android and iOS. The core game mechanics — 42 territories, 3 AI difficulty levels, card trading, blitz attack, simulation mode — are already validated in Python. The port is therefore a translation problem, not a design problem. The key risks are logic drift during the Python-to-Dart translation, mobile-specific UX gaps (touch targets, orientation, app backgrounding), and performance in the map rendering layer.
 
-The core technical challenge is not the web stack or the UI -- it is building AI bots that produce fun, competitive games. Risk's decision space is enormous (estimated state space ~2^42), making tree-search approaches infeasible. The established approach from academic literature is heuristic evaluation: bots score possible actions using weighted factors like continent control progress, border security ratios, and threat assessment. The three difficulty tiers (Easy, Medium, Hard) should be implemented incrementally, with Easy using random valid moves, Medium using basic heuristics, and Hard using tuned strategic evaluation with Monte Carlo combat simulation.
+The recommended approach is a clean 4-layer architecture: pure Dart game engine (direct port of Python engine), Riverpod `AsyncNotifier` for state orchestration, `CustomPainter` + `InteractiveViewer` for map rendering, and ObjectBox for save-game persistence. The engine layer must be built and validated with golden-fixture tests against the Python source before any UI is wired. Bot turns must run in Dart isolates from day one — retrofitting isolates into an already-wired UI is high-cost.
 
-The biggest risks are: (1) incorrect territory adjacency data silently breaking the entire game -- the classic Risk map has 83 edges including non-obvious cross-ocean routes, and even Hasbro shipped an edition with a missing connection; (2) AI that produces endless, boring games through excessive passivity or self-destructive aggression; and (3) the card trading system, which is the most rules-complex part of Risk with subtle edge cases around global escalation tracking, forced trades, and elimination card transfers. All three are mitigated through rigorous automated testing: statistical validation of dice probabilities, graph property assertions for adjacency data, and headless AI-vs-AI batch games to detect stalemate patterns before they waste human playtime.
+The greatest technical risks are UI thread blocking from bot AI computation (must use `Isolate.run()`) and CustomPainter performance collapse under pinch-zoom on mid-range Android (must pre-rasterize static map layer). Both require architectural decisions at the start of their respective phases, not as patches. The mobile UX risks — small touch targets in Europe/SE Asia, app backgrounding state loss, bottom sheet accidental dismissal — are well-understood with clear mitigations and can be addressed incrementally.
+
+---
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack is lean and dependency-light. Python 3.12+ for the backend with FastAPI as the async web framework, serving a single-page frontend built with vanilla JavaScript and inline SVG for the territory map. No frontend build tooling, no database, no task queues.
+Flutter 3.41 (current stable, Feb 2026) with Dart 3.11 is the clear choice for a cross-platform mobile board game targeting Android and iOS from a single codebase. The widget toolkit maps well to a turn-based game loop, and Flutter's `CustomPainter` + `GestureDetector` provide the map rendering and hit-detection primitives needed without a game engine framework like Flame (which adds unnecessary overhead for an event-driven board game).
+
+State management uses Riverpod 3.x (`flutter_riverpod ^3.3.1`) with `AsyncNotifier` — the compile-time safety and clean async modeling for bot turns makes this the right choice over BLoC (too verbose for solo project) or Provider (predecessor with known runtime errors). Immutable game state uses `freezed ^3.2.5`, which is the direct Dart equivalent of the Python Pydantic `model_copy()` pattern already in use. For persistence, ObjectBox 5.2 (actively backed) is chosen over Hive and Isar (both abandoned by original author in 2024).
 
 **Core technologies:**
-- **FastAPI + Uvicorn:** Async HTTP/WebSocket server -- native WebSocket support for real-time state push, Pydantic integration for typed game state serialization
-- **Pydantic v2:** Game state models and validation -- automatic JSON serialization for WebSocket transmission, enforces data contracts between components
-- **NetworkX:** Territory adjacency graph -- mature graph library providing pathfinding (fortification validation), subgraph operations (continent detection), and adjacency queries for 42 nodes / 83 edges
-- **NumPy:** Vectorized dice simulation -- 10-100x faster than stdlib random for batch Monte Carlo combat evaluation used by Hard bot
-- **SVG (inline):** Territory map rendering -- DOM-native click/hover events, resolution-independent, each territory is a colorable/clickable path element
-- **Vanilla JS (ES6+):** Frontend interactivity -- no build tooling needed, the UI is simple enough (~3 views: map, sidebar, action controls)
-- **uv + Ruff:** Project tooling -- modern Python package management and linting
+- **Flutter 3.41 / Dart 3.11:** Cross-platform mobile framework — current stable, bundled Dart, single codebase for Android + iOS
+- **flutter_riverpod ^3.3.1:** State management — `AsyncNotifier` models bot-turn async cleanly; compile-time safety prevents provider-not-found runtime errors
+- **freezed ^3.2.5:** Immutable data classes — direct equivalent of Python's Pydantic `model_copy()`; generates `copyWith`, equality, JSON serialization
+- **flutter_svg ^2.2.4 + path_parsing ^1.1.0:** Map rendering — `flutter_svg` for static background; `path_parsing` (Flutter team maintained) for SVG path to Dart `Path` conversion for hit testing
+- **objectbox ^5.2.0:** Save-game persistence — ACID-compliant, mobile-optimized, actively maintained (commercial backing); stores `GameState` as JSON string in named save slots
+- **shared_preferences ^2.5.4:** App settings — bot speed, haptic toggle, colorblind mode; not for game state
+
+**Critical version requirements:**
+- `flutter_riverpod` and `riverpod_annotation` must match major version (both `^3.3.1`)
+- `objectbox` and `objectbox_flutter_libs` must match exactly (version mismatch causes runtime crash)
+- `freezed` and `freezed_annotation` must match major version
 
 ### Expected Features
 
-**Must have (table stakes) -- v1 launch:**
-- Territory data model (42 territories, 6 continents, adjacencies) and SVG map display
-- Game setup: random territory distribution, configurable player count (1 human + 1-5 bots), bot difficulty selection
-- All three turn phases: draft (reinforcement + continent bonuses), attack (dice rolling, conquest), fortify (connected-path movement)
-- Territory card system: collection, set trading with escalating bonuses, forced trade at 5+, territory match bonus
-- Player elimination with card transfer, victory detection
-- Easy bot AI (random/simple heuristic)
-- Clickable territory interaction, phase indicators, skip/end phase buttons
+The feature set divides clearly between mobile table stakes (things users assume exist) and differentiators that improve on the primary competitor, Risk: Global Domination (SMG Studio, 4.34/5, 19M downloads).
 
-**Should have (differentiators) -- v1.x:**
-- Medium and Hard bot AI (the core value proposition per PROJECT.md)
-- Blitz/auto-resolve combat and attack-until-X-remain
-- Bot turn speed control (instant/fast/normal)
-- Game log / event history (essential when bots move fast)
-- Win probability display before attacks
-- End-game summary screen
+**Must have (table stakes) — v1 launch:**
+- Touch map interaction: tap-to-select, pinch-to-zoom (min 1x, max 4x), pan — without this the game is not playable on mobile
+- Auto-save on every turn end + resume on app restart — mobile users get interrupted; game loss on interruption is unacceptable
+- Responsive layout: portrait (map full-width, controls in bottom sheet) and landscape (map + side panel) — users rotate immediately
+- Settings screen: bot speed (Slow/Fast/Instant), haptic toggle, colorblind mode (Wong palette) — minimum accessibility and configurability
+- Haptic feedback: dice roll, territory capture, invalid action, turn start — differentiates from web; native feel at no implementation cost
+- Victory/defeat screen — satisfying close; absence feels like a crash
+- Abandon game confirmation via `PopScope` — standard mobile pattern
 
-**Defer (v2+):**
-- Bot personality styles (aggressive, defensive, expansionist)
-- Per-game statistics and charts
-- Game history / win-loss tracking (requires persistence)
-- Manual territory draft, alternative maps, save/load
+**Should have — v1.x after validation:**
+- Tablet layout: persistent side panel at 600dp+ breakpoint
+- Contextual rule hints: one-time tooltips on first card trade, first blitz opportunity
+- End-game stats breakdown: turn count, territories held, armies eliminated
+- Win/loss local history via `shared_preferences`
+
+**Defer to v2+:**
+- Interactive tutorial (requires full game loop complete first; high implementation cost)
+- Dark/light theme override in settings (system auto-detection sufficient for launch)
+- Dice roll animation (keep it skippable; not essential for gameplay)
+
+**Anti-features (do not build):**
+- Undo/take-back: undermines strategic commitment; use pre-commit confirmation dialog instead
+- Online multiplayer: requires server infrastructure, auth, disconnect handling — out of scope
+- Sound effects/music: explicitly out of scope; haptics cover tactile feedback
+- Multiple save slots: enables save-scumming against bots; single auto-save is correct design
+- Cloud sync: requires auth, conflict resolution; local-only is sufficient
 
 ### Architecture Approach
 
-Server-authoritative, state-machine-driven architecture with strict separation between game logic, AI, and presentation. The Python backend owns all state and rule enforcement. The browser client is a dumb terminal that sends action intents and renders state updates received via WebSocket. Bots and humans implement the same abstract Player interface, making them interchangeable from the Turn Engine's perspective.
+The architecture is a 4-layer on-device system: **Presentation** (Flutter widgets) → **State** (Riverpod providers) → **Engine** (pure Dart, zero Flutter imports) → **Data** (freezed models, static map JSON). This directly mirrors the Python architecture's separation of concerns and makes the engine layer independently testable with plain `dart test`. The elimination of the FastAPI/WebSocket layer is the core structural change; `GameNotifier` (`AsyncNotifier<GameState>`) replaces the Python game manager and WebSocket event loop.
 
 **Major components:**
-1. **Map/Graph Module** -- territory definitions, adjacency graph (NetworkX), continent groupings, pathfinding for fortification
-2. **Game State Container** -- single source of truth for territory ownership, army counts, player hands, turn order; Pydantic models with JSON serialization
-3. **Turn Engine (FSM)** -- drives the game loop through REINFORCE -> ATTACK -> FORTIFY -> END_TURN phases with sub-states for post-conquest army movement and forced card trades
-4. **Combat Resolver** -- dice rolling, pairwise comparison (ties to defender), army loss calculation, territory capture
-5. **Action Validator / Rule Engine** -- validates every action against current phase and game state before execution; single gate for all mutations
-6. **Player Interface (ABC)** -- abstract base class with `choose_reinforcement()`, `choose_attack()`, `choose_fortify()` methods; HumanPlayer bridges to WebSocket, Bot implementations run AI logic
-7. **Bot AI Implementations** -- Easy (random valid moves), Medium (weighted heuristics), Hard (strategic evaluation + Monte Carlo combat sim)
-8. **WebSocket Server (FastAPI)** -- bridges backend to browser, sends state updates, receives human actions
-9. **Browser Client** -- SVG map renderer, game info panel, action controls; zero game logic
+1. **GameNotifier** (`AsyncNotifier<GameState>`) — owns canonical game state; orchestrates human moves, bot turns via `Isolate.run()`, and simulation timer; replaces FastAPI game manager + WebSocket layer
+2. **MapPainter** (`CustomPainter`) — renders 42 territory paths with color-by-owner, army count labels, selection highlights; pre-parsed SVG paths from `path_parsing`; hit detection via `path.contains(localPosition)`
+3. **Engine layer** (`engine/` — pure Dart) — direct port of Python `turn.py`, `combat.py`, `cards.py`, `fortify.py`, `setup.py`; immutable `GameState` with `copyWith`; zero Flutter imports
+4. **Bot Agents** (`bots/` — pure Dart) — `EasyAgent`, `MediumAgent`, `HardAgent` implementing `PlayerAgent` interface; run in `Isolate.run()` during gameplay to prevent UI blocking
+5. **UIStateNotifier** — ephemeral UI state (selected territory, valid targets); deliberately separate from `GameState` to prevent UI pollution of engine logic
+6. **SimModeNotifier** — controls AI-vs-AI simulation: `Timer.periodic` scheduling, speed control, pause/resume
+
+**Key architectural patterns:**
+- Engine functions are pure: `(GameState, ...) → GameState`. No side effects, no Flutter dependencies.
+- `UIState` (selection, valid targets) is separate from `GameState` (game logic). Never merge them.
+- SVG territory paths are parsed once at startup into `Map<String, Path>`; passed to `MapPainter` as constructor parameter. Never parsed inside `paint()`.
+- Map renders as two layers: pre-rasterized static background + dynamic overlay `CustomPainter` for army counts and highlights. Only the overlay repaints on state changes.
 
 ### Critical Pitfalls
 
-1. **Incorrect territory adjacency data** -- The classic map has 83 edges including cross-ocean routes that are easy to miss. Use a verified adjacency list from an established source, write tests asserting exactly 42 territories, exactly 83 bidirectional edges, and spot-check all cross-ocean connections (Alaska-Kamchatka, North Africa-Brazil, etc.).
+1. **AI bot blocking the UI thread (M1)** — HardAgent's O(n*k) territory scoring runs fine in Python on a server but causes frame drops on Flutter's main isolate. Use `Isolate.run()` for all bot turns from the first wiring. Never invoke agent logic in `onTap` callbacks or `setState`. Recovery cost if retrofitted after full UI is built: HIGH.
 
-2. **AI producing endless/boring games** -- The most common failure mode. Passive AI creates stalemates; reckless AI self-destructs. Mitigate with escalating card trade-in values (Risk's built-in anti-stalemate mechanic), explicit aggression parameters per difficulty, threat assessment heuristics, and batch-testing AI-only games at 100x speed to detect stalemate patterns.
+2. **CustomPainter zoom performance collapse (M2)** — Drawing all 42 territory paths live in `CustomPainter` inside `InteractiveViewer` causes 80ms+ frame times on mid-range Android during pinch-zoom. Pre-rasterize the static map layer using `ui.PictureRecorder` at startup. Only the dynamic overlay (army counts, highlights) repaints on state changes. Architecture decision must be made before building map interaction; recovery cost if wrong: HIGH.
 
-3. **Card trading rules complexity** -- Most commonly implemented incorrectly. Key traps: global (not per-player) escalation tracking, forced trade at 5+ cards, card transfer on elimination with forced trade if eliminator hits 6+, territory match bonus of +2 armies. Test every edge case explicitly.
+3. **Dart/Python logic drift (M4)** — Integer division (`~/` not `/`), dice comparison semantics, BFS traversal order, card trade escalation sequence can silently diverge between languages. Capture golden test fixtures from the Python engine (seeded state → output JSON) before porting. All golden fixtures must pass before any engine function is considered done.
 
-4. **Dice combat probability errors** -- Incorrect tie resolution or dice count constraints silently break game balance. Correct 3v2 probabilities: attacker wins both ~37.2%, split ~33.6%, defender wins both ~29.3%. Validate with 100k+ simulation runs.
+4. **App backgrounding state loss (M6)** — iOS can terminate a paused app without further callbacks. Save `GameState` to local storage on `AppLifecycleState.inactive` (fires on both platforms before potential kill), not `paused`. Test by force-terminating via Xcode/adb after 10 minutes backgrounded on both platforms.
 
-5. **Fortification without connected path validation** -- Must verify source and destination are connected through a chain of player-owned territories (BFS/DFS on owned subgraph), not just adjacent. Build this as a reusable utility since AI also needs it.
+5. **Async state management complexity (M5)** — A single `StatefulWidget` holding `GameState` produces race conditions when bot isolates post new state while user is mid-gesture. Use Riverpod `AsyncNotifier` from the start. All state transitions (human move, bot move, simulation tick) go through a single `GameNotifier` that processes actions serially.
+
+6. **Touch targets too small (M3)** — Europe and SE Asia territories render below 30dp on a phone screen. Expand hit regions by 6dp padding; add disambiguation popup when touch falls in multiple expanded regions. Test on a physical device with a finger, not the simulator.
+
+---
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure:
+The architecture research provides an explicit 7-phase build order with clear dependencies. The feature research confirms all game mechanics exist and only the mobile UX layer is net-new. Phase structure follows the dependency graph: engine before providers, providers before widgets, widgets before integration.
 
-### Phase 1: Foundation -- Data Models, Map, and Game State
+### Phase 1: Flutter Project Scaffold + Data Models
 
-**Rationale:** Everything depends on correct territory data and a well-structured game state. The adjacency graph is the single most critical data structure -- if it is wrong, everything downstream breaks. Build and exhaustively test this first.
-**Delivers:** Territory data model (42 territories, 6 continents, 83 edges), NetworkX adjacency graph, Pydantic game state models, action type definitions, game map module with adjacency checks, connected-territory pathfinding, and continent control verification.
-**Addresses:** Territory data model, map data structure (from FEATURES P1)
-**Avoids:** Pitfall 1 (incorrect adjacency), Pitfall 5 (fortification path validation)
+**Rationale:** Zero-dependency foundation. All subsequent phases depend on `@freezed` models and the map graph being in place. Code generation setup (build_runner, freezed, json_serializable) must work before any engine code is written.
+**Delivers:** Working Flutter project; `pubspec.yaml` configured; `@freezed` `GameState`/`TerritoryState`/`PlayerState`/`Card`/`TurnPhase` models; `MapGraph` with adjacency, BFS, continent queries; bundled `map.json` asset; passing unit tests for all graph queries.
+**Addresses:** No user-facing features, but enables everything else. ObjectBox and shared_preferences configured and verified.
+**Avoids:** Build system version conflicts caught early; `objectbox`/`objectbox_flutter_libs` version mismatch is a runtime crash if missed.
+**Research flag:** Standard patterns — skip research phase. Flutter project setup and freezed code gen are well-documented with official guides.
 
-### Phase 2: Game Engine -- Turn FSM, Combat, Rules, and Cards
+### Phase 2: Dart Game Engine Port
 
-**Rationale:** The turn state machine is the skeleton of the game. Combat resolution, the card system, and action validation are tightly coupled to the FSM and must be built together. The card system is complex enough to warrant dedicated attention alongside the engine, not as an afterthought.
-**Delivers:** Turn Engine (FSM with sub-states), Combat Resolver (dice rolling with statistical validation), Action Validator, card collection/trading with escalating bonuses, player elimination with card transfer, victory detection.
-**Addresses:** All turn phases, combat resolution, card system, player elimination, victory detection (from FEATURES P1)
-**Avoids:** Pitfall 2 (dice errors), Pitfall 4 (card complexity), Pitfall 6 (phase management bugs)
+**Rationale:** Engine must be correct before any UI is built. Golden fixture tests against Python source catch logic drift early when it is cheap to fix. This phase produces pure Dart that can be fully tested without the Flutter runtime.
+**Delivers:** Pure Dart port of `combat.py`, `cards.py`, `fortify.py`, `reinforcements.py`, `setup.py`, `turn.py`. Full golden-fixture test suite against Python output. Combat statistics match Python within 0.5% over 10k simulated trials.
+**Uses:** `freezed` immutable models, `dart:math.Random` (injected for testability)
+**Avoids:** Dart/Python logic drift (Pitfall M4). Golden fixtures catch silent divergence early, when it costs hours not days.
+**Research flag:** Standard patterns — skip research phase. Direct algorithmic port; `copyWith` for `model_copy()` is a known 1:1 translation.
 
-### Phase 3: Player Interface, WebSocket Server, and Basic UI
+### Phase 3: Bot Agents (Dart Port)
 
-**Rationale:** With the game engine complete and testable via mock players, wire up the communication layer and build a functional (not polished) UI. The Player Interface ABC must exist before any bots, and the WebSocket bridge must exist before the human can play.
-**Delivers:** Player Interface ABC, HumanPlayer WebSocket adapter, FastAPI WebSocket server, static HTML/CSS/JS frontend with SVG map rendering, clickable territories, phase indicators, army count display, basic action controls (dice roll, skip phase).
-**Addresses:** Map display, clickable territories, phase indicators, army counts, color-coded territories (from FEATURES P1)
-**Avoids:** Anti-Pattern 1 (client-side game logic), Pitfall 8 (UI information gaps)
+**Rationale:** Bots depend on the engine but are independent of the UI. Porting and testing them in isolation ensures the `PlayerAgent` interface is stable before `GameNotifier` orchestrates them. The isolate architecture is established here, not retrofitted.
+**Delivers:** `EasyAgent`, `MediumAgent`, `HardAgent` implementing `PlayerAgent` interface. Unit tests with fixed-seed `Random`. Statistical validation (win rates consistent with Python version). `Isolate.run()` pattern established and validated.
+**Avoids:** UI thread blocking (Pitfall M1) — isolate architecture built here so it is never an afterthought.
+**Research flag:** Standard patterns — skip research phase. Direct port of Python agents; `Isolate.run()` is well-documented in Flutter.
 
-### Phase 4: Bot AI -- Easy and Medium Difficulty
+### Phase 4: Riverpod State Providers + Persistence
 
-**Rationale:** Now that the game is playable by a human, add AI opponents. Easy bot first to validate the Player Interface contract works, then Medium bot to prove the heuristic framework. These must be built before Hard bot because each tier informs the next.
-**Delivers:** Easy bot (random valid moves with basic heuristics), Medium bot (weighted heuristics: continent pursuit, border reinforcement, favorable-odds attacks), bot turn execution integrated into the game loop.
-**Addresses:** Easy bot AI, bot turn execution (from FEATURES P1); Medium bot AI (from FEATURES P2)
-**Avoids:** Pitfall 3 (endless games -- validate via AI-only batch testing), Pitfall 7 (decision space explosion -- filter action space with strategic constraints)
+**Rationale:** `GameNotifier`, `UIStateNotifier`, `SimModeNotifier` are the coordination layer between engine and UI. Must exist before any widget consumes state. Lifecycle persistence belongs here — it must be in place before real gameplay testing begins, or every development session risks data loss.
+**Delivers:** `GameNotifier` (`AsyncNotifier<GameState>`), `UIStateNotifier`, `SimModeNotifier`, `mapGraphProvider`. `WidgetsBindingObserver` saving `GameState` to ObjectBox on `AppLifecycleState.inactive`. Resume prompt on cold start. Settings persistence via `shared_preferences`. `ProviderContainer` tests for all notifiers.
+**Addresses:** Auto-save/resume (P1 feature), settings storage, async state management complexity (Pitfall M5), app backgrounding state loss (Pitfall M6).
+**Avoids:** Race conditions from ad-hoc state management; state loss before first real test session establishes a pattern that is painful to retrofit.
+**Research flag:** Standard patterns — skip research phase. Riverpod `AsyncNotifier` and ObjectBox have official documentation with examples.
 
-### Phase 5: Hard Bot AI and Combat Enhancements
+### Phase 5: Map Widget (Rendering + Touch Interaction)
 
-**Rationale:** Hard bot is the core value proposition but requires the heuristic framework from Phase 4 and tuned Monte Carlo combat evaluation. Ship alongside blitz/auto-resolve since both use the same probability math. Bot speed controls and game log ship here because they become necessary when Hard bots play full games.
-**Delivers:** Hard bot (strategic evaluation: continent control, threat assessment, card timing, Monte Carlo combat simulation), blitz/auto-resolve combat, bot turn speed control, game log, win probability display.
-**Addresses:** Hard bot AI, blitz combat, bot speed control, game log, win probability (from FEATURES P2)
-**Avoids:** Pitfall 3 (endless games -- tune aggression parameters, validate with batch testing), Pitfall 7 (decision space -- profile AI turn time, target <100ms)
+**Rationale:** The map widget is the critical path to playability — without territory selection there is no game. It is also the highest-risk rendering component. The pre-rasterization architecture decision must be made before any rendering code is written; it cannot be patched in after the fact without a full rewrite.
+**Delivers:** SVG territory paths parsed at startup via `path_parsing`. Two-layer map rendering: pre-rasterized static background (`ui.PictureRecorder`) + dynamic overlay `CustomPainter`. `GestureDetector` tap-to-select with polygon hit testing and 6dp hit-region expansion. Disambiguation popup for dense territory regions. `InteractiveViewer` pinch-zoom (1x–4x) and pan. Coordinate transform via `controller.toScene(localPosition)` for correct zoom hit testing.
+**Addresses:** Touch map interaction (P1), touch target accessibility (P1), colorblind mode territory color rendering.
+**Avoids:** CustomPainter zoom performance (Pitfall M2), touch targets too small (Pitfall M3), InteractiveViewer coordinate transform bug (integration gotcha from PITFALLS.md).
+**Research flag:** Needs deeper research — complex rendering architecture; known Flutter performance regression with CustomPainter + InteractiveViewer (GitHub issue #72066); `ui.PictureRecorder` pre-rasterization implementation details need prototyping before coding begins.
 
-### Phase 6: Polish and Quality of Life
+### Phase 6: Screens, Widgets, and Mobile UX
 
-**Rationale:** After core gameplay and AI are solid, add polish features that improve the experience but are not essential for a playable game.
-**Delivers:** End-game summary screen, reinforcement undo (before committing), cross-ocean route visual indicators, colorblind-friendly palette validation, manual territory draft option.
-**Addresses:** End-game summary, setup enhancements (from FEATURES P2/P3)
+**Rationale:** With engine, providers, and map widget in place, the game is playable. This phase assembles the full UI: home screen, game screen, responsive layout, settings, victory/defeat. Platform-specific behavior (bottom sheet dismissal, safe area, haptics) is handled per-widget here.
+**Delivers:** `HomeScreen` (player count, difficulty), `GameScreen` (map + sidebar + `ActionPanel` bottom sheet), responsive `LayoutBuilder` breakpoint (portrait bottom sheet vs landscape side panel), `SettingsScreen` (bot speed, haptic toggle, colorblind mode). Victory/defeat modal with stats. `PopScope` abandon game confirmation. Haptic feedback vocabulary (`HapticFeedback.mediumImpact()` for dice, `heavyImpact()` for capture, `vibrate()` for invalid). `isDismissible: false` on all game-critical bottom sheets.
+**Addresses:** Responsive layout (P1), settings screen (P1), haptic feedback differentiator (P1), victory/defeat screen (P1), abandon confirmation (P1), colorblind mode (P1).
+**Avoids:** iOS/Android behavioral differences (Pitfall M7) — `isDismissible: false`, `SafeArea` bottom insets, back gesture handling all addressed here per-widget.
+**Research flag:** Standard patterns — skip research phase. Flutter responsive layouts, Material bottom sheets, and HapticFeedback API are well-documented.
+
+### Phase 7: Simulation Mode + End-to-End Integration
+
+**Rationale:** Simulation mode depends on all prior phases. Integration testing validates the full game loop including bot turns, game-over detection, and resume-after-backgrounding. Performance must be validated on physical hardware before any milestone sign-off.
+**Delivers:** `SimModeNotifier` timer loop (persistent isolate for continuous bot play, not per-turn `Isolate.run()`), simulation speed control (Slow/Fast/Instant), tap-to-inspect territory during simulation, end-game stats screen, win/loss local history, full integration test (complete simulated game). Performance validated on low-end Android (Pixel 3a equivalent): 60fps during zoom, <16ms during bot turn, stable memory over 20-game simulation run.
+**Addresses:** Simulation mode (parity with web version), end-game stats (P2 feature), win/loss history (P2 feature).
+**Avoids:** Simulation mode isolate-spawning jitter — persistent isolate with message loop, not per-turn `Isolate.run()` for the continuous simulation case.
+**Research flag:** Standard patterns for Flutter side. Simulation mode logic is a direct port of existing Python/JS behavior.
 
 ### Phase Ordering Rationale
 
-- **Phases 1-2 are strictly sequential:** The engine cannot exist without the data models, and the engine must be testable before any UI or AI work begins. This matches the architecture's bottom-up dependency chain.
-- **Phase 3 depends on Phase 2** but can overlap slightly: the SVG map can be prototyped while the engine is being finalized.
-- **Phase 4 is independent of Phase 3's polish** but requires the Player Interface from Phase 3. In practice, build them close together.
-- **Phase 5 builds on Phase 4's heuristic framework.** Do not attempt Hard bot without validating the approach on Easy and Medium first.
-- **Phase 6 is truly independent** and can be interleaved as needed.
+- **Engine before providers before widgets** — the dependency graph from ARCHITECTURE.md is unambiguous and matches the successful structure of the Python v1.0 build. Shortcuts here produce hard-to-isolate bugs.
+- **Isolate architecture in Phase 3, not Phase 7** — bot isolate wiring belongs to the bot agent phase. Retrofitting isolates after the UI is wired is the single highest-cost recovery scenario identified in PITFALLS.md.
+- **Map widget in Phase 5 as its own phase** — the map is the highest-risk component technically (performance architecture decision, hit testing) and the critical path to playability. Isolating it as a dedicated phase ensures the pre-rasterization approach is prototyped and validated before the screen assembly phase begins.
+- **State persistence in Phase 4** — lifecycle persistence must be established before real gameplay testing. Every development test session that involves actual gameplay risks data loss without it.
+- **Responsive layout built first in Phase 6** — the FEATURES.md dependency graph warns that responsive layout must be the foundation, not retrofitted. The `LayoutBuilder` breakpoint is the first thing built in Phase 6 before any UI elements are placed.
 
 ### Research Flags
 
-Phases likely needing deeper research during planning:
-- **Phase 2 (Card System):** The edge cases around card trading, escalation, and elimination transfers are numerous and subtle. Recommend pulling the official Hasbro rules PDF and cross-referencing with multiple community rule clarifications before implementation.
-- **Phase 4-5 (Bot AI):** Heuristic tuning for Medium and Hard bots requires iteration. Plan for AI-vs-AI batch testing infrastructure early. The academic papers (Maastricht BSR/BST metrics, Cornell Risk agent) should be referenced during implementation.
+Phases likely needing `/gsd:research-phase` during planning:
+- **Phase 5 (Map Widget):** Complex rendering architecture; known Flutter performance regression with CustomPainter + InteractiveViewer; `ui.PictureRecorder` pre-rasterization approach needs implementation research and a prototype before full implementation begins.
 
-Phases with standard patterns (skip deep research):
-- **Phase 1 (Data Models):** Well-established patterns. The adjacency data is available from multiple open-source implementations. NetworkX API is well-documented.
-- **Phase 3 (WebSocket + UI):** FastAPI WebSocket documentation is comprehensive. SVG territory interaction is a solved problem.
+Phases with standard patterns (skip research-phase):
+- **Phase 1 (Scaffold + Models):** Flutter project setup, freezed, and build_runner are well-documented with official guides.
+- **Phase 2 (Engine Port):** Direct algorithmic translation with well-understood `copyWith` for `model_copy()` pattern.
+- **Phase 3 (Bot Agents):** Direct port of Python agents; `Isolate.run()` usage is well-documented in Flutter.
+- **Phase 4 (Providers + Persistence):** Riverpod `AsyncNotifier` and ObjectBox have official documentation.
+- **Phase 6 (Screens + UX):** Flutter responsive layouts, Material components, and HapticFeedback are well-documented.
+- **Phase 7 (Simulation + Integration):** Simulation mode is a direct port; integration testing patterns are standard.
+
+---
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All technologies are mature, well-documented, and widely used. No exotic dependencies. Version requirements are clear. |
-| Features | HIGH | Risk is a 65-year-old game with canonical rules. Feature scope is well-defined by the game itself and validated against commercial implementations (SMG Studio). |
-| Architecture | HIGH | Server-authoritative FSM-driven architecture is the standard pattern for turn-based games. Multiple academic and open-source implementations confirm the approach. |
-| Pitfalls | HIGH | Pitfalls are well-documented across academic papers, open-source bug trackers, and community implementations. The specific failure modes (adjacency errors, AI stalemates, card rule complexity) are recurring and predictable. |
+| Stack | HIGH | All packages verified on pub.dev with recent publish dates (2026). Flutter 3.41 is current stable. Version compatibility matrix confirmed. All primary sources are official flutter.dev and pub.dev publisher pages. |
+| Features | HIGH | Feature table stakes derived from mobile platform guidelines (Apple HIG, Material Design) and competitor analysis (Risk: Global Domination, 19M downloads). Colorblind palette sourced from medical literature. Android orientation restriction changes sourced from official Android Developers blog. |
+| Architecture | HIGH | Patterns sourced from official Riverpod, Flutter, and Dart documentation. Build order is logically derivable from the dependency graph. CustomPainter + Isolate patterns confirmed by multiple community sources. The architecture is a direct structural mapping of the existing Python design. |
+| Pitfalls | HIGH | Mobile-specific pitfalls (M1–M7) derived from Flutter platform behavior documentation and known GitHub issues. Game engine pitfalls drawn from v1.0 development experience. Concrete warning signs and recovery costs provided for each. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **SVG map asset:** The 42-territory SVG map with clickable path elements needs to be created or sourced. This is a non-trivial asset that affects Phase 3 timeline. Consider finding an existing open-source Risk SVG map and adapting it, or generating territory paths from coordinate data.
-- **Hard bot tuning methodology:** While the heuristic approach is well-established, the specific weight tuning for the Hard bot will require experimentation. Plan for an iterative tuning cycle with AI-vs-AI batch testing. No amount of upfront research replaces playtesting.
-- **Cross-ocean route visualization:** How to visually represent Alaska-Kamchatka and other sea routes on the SVG map is a UX design question that research did not fully resolve. Dashed lines between non-adjacent map regions is the common approach.
-- **Game setup UX flow:** The research covers game mechanics thoroughly but the setup screen flow (choosing player count, bot difficulties, starting the game) needs UX design during Phase 3 planning.
+- **Pre-rasterization implementation specifics:** PITFALLS.md describes the two-layer rendering approach (pre-rasterized background + dynamic overlay) as the correct architecture, but the exact implementation using `ui.PictureRecorder` and `RawImage` in Dart needs to be prototyped and benchmarked against a target device. Address in Phase 5 planning research.
+- **Territory SVG path coordinate space:** The existing `map.json` / SVG asset's territory path format (whether paths are in SVG coordinate space, normalized, or already in Flutter coordinate space) affects the hit-test coordinate transform implementation. Validate against the actual asset at the start of Phase 5.
+- **Dart Random seeding vs Python:** PITFALLS.md notes that Python's Mersenne Twister and Dart's `dart:math.Random` use different PRNGs. Golden fixtures must capture output states, not attempt to replay the same random draws. Requires careful test harness design at the start of Phase 2.
+- **ObjectBox `objectbox_flutter_libs` path:** The recommended `pubspec.yaml` references `path: flutter_libs` for the generated native library path. Verify against the actual `dart run objectbox:download-libs` output structure during Phase 1 setup.
+
+---
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [Official Risk Rules (Hasbro PDF)](https://www.hasbro.com/common/instruct/risk.pdf) -- canonical rule reference
-- [FastAPI WebSocket Documentation](https://fastapi.tiangolo.com/advanced/websockets/) -- server implementation
-- [NetworkX 3.6.1 Documentation](https://networkx.org/documentation/stable/tutorial.html) -- graph library API
-- [Risk Battle Outcome Odds Calculator](https://riskodds.com/) -- combat probability reference
-- [Risk dice probability analysis (DataGenetics)](http://www.datagenetics.com/blog/november22011/index.html) -- exact per-round expected losses
+
+- [Flutter 3.41 Release Notes](https://docs.flutter.dev/release/whats-new) — Flutter stable version, Dart bundling
+- [flutter_riverpod pub.dev](https://pub.dev/packages/flutter_riverpod) — Version 3.3.1, flutter.dev publisher
+- [Riverpod 3.0 What's New](https://riverpod.dev/docs/whats_new) — AsyncNotifier, mutations, offline persistence hooks
+- [Riverpod AsyncNotifier guide](https://riverpod.dev/docs/essentials/side_effects) — AsyncNotifier patterns
+- [freezed pub.dev](https://pub.dev/packages/freezed) — Version 3.2.5
+- [json_serializable pub.dev](https://pub.dev/packages/json_serializable) — Version 6.13.0, Google publisher
+- [flutter_svg pub.dev](https://pub.dev/packages/flutter_svg) — Version 2.2.4, flutter.dev publisher
+- [path_parsing pub.dev](https://pub.dev/packages/path_parsing) — Version 1.1.0, flutter.dev publisher; successor to abandoned `path_drawing`
+- [objectbox pub.dev](https://pub.dev/packages/objectbox) — Version 5.2.0, objectbox.io publisher
+- [shared_preferences pub.dev](https://pub.dev/packages/shared_preferences) — Version 2.5.4
+- [mocktail pub.dev](https://pub.dev/packages/mocktail) — Version 1.0.4, felangel.dev
+- [Flutter CustomPainter docs](https://api.flutter.dev/flutter/rendering/CustomPainter-class.html) — CustomPainter API
+- [Dart Isolates — official docs](https://dart.dev/language/isolates) — Isolate.run() and persistent isolates
+- [Flutter concurrency and isolates](https://docs.flutter.dev/perf/isolates) — Flutter-specific isolate guidance
+- [Flutter HapticFeedback API](https://api.flutter.dev/flutter/services/HapticFeedback-class.html) — platform haptic methods
+- [Android 16 orientation/resizability changes](https://android-developers.googleblog.com/2025/01/orientation-and-resizability-changes-in-android-16.html) — forced orientation lock removed at API 36
+- [Android 17 orientation/resizability changes](https://android-developers.googleblog.com/2026/02/prepare-your-app-for-resizability-and.html) — opt-out removed for large screens at API 37
+- [Flutter CustomPainter performance issue #72066](https://github.com/flutter/flutter/issues/72066) — known regression with complex paths + InteractiveViewer
 
 ### Secondary (MEDIUM confidence)
-- [Evaluating Heuristics in the Game Risk (Maastricht)](https://project.dke.maastrichtuniversity.nl/games/files/bsc/Hahn_Bsc-paper.pdf) -- BSR/BST metrics, AI heuristic evaluation
-- [RISK AI Project (Gettysburg)](http://modelai.gettysburg.edu/2019/risk/RISK_AI_Handout.pdf) -- heuristic bot implementation guide
-- [CS Cornell - An Intelligent Agent for Risk](https://www.cs.cornell.edu/boom/2001sp/Choi/473repo.html) -- AI challenges, state space analysis
-- [SMG Studio Risk AI](https://smgstudio.freshdesk.com/support/solutions/articles/11000077687-our-risk-ai) -- commercial AI persona system
-- [Game Programming Patterns: State](https://gameprogrammingpatterns.com/state.html) -- FSM patterns
-- [Turn-Based Game Architecture Guide](https://outscal.com/blog/turn-based-game-architecture) -- architecture patterns
 
-### Tertiary (LOW confidence)
-- [Playing the Game of Risk with an AlphaZero Agent](https://www.diva-portal.org/smash/get/diva2:1514096/FULLTEXT01.pdf) -- confirms neural approach is overkill, useful for branching factor data
-- [PyRisk on GitHub](https://github.com/chronitis/pyrisk) -- open source reference implementation
+- [Build interactive maps in Flutter with SVG — Appwriters](https://www.appwriters.dev/blog/flutter-interactive-svg-maps) — path-based hit detection pattern
+- [Flutter State Management 2025–2026: Riverpod vs BLoC — Foresight Mobile](https://foresightmobile.com/blog/best-flutter-state-management) — ecosystem consensus on Riverpod
+- [Hive/Isar abandonment context](https://dinkomarinac.dev/best-local-database-for-flutter-apps-a-complete-guide/) — maintenance status confirmed by multiple sources
+- [RISK: Global Domination on Google Play](https://play.google.com/store/apps/details?id=com.hasbro.riskbigscreen&hl=en_US) — competitor feature analysis, 4.34/5, 19M downloads
+- [Color Blind Mode in Games — Number Analytics](https://www.numberanalytics.com/blog/ultimate-guide-color-blind-mode-games) — Wong palette for colorblind support
+- [Mobile Gaming UX: Haptic Feedback](https://interhaptics.medium.com/mobile-gaming-ux-how-haptic-feedback-can-change-the-game-3ef689f889bc) — haptic vocabulary design for games
+- [Apple Developer: Onboarding for Games](https://developer.apple.com/app-store/onboarding-for-games/) — optional tutorial guidance; confirms skip-tutorial as best practice
+- [Flutter InteractiveViewer for game maps](https://gladimdim.org/animating-interactiveviewer-in-flutter-or-how-to-animate-map-in-your-game) — TransformationController coordinate transform pattern
 
 ---
-*Research completed: 2026-03-08*
+*Research completed: 2026-03-14*
 *Ready for roadmap: yes*

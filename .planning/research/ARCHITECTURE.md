@@ -1,403 +1,612 @@
 # Architecture Patterns
 
-**Domain:** Risk-like turn-based strategy board game with AI bots
-**Researched:** 2026-03-08
+**Domain:** Flutter mobile port of a turn-based Risk board game (no backend, on-device engine)
+**Researched:** 2026-03-14
+**Confidence:** HIGH
 
-## Recommended Architecture
+---
 
-The system follows a **server-authoritative, state-machine-driven** architecture with clear separation between game logic, AI, and presentation. The server (Python) owns all game state and rule enforcement. The client (browser) is a thin view layer that sends player actions and renders state updates.
+## Context: What Is Being Ported
 
-```
-+------------------------------------------------------------------+
-|                        Python Backend                             |
-|                                                                   |
-|  +------------+    +-------------+    +-----------------------+   |
-|  |            |    |             |    |                       |   |
-|  |  Map/Graph |<-->| Game State  |<-->|   Turn Engine (FSM)   |   |
-|  |   Module   |    |  Container  |    |                       |   |
-|  |            |    |             |    |  Reinforce -> Attack   |   |
-|  +------------+    +------+------+    |  -> Fortify -> Next   |   |
-|                           |           +-----------+-----------+   |
-|                           |                       |               |
-|                    +------v------+    +-----------v-----------+   |
-|                    |             |    |                       |   |
-|                    | Combat      |    |   Player Interface    |   |
-|                    | Resolver    |    |   (Human / Bot ABC)   |   |
-|                    |             |    |                       |   |
-|                    +-------------+    |  +-------+ +-------+ |   |
-|                                       |  | Easy  | | Hard  | |   |
-|                                       |  | Bot   | | Bot   | |   |
-|                                       |  +-------+ +-------+ |   |
-|                                       +-----------------------+   |
-|                                                                   |
-|  +------------------------------------------------------------+  |
-|  |              Action Validator / Rule Engine                 |  |
-|  +------------------------------------------------------------+  |
-|                                                                   |
-|  +------------------------------------------------------------+  |
-|  |              WebSocket Server (FastAPI)                     |  |
-|  +------------------------------------------------------------+  |
-+------------------------------------------------------------------+
-        |  WebSocket (JSON messages)  ^
-        v                             |
-+------------------------------------------------------------------+
-|                      Browser Client                               |
-|                                                                   |
-|  +------------------+  +------------------+  +-----------------+  |
-|  | Map Renderer     |  | Game Info Panel  |  | Action Controls |  |
-|  | (SVG/Canvas)     |  | (armies, cards)  |  | (buttons, dice) |  |
-|  +------------------+  +------------------+  +-----------------+  |
-+------------------------------------------------------------------+
-```
+The existing system is a Python/FastAPI backend + vanilla JS frontend communicating over WebSocket. The mobile version eliminates the client-server split entirely. Everything runs on-device in Dart. This is a structural transformation, not a line-for-line translation.
 
-### Component Boundaries
+**What disappears:** FastAPI, WebSocket, JSON serialization layer, NetworkX
+**What maps directly:** Game engine logic, bot strategy algorithms, FSM phases, map graph
+**What is new:** Flutter widget tree, Riverpod state providers, CustomPainter map rendering, Dart isolates for bot AI
 
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| **Map/Graph Module** | Territory definitions, adjacency graph, continent groupings, pathfinding (connected territory checks) | Game State (reads map structure), Turn Engine (validates moves) |
-| **Game State Container** | Single source of truth: territory ownership, army counts, player hands (cards), turn order, elimination status | All backend components read from it; only Turn Engine and Action Validator mutate it |
-| **Turn Engine (FSM)** | Drives the game loop through phases: Setup -> Reinforce -> Attack -> Fortify -> Next Player. Manages turn transitions and win condition checks | Game State (reads/writes), Player Interface (requests actions), Combat Resolver (delegates attacks) |
-| **Combat Resolver** | Dice rolling, attacker/defender loss calculation, territory capture, card awards | Turn Engine (called during attack phase), Game State (reads armies, writes results) |
-| **Action Validator / Rule Engine** | Validates every action against current game state and rules before execution. Rejects illegal moves | Turn Engine (pre-action check), Game State (reads for validation) |
-| **Player Interface (ABC)** | Abstract base class that both HumanPlayer and Bot classes implement. Defines the contract: `choose_reinforce()`, `choose_attack()`, `choose_fortify()`, etc. | Turn Engine (called for decisions), Game State (reads for decision-making) |
-| **Bot AI Implementations** | Concrete Player Interface implementations with varying strategy depth (Easy=random, Medium=heuristic, Hard=strategic) | Player Interface contract, Game State (reads for analysis), Map/Graph (reads for pathfinding/territory analysis) |
-| **WebSocket Server** | Bridges backend to browser. Sends state updates, receives human player actions. Translates between JSON messages and internal action objects | HumanPlayer adapter (forwards actions), Game State (serializes for client) |
-| **Browser Client** | Renders map, displays game info, captures human input. Zero game logic | WebSocket Server only |
+---
 
-### Data Flow
+## Standard Architecture
 
-**Game Loop (per turn):**
+### System Overview
 
 ```
-1. Turn Engine determines current player and phase
-2. Turn Engine asks Player Interface for a decision
-   - If Bot: Bot analyzes GameState, returns action immediately
-   - If Human: HumanPlayer adapter sends state to browser via WebSocket,
-     waits for action response from browser via WebSocket
-3. Action Validator checks the proposed action against rules
-   - If invalid: reject, request again (step 2)
-   - If valid: proceed
-4. Turn Engine applies action to Game State
-   - If attack: delegate to Combat Resolver, apply results
-5. Turn Engine checks win/elimination conditions
-6. Turn Engine serializes updated state, broadcasts to client via WebSocket
-7. Turn Engine advances phase or player
-8. Repeat from step 1
++--------------------------------------------------------------------+
+|                         Flutter App (on-device)                     |
++--------------------------------------------------------------------+
+|                          Presentation Layer                         |
+|                                                                     |
+|  +------------------+  +-------------------+  +------------------+ |
+|  |  MapWidget       |  |  SidebarWidget    |  |  ActionPanel     | |
+|  |  (CustomPainter) |  |  (armies, cards)  |  |  (bottom sheet)  | |
+|  +--------+---------+  +---------+---------+  +--------+---------+ |
+|           |                      |                     |           |
++-----------|----------------------|---------------------|------------+
+|                         State Layer (Riverpod)                      |
+|                                                                     |
+|  +------------------+  +-------------------+  +------------------+ |
+|  |  GameNotifier    |  |  UIStateNotifier  |  |  SimModeNotifier | |
+|  |  (game state,    |  |  (selection,      |  |  (auto-play,     | |
+|  |   turn control)  |  |   phase prompts)  |  |   speed control) | |
+|  +--------+---------+  +---------+---------+  +--------+---------+ |
+|           |                      |                     |           |
++-----------|----------------------|---------------------|------------+
+|                         Engine Layer (pure Dart)                    |
+|                                                                     |
+|  +------------------+  +-------------------+  +------------------+ |
+|  |  TurnEngine      |  |  CombatResolver   |  |  MapGraph        | |
+|  |  (FSM: reinforce |  |  (dice, losses,   |  |  (adjacency,     | |
+|  |   attack fortify)|  |   conquest)       |  |   BFS, conts)    | |
+|  +------------------+  +-------------------+  +------------------+ |
+|                                                                     |
+|  +------------------+  +-------------------+  +------------------+ |
+|  |  Bot Agents      |  |  CardEngine       |  |  SetupEngine     | |
+|  |  Easy/Med/Hard   |  |  (trade, deck,    |  |  (distribute     | |
+|  |  (Dart isolates) |  |   wildcards)      |  |   territories)   | |
+|  +------------------+  +-------------------+  +------------------+ |
+|                                                                     |
++--------------------------------------------------------------------+
+|                          Data Layer                                 |
+|                                                                     |
+|  +------------------+  +-------------------+                       |
+|  |  GameState       |  |  MapData           |                      |
+|  |  (freezed,       |  |  (static JSON,     |                      |
+|  |   immutable)     |  |   loaded once)     |                      |
+|  +------------------+  +-------------------+                       |
++--------------------------------------------------------------------+
 ```
 
-**State Update Flow (unidirectional):**
+### Component Responsibilities
+
+| Component | Responsibility | Implementation |
+|-----------|----------------|----------------|
+| **MapWidget** | Renders 42 territories with color-by-owner, army counts, selection highlight; handles tap-to-select | `CustomPainter` + `GestureDetector`, SVG paths parsed via `path_drawing` |
+| **SidebarWidget** | Displays current player info, cards in hand, continent bonuses, phase indicator | Stateless widgets reading Riverpod providers |
+| **ActionPanel** | Bottom sheet with context-sensitive controls (attack button, dice selector, end phase) | `DraggableScrollableSheet`, watches `UIStateNotifier` |
+| **GameNotifier** | Owns the canonical `GameState`; orchestrates turn execution; exposes methods called by widgets | `AsyncNotifier<GameState>` in Riverpod |
+| **UIStateNotifier** | Tracks ephemeral UI: selected source territory, selected target, valid targets list, phase prompt text | `Notifier<UIState>` in Riverpod |
+| **SimModeNotifier** | Controls AI-vs-AI simulation: running/paused, speed, turn delay timer | `Notifier<SimState>` in Riverpod |
+| **TurnEngine** | Pure functions: `executeReinforce`, `executeAttack`, `executeFortify`, `executeTurn`; no Flutter dependencies | Pure Dart library, zero imports from flutter |
+| **CombatResolver** | `resolveCombat(attackerDice, defenderDice, rng)` → losses; `executeBlitz` loop | Pure Dart, injectable `Random` for tests |
+| **MapGraph** | Adjacency check, `neighbors()`, `connectedTerritories()` via BFS, `continentBonus()` | Pure Dart, built from `MapData` at startup |
+| **Bot Agents** | `EasyAgent`, `MediumAgent`, `HardAgent` implementing `PlayerAgent` interface; all methods synchronous and pure | Pure Dart classes, run in Isolate via `Isolate.run()` |
+| **CardEngine** | `drawCard`, `executeTrade`, `isValidSet`, card bonus escalation table | Pure Dart |
+| **SetupEngine** | `distributeTerritoriesRandomly`, `assignInitialArmies` | Pure Dart |
+| **GameState** | Complete game snapshot: territories, players, turn phase, cards, deck, trade count | `@freezed` class with `copyWith`, deep equality |
+| **MapData** | Static: territory names, adjacencies, continents, bonuses | Loaded once from bundled JSON asset |
+
+---
+
+## Recommended Project Structure
 
 ```
-Player Decision --> Action Validator --> Game State Mutation --> State Broadcast --> Client Render
+lib/
+├── main.dart                    # App entry point, ProviderScope
+├── app.dart                     # MaterialApp, routing
+│
+├── engine/                      # Pure Dart game logic (zero Flutter imports)
+│   ├── models/
+│   │   ├── game_state.dart      # @freezed GameState, TerritoryState, PlayerState
+│   │   ├── actions.dart         # @freezed AttackAction, FortifyAction, etc.
+│   │   ├── cards.dart           # @freezed Card, TurnPhase enum
+│   │   └── map_schema.dart      # @freezed MapData, ContinentData
+│   ├── map_graph.dart           # MapGraph: adjacency, BFS, continent queries
+│   ├── combat.dart              # resolveCombat, executeAttack, executeBlitz
+│   ├── reinforcements.dart      # calculateReinforcements
+│   ├── cards.dart               # drawCard, executeTrade, isValidSet
+│   ├── fortify.dart             # executeFortify, BFS path validation
+│   ├── setup.dart               # distributeTerritoriesRandomly
+│   └── turn.dart                # executeReinforcePhase, executeAttackPhase, etc.
+│
+├── bots/                        # AI agents (pure Dart, no Flutter)
+│   ├── player_agent.dart        # abstract class PlayerAgent (interface)
+│   ├── easy_agent.dart          # random valid moves
+│   ├── medium_agent.dart        # heuristic scoring
+│   └── hard_agent.dart          # HardAgent: BSR, continent progress, probability
+│
+├── providers/                   # Riverpod state providers
+│   ├── game_provider.dart       # GameNotifier: AsyncNotifier<GameState>
+│   ├── ui_provider.dart         # UIStateNotifier: selection, valid targets
+│   ├── sim_provider.dart        # SimModeNotifier: simulation speed/state
+│   └── map_provider.dart        # mapGraphProvider: loaded once, cached
+│
+├── screens/
+│   ├── home_screen.dart         # Game setup: player count, difficulty
+│   └── game_screen.dart         # Main game UI: map + sidebar + action panel
+│
+├── widgets/
+│   ├── map/
+│   │   ├── map_widget.dart      # CustomPaint host + GestureDetector
+│   │   ├── map_painter.dart     # CustomPainter implementation
+│   │   └── territory_paths.dart # Parsed SVG path data for 42 territories
+│   ├── sidebar/
+│   │   ├── player_info.dart     # Current player name, armies to place
+│   │   ├── cards_hand.dart      # Card display + trade button
+│   │   └── continent_panel.dart # Continent control bonuses
+│   └── action_panel/
+│       ├── action_panel.dart    # DraggableScrollableSheet container
+│       ├── reinforce_controls.dart
+│       ├── attack_controls.dart  # Dice selector, blitz toggle
+│       └── fortify_controls.dart
+│
+└── assets/
+    └── map.json                 # Territory definitions, adjacencies, continents
 ```
 
-The client never mutates game state. It only sends action intents (e.g., `{"action": "attack", "from": "Brazil", "to": "North Africa", "armies": 3}`). The server validates and either applies or rejects.
+### Structure Rationale
 
-**AI Decision Flow:**
+- **engine/:** Zero Flutter imports enforced. This enables testing every game rule, bot decision, and combat outcome with plain `dart test`, no widget testing overhead. Direct Dart port of the Python engine with immutable `copyWith` replacing `model_copy`.
+- **bots/:** Separate from engine because they depend on the engine (read-only state analysis) but are not part of the turn execution mechanism. Mirrors the Python `bots/` package.
+- **providers/:** Thin coordination layer. Providers call engine functions, store results, notify widgets. No game logic lives here.
+- **widgets/map/:** Isolated because the map painter is the most complex widget; isolating it makes it independently testable via golden tests.
 
-```
-Game State (read-only snapshot) --> Bot Strategy Layer
-  --> Territory Analysis (border detection, continent progress)
-  --> Threat Assessment (neighbor army counts, player strength)
-  --> Goal Selection (which continent to pursue, who to attack)
-  --> Action Generation (concrete moves)
---> Action returned to Turn Engine
-```
+---
 
-## Patterns to Follow
+## Architectural Patterns
 
-### Pattern 1: Finite State Machine for Turn Phases
+### Pattern 1: Riverpod AsyncNotifier for Game Orchestration
 
-**What:** Model each turn as a state machine with explicit phase transitions: `REINFORCE -> ATTACK -> FORTIFY -> END_TURN`. The game itself is a higher-level FSM: `SETUP -> PLAYING -> GAME_OVER`.
+**What:** A single `GameNotifier extends AsyncNotifier<GameState>` owns turn execution. Human player actions call public methods (`attack(source, target, dice)`). Bot turns run asynchronously via Dart isolates and resolve to state updates. The UI always rebuilds from the new state.
 
-**When:** Always. This is the backbone of the game loop.
+**When to use:** Always. Riverpod's `AsyncNotifier` handles loading states during bot AI computation, error states for rule violations, and provides a single place to reason about game progression.
 
-**Why:** Turn-based games map perfectly to FSMs. Each phase has different valid actions, different UI states, and different exit conditions. The FSM prevents illegal state transitions (e.g., attacking during reinforcement phase).
+**Trade-offs:** Slightly more ceremony than direct state mutation, but gives you `ref.watch` granularity, loading spinners during bot turns, and easy testing via `ProviderContainer`.
 
 **Example:**
-```python
-from enum import Enum, auto
+```dart
+@riverpod
+class GameNotifier extends _$GameNotifier {
+  @override
+  Future<GameState> build() async {
+    // Initial state is empty; game starts via setupGame()
+    return GameState.initial();
+  }
 
-class TurnPhase(Enum):
-    REINFORCE = auto()
-    ATTACK = auto()
-    FORTIFY = auto()
-    END_TURN = auto()
+  Future<void> setupGame(GameConfig config) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final mapGraph = ref.read(mapGraphProvider);
+      return SetupEngine.distributeTerritoriesRandomly(config, mapGraph);
+    });
+  }
 
-class GamePhase(Enum):
-    SETUP = auto()       # Initial army placement
-    PLAYING = auto()     # Main game loop
-    GAME_OVER = auto()   # Winner determined
+  Future<void> submitHumanAttack(AttackAction action) async {
+    final current = state.requireValue;
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final rng = Random();
+      final mapGraph = ref.read(mapGraphProvider);
+      final (newState, _, conquered) = CombatEngine.executeAttack(
+        current, mapGraph, action, current.currentPlayerIndex, rng);
+      return newState;
+    });
+  }
 
-class TurnEngine:
-    def __init__(self, game_state: GameState):
-        self.game_phase = GamePhase.SETUP
-        self.turn_phase = TurnPhase.REINFORCE
-        self.game_state = game_state
-
-    def advance_phase(self):
-        if self.turn_phase == TurnPhase.REINFORCE:
-            self.turn_phase = TurnPhase.ATTACK
-        elif self.turn_phase == TurnPhase.ATTACK:
-            self.turn_phase = TurnPhase.FORTIFY
-        elif self.turn_phase == TurnPhase.FORTIFY:
-            self.turn_phase = TurnPhase.END_TURN
-            self._next_player()
-            self.turn_phase = TurnPhase.REINFORCE
+  Future<void> runBotTurn() async {
+    final current = state.requireValue;
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      // Run bot in isolate to avoid UI jank
+      return await Isolate.run(() {
+        final mapGraph = ref.read(mapGraphProvider);
+        final bot = _agentFor(current.currentPlayerIndex);
+        return TurnEngine.executeTurn(current, mapGraph, bot, Random());
+      });
+    });
+  }
+}
 ```
 
-### Pattern 2: Player Interface Abstraction (Strategy Pattern)
+### Pattern 2: Immutable State with Freezed (Mirrors Python model_copy)
 
-**What:** Define an abstract `Player` interface that both human and bot players implement. The Turn Engine interacts only with this interface, never with concrete implementations.
+**What:** All game state objects are `@freezed` classes. Every engine function takes a `GameState` and returns a new `GameState`. No mutation. Mirrors Python's `state.model_copy(update={...})` exactly.
 
-**When:** Always. This is what makes bots and humans interchangeable.
+**When to use:** Always. The entire engine layer is pure functions on immutable data. This is the direct translation of the Pydantic immutable state pattern.
 
-**Why:** The Turn Engine should not care whether it's asking a human or a bot. The same `choose_attack()` call works for both. For humans, the implementation bridges to the WebSocket; for bots, it runs AI logic. This also makes adding new bot strategies trivial.
+**Trade-offs:** Code generation step required (`dart run build_runner build`). Adds a `build_runner` dev dependency. Worth it: deep equality, `copyWith`, pattern matching, and JSON serialization are generated for free.
 
 **Example:**
-```python
-from abc import ABC, abstractmethod
+```dart
+@freezed
+class GameState with _$GameState {
+  const factory GameState({
+    required Map<String, TerritoryState> territories,
+    required List<PlayerState> players,
+    @Default(0) int currentPlayerIndex,
+    @Default(0) int turnNumber,
+    @Default(TurnPhase.reinforce) TurnPhase turnPhase,
+    @Default(0) int tradeCount,
+    @Default({}) Map<int, List<Card>> cards,
+    @Default([]) List<Card> deck,
+    @Default(false) bool conqueredThisTurn,
+  }) = _GameState;
+}
 
-class Player(ABC):
-    @abstractmethod
-    async def choose_reinforcement(self, state: GameState, armies: int) -> dict[str, int]:
-        """Return {territory_name: army_count} allocation."""
-        ...
-
-    @abstractmethod
-    async def choose_attack(self, state: GameState) -> Attack | None:
-        """Return an Attack action or None to end attack phase."""
-        ...
-
-    @abstractmethod
-    async def choose_fortify(self, state: GameState) -> Fortify | None:
-        """Return a Fortify action or None to skip."""
-        ...
-
-class HumanPlayer(Player):
-    async def choose_attack(self, state: GameState) -> Attack | None:
-        await self.websocket.send_json({"phase": "attack", "state": state.serialize()})
-        response = await self.websocket.receive_json()
-        return Attack.from_dict(response) if response.get("action") != "pass" else None
-
-class EasyBot(Player):
-    async def choose_attack(self, state: GameState) -> Attack | None:
-        # Random valid attack or pass
-        ...
+// Engine function: same shape as Python execute_attack
+(GameState, CombatResult, bool) executeAttack(
+  GameState state,
+  MapGraph mapGraph,
+  AttackAction action,
+  int playerIndex,
+  Random rng,
+) {
+  // ... resolve combat
+  return (state.copyWith(territories: newTerritories), result, conquered);
+}
 ```
 
-### Pattern 3: Graph-Based Map Representation
+### Pattern 3: CustomPainter Map with Hit Detection
 
-**What:** Represent the world map as an adjacency graph where territories are nodes and borders are edges. Continents are node groups with metadata (bonus value).
+**What:** The 42 territories are rendered as `Path` objects in a `CustomPainter`. Tap detection uses `path.contains(localPosition)` for each territory. This avoids the weight of Flame or a game loop for a static board game map.
 
-**When:** Always. The map is fundamentally a graph problem.
+**When to use:** For this project. A full game engine (Flame) adds 5MB+ and a component/game-loop abstraction that is unnecessary for a board game where the "animation" is just color changes and number updates.
 
-**Why:** Graph representation enables efficient adjacency checks (can I attack from here?), connected-component analysis (can I fortify between these territories?), and continent control verification. It also supports the future requirement of custom maps -- any valid graph is a valid map.
+**Trade-offs:** CustomPainter requires manual SVG path parsing upfront. The `path_drawing` package converts SVG path strings to Flutter `Path` objects. Hit detection is O(n) over 42 territories per tap — completely negligible.
 
 **Example:**
-```python
-from dataclasses import dataclass
+```dart
+class MapPainter extends CustomPainter {
+  final GameState gameState;
+  final String? selectedTerritory;
+  final Set<String> validTargets;
+  final Map<String, Path> territoryPaths; // pre-parsed from SVG
 
-@dataclass
-class Territory:
-    name: str
-    continent: str
-    neighbors: list[str]  # adjacent territory names
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final entry in territoryPaths.entries) {
+      final name = entry.key;
+      final path = entry.value;
+      final ts = gameState.territories[name]!;
 
-@dataclass
-class Continent:
-    name: str
-    territories: list[str]
-    bonus_armies: int
+      final paint = Paint()
+        ..color = _ownerColor(ts.owner)
+        ..style = PaintingStyle.fill;
 
-class GameMap:
-    def __init__(self):
-        self.territories: dict[str, Territory] = {}
-        self.continents: dict[str, Continent] = {}
+      if (name == selectedTerritory) {
+        paint.color = paint.color.withOpacity(0.5);
+      }
+      canvas.drawPath(path, paint);
+    }
+  }
 
-    def are_adjacent(self, t1: str, t2: str) -> bool:
-        return t2 in self.territories[t1].neighbors
+  String? hitTest(Offset localPosition) {
+    for (final entry in territoryPaths.entries) {
+      if (entry.value.contains(localPosition)) return entry.key;
+    }
+    return null;
+  }
+}
 
-    def are_connected(self, t1: str, t2: str, owner: str, state: GameState) -> bool:
-        """BFS/DFS to check if t1 and t2 are connected through territories owned by owner."""
-        ...
-
-    def controls_continent(self, player: str, continent: str, state: GameState) -> bool:
-        return all(
-            state.owner(t) == player
-            for t in self.continents[continent].territories
-        )
+// In MapWidget:
+GestureDetector(
+  onTapDown: (details) {
+    final hit = painter.hitTest(details.localPosition);
+    if (hit != null) ref.read(uiStateProvider.notifier).selectTerritory(hit);
+  },
+  child: CustomPaint(painter: painter),
+)
 ```
 
-### Pattern 4: Serializable Game State
+### Pattern 4: PlayerAgent Interface (Mirrors Python Protocol)
 
-**What:** The GameState object should be trivially serializable to JSON for WebSocket transmission and for potential save/load functionality.
+**What:** An abstract `PlayerAgent` class defines the contract: `chooseReinforcement`, `chooseAttack`, `chooseFortify`, `chooseCardTrade`, `chooseAdvanceArmies`. Human turns fulfill this contract through UI interaction captured by the `GameNotifier`. Bot turns fulfill it inline.
 
-**When:** Every state update that needs to reach the client.
+**When to use:** Always. This is the direct Dart translation of the Python duck-typed agent protocol.
 
-**Why:** The client needs the full state to render. Bots may want state snapshots for simulation. Serialization also enables game replay and debugging.
+**Trade-offs:** The human player's "agent" is implicit in the UI flow — the user taps, `GameNotifier` receives the action, and the phase advances. Bots are explicit `PlayerAgent` implementations that can be unit tested in isolation.
 
 **Example:**
-```python
-@dataclass
-class GameState:
-    territories: dict[str, TerritoryState]  # {name: {owner, armies}}
-    players: list[PlayerState]               # [{name, cards, alive}]
-    current_player: int
-    turn_phase: TurnPhase
-    turn_number: int
-    card_trade_count: int                    # escalating card values
+```dart
+abstract class PlayerAgent {
+  ReinforcePlacementAction chooseReinforcement(GameState state, int armies);
+  AttackAction? chooseAttack(GameState state);
+  FortifyAction? chooseFortify(GameState state);
+  TradeCardsAction? chooseCardTrade(GameState state, List<Card> cards, {required bool forced});
+  int chooseAdvanceArmies(GameState state, String source, String target, int min, int max);
+}
 
-    def serialize(self) -> dict:
-        """Convert to JSON-safe dict for WebSocket transmission."""
-        ...
-
-    def snapshot(self) -> "GameState":
-        """Deep copy for AI simulation without affecting real state."""
-        ...
+class HardAgent implements PlayerAgent {
+  final MapGraph _mapGraph;
+  final Random _rng;
+  // ... direct port of Python HardAgent
+}
 ```
 
-### Pattern 5: Action Objects (Command-like)
+### Pattern 5: Dart Isolates for Bot AI (No UI Jank)
 
-**What:** Represent every player action as a typed data object that the validator can inspect and the engine can apply. Not full Command pattern (no undo needed), but structured actions rather than raw dicts.
+**What:** Bot turn execution runs in a separate Dart isolate via `Isolate.run()`. The UI shows a loading/thinking indicator while the bot computes. When the isolate returns the new `GameState`, the `GameNotifier` updates and the UI rebuilds.
 
-**When:** All player interactions with the game.
+**When to use:** For bot turns in non-simulation mode. In simulation mode (all bots), consider a ticker-based loop with configurable delay for visual feedback.
 
-**Why:** Typed action objects enable validation logic to be centralized and thorough. They also provide a clean audit trail of what happened during the game.
+**Trade-offs:** `Isolate.run()` spawns a new isolate per call and passes data by copy. For Risk's game state (~42 territories, ≤6 players), serialization overhead is negligible. The HardAgent's `O(n^2)` territory analysis runs in under 10ms in practice; isolates are used defensively to keep the UI frame rate clean.
 
-**Example:**
-```python
-@dataclass
-class Attack:
-    source: str       # attacking territory
-    target: str       # defending territory
-    num_dice: int     # 1-3
+**Caveats:** Objects passed to/from isolates must be primitives, typed lists, or implement `Isolatable`. Since `GameState` is a plain Dart object (no Flutter state), it passes across the isolate boundary cleanly. The `MapGraph` must be reconstructed in the isolate (it's inexpensive — just adjacency maps).
 
-@dataclass
-class Reinforce:
-    placements: dict[str, int]  # {territory: armies_to_add}
+---
 
-@dataclass
-class Fortify:
-    source: str
-    target: str
-    armies: int
-```
+## Data Flow
 
-## Anti-Patterns to Avoid
-
-### Anti-Pattern 1: Client-Side Game Logic
-
-**What:** Putting rule validation or state mutation in the browser JavaScript.
-
-**Why bad:** Even though this is single-player, splitting logic between Python and JS creates two sources of truth, doubles the bug surface, and makes the Python game engine untestable in isolation. The browser should be a dumb terminal.
-
-**Instead:** All game logic lives in Python. The browser sends action intents, receives state updates. The only JS logic is rendering and UI interaction.
-
-### Anti-Pattern 2: Monolithic Game Class
-
-**What:** One giant `Game` class that handles map, state, rules, AI, combat, and communication.
-
-**Why bad:** Becomes unmaintainable fast. Risk has enough complexity (42 territories, cards, continent bonuses, multi-phase turns, multiple bot strategies) that a single class will balloon to thousands of lines.
-
-**Instead:** Separate concerns into distinct modules: `map.py`, `state.py`, `engine.py`, `combat.py`, `rules.py`, `bots/`. Each with clear interfaces.
-
-### Anti-Pattern 3: Tight Coupling Between Bot Logic and Game Engine
-
-**What:** Bot decision-making code directly calling game engine internals or mutating state.
-
-**Why bad:** Makes it impossible to test bots independently, swap strategies, or add difficulty levels without touching engine code.
-
-**Instead:** Bots receive a read-only state snapshot and return action objects. They never call engine methods or mutate state directly.
-
-### Anti-Pattern 4: Synchronous Blocking for Human Input
-
-**What:** Using blocking I/O to wait for human player actions in the game loop.
-
-**Why bad:** Blocks the entire server, prevents sending state updates, and makes the architecture incompatible with async WebSocket communication.
-
-**Instead:** Use async/await. The Turn Engine awaits the Player Interface, which for humans awaits a WebSocket message. For bots, the await resolves immediately with their computed action.
-
-### Anti-Pattern 5: Storing Map Topology in Game State
-
-**What:** Mixing the static map definition (which territories exist, their adjacencies) with dynamic game state (who owns what, army counts).
-
-**Why bad:** The map never changes during a game. Mixing it with mutable state complicates serialization, makes state snapshots heavier than needed, and blocks the "future custom maps" requirement.
-
-**Instead:** `GameMap` is a static, immutable configuration loaded once. `GameState` references territory names but doesn't store topology. The map is injected into the engine at startup.
-
-## Scalability Considerations
-
-| Concern | This Project (1 human, local) | Future: Multiple Maps | Future: Online Multiplayer |
-|---------|-------------------------------|----------------------|---------------------------|
-| State size | Trivial (42 territories) | Same per game | Same per game, many concurrent games |
-| AI compute | Main bottleneck for Hard bot; keep under 2s per decision | Same | Move AI to background workers |
-| WebSocket | Single connection, negligible | Same | Connection management, rooms |
-| Map loading | Load once at startup from JSON/Python config | Load selected map config | Same, validated server-side |
-| Concurrency | Single game loop, no contention | Same | Async game rooms, each with own state |
-
-## Suggested Build Order (Dependencies)
-
-The architecture has clear dependency layers. Build bottom-up:
+### Human Turn Flow
 
 ```
-Phase 1: Foundation (no dependencies)
-  |- Map/Graph Module (territories, adjacency, continents)
-  |- Game State Container (ownership, armies, cards, serialization)
-  |- Action Types (dataclasses for Reinforce, Attack, Fortify)
-
-Phase 2: Game Engine (depends on Phase 1)
-  |- Combat Resolver (dice logic, loss calculation)
-  |- Action Validator / Rule Engine (legal move checking)
-  |- Turn Engine / FSM (phase management, turn flow)
-  |- Player Interface ABC
-
-Phase 3: Players (depends on Phase 2)
-  |- Easy Bot (random valid moves)
-  |- Medium Bot (heuristic-based)
-  |- Hard Bot (strategic reasoning)
-
-Phase 4: Communication (depends on Phase 2)
-  |- WebSocket Server (FastAPI)
-  |- HumanPlayer adapter (bridges WebSocket to Player Interface)
-  |- State serialization for client
-
-Phase 5: Client (depends on Phase 4)
-  |- Map rendering (SVG or Canvas)
-  |- Game info display
-  |- Action input controls
-
-Phase 6: Integration (depends on all above)
-  |- Full game loop: human + bots playing together
-  |- Game setup UI (player count, difficulty selection)
+User taps territory
+    |
+    v
+MapWidget.onTapDown → UIStateNotifier.selectTerritory(name)
+    |
+    v (user taps second territory for attack target)
+ActionPanel shows AttackControls (source, target, dice count)
+    |
+    v (user confirms attack)
+GameNotifier.submitHumanAttack(action)
+    |
+    v
+CombatEngine.executeAttack(state, mapGraph, action, rng)
+    |
+    v (returns new GameState)
+GameNotifier emits AsyncData(newState)
+    |
+    v
+MapWidget, SidebarWidget, ActionPanel all rebuild via ref.watch
 ```
 
-**Key dependency insight:** Phases 3 and 4 are independent of each other and can be built in parallel. The game engine (Phase 2) can be fully tested with mock players before any UI or real bots exist. This means the core game can be validated with automated tests before investing in frontend work.
+### Bot Turn Flow
 
-**Critical path:** Map -> State -> Rules -> Engine -> Integration. The AI bots and the web UI are branches off the engine, not sequential.
+```
+GameNotifier.runBotTurn()
+    |
+    v (AsyncLoading emitted, UI shows spinner)
+Isolate.run(() {
+    bot = HardAgent(mapGraph, rng)
+    return TurnEngine.executeTurn(state, mapGraph, bot, rng)
+})
+    |
+    v (Isolate returns new GameState)
+GameNotifier emits AsyncData(newState)
+    |
+    v
+UI rebuilds with updated state
+    |
+    v (if not game over, schedule next bot turn with Timer delay in sim mode)
+```
 
-## Technology Choices (Architecture-Relevant)
+### Simulation Mode Flow
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Server framework | **FastAPI** | Native async support, WebSocket built-in, lightweight for local use. No need for Django's overhead. |
-| Client-server protocol | **WebSocket (JSON)** | Bidirectional, persistent connection. Server can push state updates without polling. JSON is human-readable for debugging. |
-| Map data format | **Python module or JSON file** | Static data, loaded once. A Python dict/dataclass is simplest; JSON enables future map loading from files. |
-| Client rendering | **SVG** | Territory shapes need to be clickable and individually styled (color by owner, army count labels). SVG handles this natively. Canvas requires manual hit detection. |
-| Async framework | **asyncio** | Native Python. The game loop is inherently sequential (turn-based) with one async wait point (human input). No need for Celery or threading. |
+```
+SimModeNotifier.startSimulation()
+    |
+    v
+Timer.periodic(speed) → GameNotifier.runBotTurn()
+    |
+    v (each timer tick advances one full turn)
+GameNotifier emits updated state after each turn
+    |
+    v
+SimModeNotifier.pauseSimulation() → Timer.cancel()
+```
+
+### State Management (Riverpod)
+
+```
+GameState (in GameNotifier)
+    |
+    +--[ref.watch]--> MapWidget (repaints on territory/player changes)
+    +--[ref.watch]--> SidebarWidget (shows current player info)
+    +--[ref.watch]--> ActionPanel (shows phase-relevant controls)
+    +--[ref.select]--> specific territory (minimal rebuilds)
+
+UIState (in UIStateNotifier)
+    |
+    +--[ref.watch]--> MapWidget (selection highlight, valid targets overlay)
+    +--[ref.watch]--> ActionPanel (enables/disables confirm button)
+
+SimState (in SimModeNotifier)
+    |
+    +--[ref.watch]--> SimControls (play/pause button, speed slider)
+```
+
+---
+
+## Integration Points
+
+### New Components (Does Not Exist in Python Version)
+
+| Component | What It Is | Notes |
+|-----------|------------|-------|
+| `MapPainter` | Flutter CustomPainter for the world map | Needs SVG territory paths converted to Flutter `Path` objects |
+| `territory_paths.dart` | Static map of territory name → Flutter Path | Generated once by parsing the SVG; stored as Dart code |
+| `GameNotifier` | Riverpod orchestrator replacing FastAPI + WebSocket | All turn control flows through here |
+| `UIStateNotifier` | Selection state for map interaction | No equivalent in Python (browser handled this in JS) |
+| `SimModeNotifier` | Simulation mode timer control | Previously in JS `simulation.js` |
+| `HomeScreen` | Game setup UI | Previously a JS form |
+
+### Modified Components (Port from Python)
+
+| Python Module | Dart Equivalent | Changes |
+|---------------|-----------------|---------|
+| `risk/engine/turn.py` | `engine/turn.dart` | Pure functions; `async/isolate` wrapping in `GameNotifier`, not in engine |
+| `risk/engine/combat.py` | `engine/combat.dart` | Direct port; `Random` injected instead of `random.Random` |
+| `risk/engine/map_graph.py` | `engine/map_graph.dart` | BFS implemented manually (no NetworkX); `Map<String, Set<String>>` adjacency |
+| `risk/engine/cards.py` | `engine/cards.dart` | Direct port |
+| `risk/engine/fortify.py` | `engine/fortify.dart` | BFS path validation rewritten without NetworkX |
+| `risk/models/game_state.py` | `engine/models/game_state.dart` | Pydantic → `@freezed`; `model_copy` → `copyWith` |
+| `risk/models/actions.py` | `engine/models/actions.dart` | Pydantic → `@freezed` |
+| `risk/bots/hard.py` | `bots/hard_agent.dart` | Direct algorithmic port; `_rng` → injected `Random` |
+| `risk/bots/medium.py` | `bots/medium_agent.dart` | Direct port |
+
+### Components That Disappear
+
+| Python Component | Reason |
+|-----------------|--------|
+| `risk/server/app.py` (FastAPI) | No network layer needed; game runs on-device |
+| `risk/server/game_manager.py` | `GameNotifier` replaces this |
+| `risk/server/human_agent.py` | Human input is captured by UI widgets, not an agent class |
+| `risk/server/messages.py` | No WebSocket messages needed |
+| Static JS files | Replaced by Flutter widgets |
+
+### Internal Boundaries
+
+| Boundary | Communication | Notes |
+|----------|---------------|-------|
+| `GameNotifier` ↔ Engine functions | Direct function calls; engine returns new `GameState` | Engine has no knowledge of Riverpod |
+| `GameNotifier` ↔ Bot agents | `Isolate.run()` with state passed by copy | Isolate boundary enforces no shared mutable state |
+| Widgets ↔ `GameNotifier` | `ref.watch(gameProvider)` and `ref.read(gameProvider.notifier).method()` | Widgets never call engine functions directly |
+| `MapWidget` ↔ `UIStateNotifier` | `ref.watch(uiStateProvider)` for display; `ref.read(uiStateProvider.notifier).selectTerritory()` for input | Selection state is UI-only, not in GameState |
+| Engine ↔ `MapGraph` | Injected at `GameNotifier` construction, passed to engine functions | Map is immutable; loaded once from bundled JSON |
+
+---
+
+## Suggested Build Order
+
+The architecture has clear dependency layers. Build bottom-up, engine first:
+
+```
+Phase 1: Data Models + Map Graph (no dependencies)
+  |- @freezed GameState, TerritoryState, PlayerState
+  |- @freezed AttackAction, FortifyAction, etc.
+  |- @freezed Card, TurnPhase, MapData
+  |- MapGraph: adjacency Map, neighbors(), connectedTerritories() BFS
+  |- map.json asset (territory definitions)
+  Unit tests: all MapGraph queries, BFS path finding
+
+Phase 2: Combat + Engine (depends on Phase 1)
+  |- CombatResolver: resolveCombat, executeAttack, executeBlitz
+  |- CardEngine: drawCard, executeTrade, isValidSet
+  |- ReinforcementEngine: calculateReinforcements
+  |- FortifyEngine: executeFortify
+  |- SetupEngine: distributeTerritoriesRandomly
+  |- TurnEngine: executeReinforcePhase, executeAttackPhase, executeFortifyPhase
+  Unit tests: all combat outcomes, card trading rules, fortify validation
+
+Phase 3: Bot Agents (depends on Phase 1 + 2)
+  |- PlayerAgent abstract interface
+  |- EasyAgent (random valid moves)
+  |- MediumAgent (heuristic scoring, direct Python port)
+  |- HardAgent (BSR, continent progress, probability — direct Python port)
+  Unit tests: all agent methods with fixed-seed Random; property tests for valid actions
+
+Phase 4: Riverpod Providers (depends on Phase 1-3)
+  |- mapGraphProvider (loaded once from assets)
+  |- GameNotifier: setupGame, submitHumanAction, runBotTurn
+  |- UIStateNotifier: selection logic, valid target computation
+  |- SimModeNotifier: timer, speed control
+  Tests: ProviderContainer tests with fake GameState
+
+Phase 5: Map Widget (depends on Phase 1 + 4)
+  |- Parse SVG territory paths into Flutter Path objects
+  |- MapPainter: color-by-owner, army count labels, selection highlight
+  |- MapWidget: CustomPaint + GestureDetector + hit detection
+  Tests: golden tests for map rendering; hit detection unit tests
+
+Phase 6: Screens + Other Widgets (depends on Phase 4 + 5)
+  |- HomeScreen: player count, difficulty selector, start button
+  |- SidebarWidget: player info, cards, continents
+  |- ActionPanel: phase-sensitive controls, bottom sheet
+  |- GameScreen: compose map + sidebar + action panel
+  Tests: widget tests for each control
+
+Phase 7: Integration + Simulation Mode (depends on all)
+  |- Full game loop: human + bots
+  |- Simulation mode: all-bot timer loop
+  |- Win/elimination/game-over screens
+  Tests: integration test running a full simulated game
+```
+
+**Key dependency insight:** Phases 1-3 are pure Dart with zero Flutter imports. They can be developed and tested in a standalone Dart package before the Flutter shell exists. This mirrors how the Python engine was developed and tested independently of FastAPI.
+
+**Critical path for playability:** Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5. The map widget blocks playability because without it there is no way to select territories.
+
+---
+
+## Anti-Patterns
+
+### Anti-Pattern 1: Game Logic in Providers or Widgets
+
+**What people do:** Put combat resolution or bot decision-making inside `GameNotifier` or directly in widget `onTap` callbacks.
+
+**Why it's wrong:** Impossible to unit test. Game rules become entangled with Flutter's widget lifecycle. Breaks the separation that made the Python engine so testable.
+
+**Do this instead:** All game logic lives in `engine/` as pure Dart functions. `GameNotifier` is a thin orchestrator that calls engine functions and stores results.
+
+### Anti-Pattern 2: Sharing MapGraph via Mutable State
+
+**What people do:** Put `MapGraph` inside `GameState` or recreate it each turn.
+
+**Why it's wrong:** The map is static (never changes during a game). Including it in `GameState` bloats state copies on every `copyWith`, inflates memory, and complicates isolate data passing.
+
+**Do this instead:** `mapGraphProvider` holds a single `MapGraph` instance loaded at startup. Engine functions receive it as a parameter. Isolates reconstruct it from raw `MapData` (which is small and serializable).
+
+### Anti-Pattern 3: Using Flame for a Board Game
+
+**What people do:** Add Flame because "it's a game."
+
+**Why it's wrong:** Flame is designed for continuous game loops (physics, sprites, animation). Risk is event-driven: state only changes on player actions. Flame adds a mandatory game loop, `Component` hierarchy, and camera system that are all overhead for a board game. It also makes standard Flutter widgets (Material bottom sheets, etc.) more awkward to integrate.
+
+**Do this instead:** Use `CustomPainter` for the map canvas and standard Flutter widgets for all UI. The map needs to repaint on state change, not every 16ms.
+
+### Anti-Pattern 4: Blocking the UI Thread with Bot AI
+
+**What people do:** Run bot turn computation synchronously in `setState` or directly in a provider update.
+
+**Why it's wrong:** HardAgent's territory scoring loops over all territories and all candidates. On a large game state, this causes frame drops. Even if it's currently fast enough, it will jank on low-end Android devices.
+
+**Do this instead:** Always run bot turns via `Isolate.run()`. The overhead of spawning an isolate is ~1ms; the safety guarantee is permanent.
+
+### Anti-Pattern 5: Putting UIState Inside GameState
+
+**What people do:** Add `selectedTerritory` or `validAttackTargets` to `GameState`.
+
+**Why it's wrong:** UI ephemera pollutes game logic. It means every bot turn carries selection state through the engine. It makes state equality unreliable (two equal game positions with different UI selections compare as not-equal). It complicates snapshot testing.
+
+**Do this instead:** `UIStateNotifier` owns selection state separately. `GameState` is pure game logic. The two are composed in the UI layer only.
+
+### Anti-Pattern 6: Re-parsing SVG Territory Paths on Every Repaint
+
+**What people do:** Parse SVG path strings inside `MapPainter.paint()`.
+
+**Why it's wrong:** `paint()` is called every frame when the widget is dirty. Parsing 42 SVG paths on every repaint causes severe jank.
+
+**Do this instead:** Parse all SVG territory paths once at app startup (or in a `FutureProvider`) and store the resulting `Map<String, Path>` in a provider. Pass the pre-parsed paths to `MapPainter` as a constructor parameter.
+
+---
+
+## Scaling Considerations
+
+This is a single-player local game, so "scaling" means adding features, not users:
+
+| Concern | Current Scope | If Multi-Map Support Added | If Save/Load Added |
+|---------|--------------|---------------------------|-------------------|
+| MapGraph | Hardcoded classic map | `mapGraphProvider` is already parameterized by `MapData`; swap JSON asset | No change |
+| GameState | In-memory only | No change | Add JSON serialization (freezed provides `fromJson`/`toJson` for free) |
+| Bot performance | HardAgent: ~5ms/turn | Same per map | Same |
+| Map rendering | 42 SVG paths | Scale with territory count; hit detection stays O(n) | No change |
+| Isolate spawning | One per bot turn | Same | Same |
+
+---
 
 ## Sources
 
-- [Turn-Based Game Architecture Guide](https://outscal.com/blog/turn-based-game-architecture) - FSM patterns for turn-based games
-- [Game Programming Patterns: State](https://gameprogrammingpatterns.com/state.html) - State pattern in game development
-- [Game Programming Patterns: Command](https://gameprogrammingpatterns.com/command.html) - Command pattern for game actions
-- [FSM for Turn-Based Games](https://www.gamedev.net/blogs/entry/2274204-finite-state-machine-for-turn-based-games/) - Finite state machines in turn-based contexts
-- [A Turn-Based Game Loop](https://journal.stuffwithstuff.com/2014/07/15/a-turn-based-game-loop/) - Turn-based loop architecture
-- [Creating an AI for Risk](https://martinsonesson.wordpress.com/2018/01/07/creating-an-ai-for-risk-board-game/) - Risk-specific AI implementation
-- [Risk Game Strategies](https://github.com/kengz/Risk-game/blob/master/strategies.md) - Strategic concepts for Risk bots
-- [GNN for Risk-like Board Games](https://ieeexplore.ieee.org/document/10108022/) - Graph neural network approaches
-- [Functional Immutable Game State](https://dev.to/binarykoan/functional-immutable-game-state-2fal) - Immutable state patterns
-- [Command Pattern for Game Architecture](https://medium.com/gamedev-architecture/decoupling-game-code-via-command-pattern-debugging-it-with-time-machine-2b177e61556c) - Decoupling via commands
-- [FastAPI WebSockets](https://fastapi.tiangolo.com/advanced/websockets/) - WebSocket implementation in FastAPI
-- [PyRisk](https://github.com/chronitis/pyrisk) - Python Risk implementation reference
-- [Networking Turn-Based Games](https://longwelwind.net/blog/networking-turn-based-game/) - Client-server patterns for turn-based games
+- [Flutter Riverpod — official documentation](https://riverpod.dev/docs/introduction/why_riverpod) — HIGH confidence
+- [Riverpod AsyncNotifier guide](https://riverpod.dev/docs/essentials/side_effects) — HIGH confidence
+- [freezed package](https://pub.dev/packages/freezed) — HIGH confidence
+- [Flutter CustomPainter documentation](https://api.flutter.dev/flutter/rendering/CustomPainter-class.html) — HIGH confidence
+- [Dart Isolates — official docs](https://dart.dev/language/isolates) — HIGH confidence
+- [Flutter concurrency and isolates](https://docs.flutter.dev/perf/isolates) — HIGH confidence
+- [Build interactive maps in Flutter with SVG — Appwriters](https://www.appwriters.dev/blog/flutter-interactive-svg-maps) — MEDIUM confidence
+- [Flutter State Management 2025: Riverpod vs BLoC — Foresight Mobile](https://foresightmobile.com/blog/best-flutter-state-management) — MEDIUM confidence
+- [Flutter Flame for board games — DEV Community](https://dev.to/krlz/make-games-with-flutter-in-2025-flame-engine-tools-and-free-assets-1n6) — MEDIUM confidence (used to confirm Flame is NOT the right choice here)
+- [Flutter project structure: feature-first — codewithandrea.com](https://codewithandrea.com/articles/flutter-project-structure/) — MEDIUM confidence
+
+---
+*Architecture research for: Flutter mobile Risk game (on-device Dart engine)*
+*Researched: 2026-03-14*
