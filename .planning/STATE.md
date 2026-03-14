@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-10T20:07:02.414Z"
+stopped_at: "Completed 05-04: awaiting human verification checkpoint"
+last_updated: "2026-03-14T19:41:43.502Z"
 last_activity: 2026-03-10 -- Completed plan 05-03 (AI simulation mode)
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 20
-  completed_plans: 19
+  completed_plans: 20
   percent: 90
 ---
 
@@ -62,6 +62,7 @@ Progress: [█████████░] 90%
 | Phase 05-hard-bot-and-ai-simulation P01 | 4 | 2 tasks | 4 files |
 | Phase 05 P03 | 4 | 2 tasks | 6 files |
 | Phase 05-hard-bot-and-ai-simulation P02 | 6 | 2 tasks | 2 files |
+| Phase 05-hard-bot-and-ai-simulation P04 | 15 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,8 @@ Recent decisions affecting current work:
 - [Phase 05-hard-bot-and-ai-simulation]: Win probability uses geometric approximation from per-roll expected losses rather than Monte Carlo simulation
 - [Phase 05-hard-bot-and-ai-simulation]: Block-opponent-continent uses territory count threshold (N-2 or 50%+) rather than exact all-but-1 match
 - [Phase 05-hard-bot-and-ai-simulation]: Army preservation check requires per-attack viability (3+ armies with advantage) not aggregate BSR threshold
+- [Phase 05-hard-bot-and-ai-simulation]: test_completes_game_without_crash reduced to 2-player: 4-player random agent games stagnate past 2000 turns
+- [Phase 05-hard-bot-and-ai-simulation]: Reverted uncommitted engine changes (cards.py recycling + turn.py blitz): caused unbounded army growth making games never complete
 
 ### Pending Todos
 
@@ -133,6 +136,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T20:07:02.409Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-14T19:41:43.494Z
+Stopped at: Completed 05-04: awaiting human verification checkpoint
 Resume file: None

@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Game Engine** - Turn FSM, combat resolution, card system, and victory detection
 - [x] **Phase 3: Web UI and Game Setup** - Browser client, interactive SVG map, WebSocket server, and player setup
 - [x] **Phase 4: Easy and Medium Bots** - First two AI difficulty tiers validating the bot framework (completed 2026-03-09)
-- [ ] **Phase 5: Hard Bot and AI Simulation** - Human-competitive AI and bot-vs-bot observation mode
+- [x] **Phase 5: Hard Bot and AI Simulation** - Human-competitive AI and bot-vs-bot observation mode (completed 2026-03-14)
 
 ## Phase Details
 
@@ -90,7 +90,7 @@ Plans:
   1. Hard bot demonstrates observable strategic play: prioritizes continent completion, concentrates armies on borders, times card trades for maximum impact, and assesses threats from other players
   2. Hard bot wins against Medium bots significantly more often than chance in batch AI-vs-AI testing
   3. User can start an AI-vs-AI simulation (no human player) and watch bots play a full game to completion
-**Plans:** 4 plans
+**Plans:** 4/4 plans complete
 Plans:
 - [ ] 05-01-PLAN.md — Wave 0: HardAgent skeleton, test stubs for BOTS-03 and BOTS-04
 - [ ] 05-02-PLAN.md — HardAgent full implementation (TDD, multi-factor heuristic strategy)
@@ -108,4 +108,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Game Engine | 3/3 | Complete | 2026-03-08 |
 | 3. Web UI and Game Setup | 4/4 | Complete | 2026-03-08 |
 | 4. Easy and Medium Bots | 7/7 | Complete   | 2026-03-09 |
-| 5. Hard Bot and AI Simulation | 0/4 | Planning complete | - |
+| 5. Hard Bot and AI Simulation | 4/4 | Complete   | 2026-03-14 |
