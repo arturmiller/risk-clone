@@ -24,9 +24,10 @@ AI bots that provide a challenging and fun single-player experience, with the ha
 
 ### Active
 
-- [ ] Architecture supports future addition of different world maps
-- [ ] Blitz attack mode in UI (auto-resolve combat)
-- [ ] Card display and trade UI improvements
+- [ ] Flutter mobile app for Android and iOS
+- [ ] Game engine rewritten in Dart (no backend, runs on-device)
+- [ ] Fresh mobile-first UI design (touch interactions, bottom sheets)
+- [ ] All v1.0 game features ported (combat, cards, fortify, AI bots, simulation mode)
 
 ### Out of Scope
 
@@ -65,5 +66,16 @@ User-reported bugs fixed during v1.0: fortify path (BFS), advance armies max, ca
 | WebSocket for real-time | Bidirectional communication for async game loop | ✓ Good |
 | HardAgent heuristic scoring | Multi-factor weighted scoring vs ML approach | ✓ Good (80% win rate) |
 
+## Current Milestone: v1.1 Mobile App
+
+**Goal:** Port the Risk game to a Flutter mobile app for Android and iOS with a fresh mobile-first UI, rewriting the game engine in Dart.
+
+**Target features:**
+- Complete Dart port of game engine (map, combat, cards, reinforcements, fortify, turn FSM)
+- All 3 AI difficulty levels ported (Easy, Medium, Hard)
+- AI-vs-AI simulation mode
+- Touch-first mobile UI with interactive map
+- Blitz attack mode
+
 ---
-*Last updated: 2026-03-14 after v1.0 milestone*
+*Last updated: 2026-03-14 after v1.1 milestone start*
