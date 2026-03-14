@@ -78,37 +78,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DART-01 | - | Pending |
-| DART-02 | - | Pending |
-| DART-03 | - | Pending |
-| DART-04 | - | Pending |
-| DART-05 | - | Pending |
-| DART-06 | - | Pending |
-| DART-07 | - | Pending |
-| BOTS-05 | - | Pending |
-| BOTS-06 | - | Pending |
-| BOTS-07 | - | Pending |
-| BOTS-08 | - | Pending |
-| BOTS-09 | - | Pending |
-| MAPW-01 | - | Pending |
-| MAPW-02 | - | Pending |
-| MAPW-03 | - | Pending |
-| MAPW-04 | - | Pending |
-| MAPW-05 | - | Pending |
-| MOBX-01 | - | Pending |
-| MOBX-02 | - | Pending |
-| MOBX-03 | - | Pending |
-| MOBX-04 | - | Pending |
-| MOBX-05 | - | Pending |
-| MOBX-06 | - | Pending |
-| SAVE-01 | - | Pending |
-| SAVE-02 | - | Pending |
+| DART-01 | Phase 7 | Pending |
+| DART-02 | Phase 7 | Pending |
+| DART-03 | Phase 7 | Pending |
+| DART-04 | Phase 7 | Pending |
+| DART-05 | Phase 7 | Pending |
+| DART-06 | Phase 7 | Pending |
+| DART-07 | Phase 6 | Pending |
+| BOTS-05 | Phase 8 | Pending |
+| BOTS-06 | Phase 8 | Pending |
+| BOTS-07 | Phase 8 | Pending |
+| BOTS-08 | Phase 8 | Pending |
+| BOTS-09 | Phase 12 | Pending |
+| MAPW-01 | Phase 10 | Pending |
+| MAPW-02 | Phase 10 | Pending |
+| MAPW-03 | Phase 10 | Pending |
+| MAPW-04 | Phase 10 | Pending |
+| MAPW-05 | Phase 10 | Pending |
+| MOBX-01 | Phase 11 | Pending |
+| MOBX-02 | Phase 11 | Pending |
+| MOBX-03 | Phase 11 | Pending |
+| MOBX-04 | Phase 11 | Pending |
+| MOBX-05 | Phase 11 | Pending |
+| MOBX-06 | Phase 11 | Pending |
+| SAVE-01 | Phase 9 | Pending |
+| SAVE-02 | Phase 9 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25
+- Mapped to phases: 25
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-14*
-*Last updated: 2026-03-14 after initial definition*
+*Last updated: 2026-03-14 after roadmap creation (traceability complete)*
