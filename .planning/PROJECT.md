@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A digital adaptation of the classic Risk board game, playable locally in a web browser against AI bots. The game features the classic world map (42 territories, 6 continents) with original Risk rules. Focus is on strong AI opponents with multiple difficulty levels, not on multiplayer or deployment.
+A browser-based Risk board game with AI opponents at three difficulty levels. Features the classic world map (42 territories, 6 continents) with faithful Risk rules, interactive SVG map, WebSocket real-time gameplay, and an AI-vs-AI simulation mode. Runs locally via Python/FastAPI backend.
 
 ## Core Value
 
@@ -12,51 +12,58 @@ AI bots that provide a challenging and fun single-player experience, with the ha
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Classic Risk world map (42 territories, 6 continents, correct adjacencies) — v1.0
+- ✓ Original Risk rules (reinforcement, attack with dice, fortify, territory cards, continent bonuses) — v1.0
+- ✓ 3 Bot difficulty levels: Easy, Medium, Hard (Hard = human-level play) — v1.0
+- ✓ Flexible player count: 2-6 (1 human + 1-5 bots) — v1.0
+- ✓ Random territory distribution at start — v1.0
+- ✓ Win condition: eliminate all opponents — v1.0
+- ✓ Simple web UI showing territory graph, armies, and all game-relevant info — v1.0
+- ✓ Local-only execution (no deployment, no server hosting) — v1.0
+- ✓ AI-vs-AI simulation mode (watch bots play) — v1.0
 
 ### Active
 
-- [ ] Classic Risk world map (42 territories, 6 continents, correct adjacencies)
-- [ ] Original Risk rules (reinforcement, attack with dice, fortify, territory cards, continent bonuses)
-- [ ] 3 Bot difficulty levels: Easy, Medium, Hard (Hard = human-level play)
-- [ ] Flexible player count: 2-6 (1 human + 1-5 bots)
-- [ ] Random territory distribution at start
-- [ ] Win condition: eliminate all opponents
-- [ ] Simple web UI showing territory graph, armies, and all game-relevant info
-- [ ] Local-only execution (no deployment, no server hosting)
 - [ ] Architecture supports future addition of different world maps
+- [ ] Blitz attack mode in UI (auto-resolve combat)
+- [ ] Card display and trade UI improvements
 
 ### Out of Scope
 
-- Multiplayer (human vs human) — focus is on bot quality
+- Multiplayer (human vs human) — focus is on bot quality, single-player only
 - Mobile app — future consideration, web-first
 - Deployment / hosting — local development only
-- Custom map editor — future feature
+- Custom map editor — future feature after multi-map support
 - Online matchmaking — single-player only
-- Animations / polished graphics — functional UI is sufficient
+- Sound effects / music — functional UI is sufficient
+- Undo/redo — anti-feature: undermines strategic commitment
 
 ## Context
 
-- Game is a stepping stone toward a full app; current focus is game mechanics and AI
-- Classic Risk rules include: initial army placement, reinforcement phase (territory count / 3 + continent bonuses), attack phase (attacker up to 3 dice vs defender up to 2 dice), fortify phase (move armies between connected territories), territory cards (sets of 3 for bonus armies)
-- The Hard bot should use strategic concepts: continent control, border defense, threat assessment, army concentration
-- Python backend chosen for AI/game logic strengths; simple web frontend for visualization
+Shipped v1.0 with 7,400+ Python LOC + 950 JS LOC.
+Tech stack: Python/FastAPI backend, vanilla JS frontend, SVG map, WebSocket communication.
+Hard bot achieves 80% win rate against Medium in batch testing.
+User-reported bugs fixed during v1.0: fortify path (BFS), advance armies max, card trade UI, continent counts, card recycling.
 
 ## Constraints
 
-- **Tech stack**: Python backend (game logic + bots), simple HTML/JS frontend (visualization)
+- **Tech stack**: Python backend (FastAPI + game logic + bots), vanilla HTML/JS/CSS frontend
 - **Scope**: No deployment infrastructure, runs locally only
-- **Players**: Always 1 human player, bots fill remaining slots
+- **Players**: 1 human + bots, or all-bot simulation
 - **Rules**: Must match official Risk board game rules faithfully
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Python for backend/AI | Strong ecosystem for game AI, clean logic | — Pending |
-| 3 bot difficulty levels | Clear differentiation without over-complexity | — Pending |
-| Classic Risk map first | Proven, well-known baseline before custom maps | — Pending |
-| No multiplayer | Focus resources on bot quality | — Pending |
+| Python for backend/AI | Strong ecosystem for game AI, clean logic | ✓ Good |
+| 3 bot difficulty levels | Clear differentiation without over-complexity | ✓ Good |
+| Classic Risk map first | Proven, well-known baseline before custom maps | ✓ Good |
+| No multiplayer | Focus resources on bot quality | ✓ Good |
+| NetworkX for graph operations | BFS, adjacency, connected components built-in | ✓ Good |
+| Pydantic immutable state | model_copy for state transitions, clean serialization | ✓ Good |
+| WebSocket for real-time | Bidirectional communication for async game loop | ✓ Good |
+| HardAgent heuristic scoring | Multi-factor weighted scoring vs ML approach | ✓ Good (80% win rate) |
 
 ---
-*Last updated: 2026-03-08 after initialization*
+*Last updated: 2026-03-14 after v1.0 milestone*
