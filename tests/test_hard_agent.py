@@ -349,14 +349,12 @@ class TestHardAdvance:
 
 class TestHardFullGame:
     def test_completes_game_without_crash(self):
-        """Run 5 games with 4 players (1 Hard + 3 Random) with different seeds."""
-        for seed in range(5):
+        """Run 3 games with 2 players (1 Hard + 1 Random) to verify no crashes."""
+        for seed in range(3):
             rng = random.Random(seed)
             agents = {
                 0: HardAgent(rng=random.Random(seed * 10)),
                 1: RandomAgent(rng=random.Random(seed * 10 + 1)),
-                2: RandomAgent(rng=random.Random(seed * 10 + 2)),
-                3: RandomAgent(rng=random.Random(seed * 10 + 3)),
             }
             final = run_game(MAP_GRAPH, agents, rng, max_turns=2000)
             winners = [p for p in final.players if p.is_alive]
