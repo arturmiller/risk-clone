@@ -42,7 +42,12 @@
   3. `MapGraph` answers adjacency, BFS connectivity, and continent control queries correctly in unit tests
   4. ObjectBox and shared_preferences are configured and verified with a round-trip write/read test
   5. `map.json` is bundled as a Flutter asset and loads at startup with all 42 territories and adjacency edges present
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Flutter project scaffold, dependencies, config files, test stubs
+- [ ] 06-02-PLAN.md — @freezed data models, MapGraph BFS implementation, mapGraphProvider
+- [ ] 06-03-PLAN.md — ObjectBox SaveSlot entity, AppStore, main.dart wiring, persistence tests
 
 ### Phase 7: Dart Game Engine Port
 **Goal**: A pure-Dart game engine that faithfully replicates all Python game rules, validated by golden-fixture tests against the Python source so logic drift is caught before any UI is built.
@@ -122,7 +127,7 @@
 | 3. Web UI and Game Setup | v1.0 | 4/4 | Complete | 2026-03-08 |
 | 4. Easy and Medium Bots | v1.0 | 7/7 | Complete | 2026-03-09 |
 | 5. Hard Bot and AI Simulation | v1.0 | 4/4 | Complete | 2026-03-14 |
-| 6. Flutter Scaffold and Data Models | v1.1 | 0/TBD | Not started | - |
+| 6. Flutter Scaffold and Data Models | v1.1 | 0/3 | In progress | - |
 | 7. Dart Game Engine Port | v1.1 | 0/TBD | Not started | - |
 | 8. Bot Agents | v1.1 | 0/TBD | Not started | - |
 | 9. Riverpod Providers and Persistence | v1.1 | 0/TBD | Not started | - |
