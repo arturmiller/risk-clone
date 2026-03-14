@@ -1,78 +1,76 @@
-# Requirements: Risk Strategy Game
+# Requirements: Risk Strategy Game — Mobile App
 
-**Defined:** 2026-03-08
+**Defined:** 2026-03-14
 **Core Value:** AI bots that provide a challenging and fun single-player experience, with the hardest difficulty playing at human-competitive level.
 
-## v1 Requirements
+## v1.1 Requirements
 
-Requirements for initial release. Each maps to roadmap phases.
+Requirements for Flutter mobile port. Each maps to roadmap phases.
 
-### Game Setup
+### Game Engine (Dart Port)
 
-- [x] **SETUP-01**: Player can select number of players (2-6)
-- [x] **SETUP-02**: Territories are randomly distributed among all players
-- [x] **SETUP-03**: Initial armies are placed according to classic Risk rules
-
-### Game Engine
-
-- [x] **ENGI-01**: Player receives reinforcements at turn start (territory count/3 + continent bonuses, minimum 3)
-- [x] **ENGI-02**: Player can attack adjacent enemy territory with 1-3 dice vs 1-2 dice
-- [x] **ENGI-03**: Player can use blitz mode to auto-resolve combat until one side is eliminated
-- [x] **ENGI-04**: Player can fortify by moving armies along connected friendly path at end of turn
-- [x] **ENGI-05**: Player earns territory card when capturing at least one territory per turn
-- [x] **ENGI-06**: Player can trade card sets for bonus armies (escalating global sequence)
-- [x] **ENGI-07**: Player must trade cards if holding 5+ cards at start of turn
-- [x] **ENGI-08**: Eliminated player's cards transfer to the eliminator
-- [x] **ENGI-09**: Game ends when one player controls all 42 territories
-
-### Map & Visualization
-
-- [x] **MAPV-01**: SVG map displays all 42 territories with correct adjacencies
-- [x] **MAPV-02**: Territories are colored by owning player
-- [x] **MAPV-03**: Army count is displayed on each territory
-- [x] **MAPV-04**: Territories are clickable for game actions (attack source/target, fortify)
-- [x] **MAPV-05**: Current turn phase and active player are clearly indicated
-- [x] **MAPV-06**: Game log shows event history (attacks, conquests, card trades, eliminations)
-- [x] **MAPV-07**: Continent bonus information is displayed on the map
+- [ ] **DART-01**: All combat rules ported (dice rolling, attacker/defender pairing, ties to defender)
+- [ ] **DART-02**: Card system ported (deck, drawing, trading with escalating bonus, forced trade at 5+)
+- [ ] **DART-03**: Reinforcement calculation ported (territory count / 3 + continent bonuses, minimum 3)
+- [ ] **DART-04**: Fortification ported (move armies along connected friendly path)
+- [ ] **DART-05**: Turn FSM ported (reinforce → attack → fortify, player rotation, elimination, victory)
+- [ ] **DART-06**: Blitz attack mode (auto-resolve until conquest or attacker depleted)
+- [ ] **DART-07**: Map graph with BFS connectivity queries (adjacency, connected territories, continent control)
 
 ### AI Bots
 
-- [x] **BOTS-01**: Easy bot makes random valid moves
-- [x] **BOTS-02**: Medium bot uses basic strategy (continent focus, reasonable attack decisions)
-- [x] **BOTS-03**: Hard bot plays at human-competitive level (threat assessment, army concentration, card timing, continent control)
-- [x] **BOTS-04**: AI-vs-AI simulation mode (watch bots play without human player)
+- [ ] **BOTS-05**: Easy bot ported (random valid moves)
+- [ ] **BOTS-06**: Medium bot ported (continent focus, border reinforcement)
+- [ ] **BOTS-07**: Hard bot ported (multi-factor heuristic scoring, threat assessment)
+- [ ] **BOTS-08**: Bot computation runs in isolate (no UI thread blocking)
+- [ ] **BOTS-09**: AI-vs-AI simulation mode (all bots, no human player)
+
+### Map & Interaction
+
+- [ ] **MAPW-01**: Interactive map widget with pinch-zoom and pan
+- [ ] **MAPW-02**: Tap territory to select (attack source/target, fortify source/target)
+- [ ] **MAPW-03**: Territories colored by owning player with army counts displayed
+- [ ] **MAPW-04**: Territory highlighting (valid sources, valid targets, selected)
+- [ ] **MAPW-05**: Hit-test expansion for small territories on phone screens
+
+### Mobile UX
+
+- [ ] **MOBX-01**: Game setup screen (player count, difficulty, game mode)
+- [ ] **MOBX-02**: Responsive layout for phone and tablet
+- [ ] **MOBX-03**: Game action controls (dice selection, blitz, end attack, skip fortify, card trade)
+- [ ] **MOBX-04**: Game log showing events (attacks, conquests, eliminations, card trades)
+- [ ] **MOBX-05**: Continent info with bonus display
+- [ ] **MOBX-06**: Game over screen with new game option
+
+### Persistence
+
+- [ ] **SAVE-01**: Auto-save game state when app is backgrounded
+- [ ] **SAVE-02**: Resume game automatically on app relaunch
 
 ## v2 Requirements
 
-### Game Setup
+### Mobile Polish
 
-- **SETUP-04**: Player can choose bot difficulty individually per bot
-- **SETUP-05**: Player can select custom colors
-- **SETUP-06**: Player can choose from multiple world maps
+- **HAPF-01**: Haptic feedback on dice rolls, conquests, and eliminations
+- **COLR-01**: Colorblind-accessible color palette option
+- **TUTR-01**: Optional skippable tutorial for new players
+- **SAVE-03**: Multiple named save slots with manual save/load
 
-### UI Enhancements
+### App Distribution
 
-- **UIEN-01**: Bot turn speed controls (slow/normal/fast/instant)
-- **UIEN-02**: Attack animations/indications
-- **UIEN-03**: End-game summary with statistics
-
-### AI Enhancements
-
-- **AIEN-01**: AI personality/play style variations (aggressive, defensive, opportunistic)
-- **AIEN-02**: AI difficulty auto-adjustment based on player skill
+- **DIST-01**: Published to Google Play Store
+- **DIST-02**: Published to Apple App Store
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
 | Multiplayer (human vs human) | Focus is on bot quality, single-player only |
-| Mobile app | Future consideration, web-first |
-| Deployment / hosting | Local development only |
-| Custom map editor | Future feature after multi-map support |
-| Online matchmaking | Single-player only |
-| Undo/redo | Anti-feature: undermines strategic commitment |
-| Save/load game | Defer to v2; in-memory state sufficient for v1 |
-| Sound effects / music | Functional UI is sufficient |
+| Online features / networking | Fully offline, on-device game |
+| Sound effects / music | Functional UI is sufficient for v1.1 |
+| Custom map editor | Future feature |
+| In-app purchases | Free game, no monetization |
+| Cloud save sync | Local-only for v1.1 |
 
 ## Traceability
 
@@ -80,35 +78,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | Phase 3 | Complete |
-| SETUP-02 | Phase 1 | Complete |
-| SETUP-03 | Phase 1 | Complete |
-| ENGI-01 | Phase 2 | Complete |
-| ENGI-02 | Phase 2 | Complete |
-| ENGI-03 | Phase 2 | Complete |
-| ENGI-04 | Phase 2 | Complete |
-| ENGI-05 | Phase 2 | Complete |
-| ENGI-06 | Phase 2 | Complete |
-| ENGI-07 | Phase 2 | Complete |
-| ENGI-08 | Phase 2 | Complete |
-| ENGI-09 | Phase 2 | Complete |
-| MAPV-01 | Phase 1 | Complete |
-| MAPV-02 | Phase 3 | Complete |
-| MAPV-03 | Phase 3 | Complete |
-| MAPV-04 | Phase 3 | Complete |
-| MAPV-05 | Phase 3 | Complete |
-| MAPV-06 | Phase 3 | Complete |
-| MAPV-07 | Phase 3 | Complete |
-| BOTS-01 | Phase 4 | Complete |
-| BOTS-02 | Phase 4 | Complete |
-| BOTS-03 | Phase 5 | Complete |
-| BOTS-04 | Phase 5 | Complete |
+| DART-01 | - | Pending |
+| DART-02 | - | Pending |
+| DART-03 | - | Pending |
+| DART-04 | - | Pending |
+| DART-05 | - | Pending |
+| DART-06 | - | Pending |
+| DART-07 | - | Pending |
+| BOTS-05 | - | Pending |
+| BOTS-06 | - | Pending |
+| BOTS-07 | - | Pending |
+| BOTS-08 | - | Pending |
+| BOTS-09 | - | Pending |
+| MAPW-01 | - | Pending |
+| MAPW-02 | - | Pending |
+| MAPW-03 | - | Pending |
+| MAPW-04 | - | Pending |
+| MAPW-05 | - | Pending |
+| MOBX-01 | - | Pending |
+| MOBX-02 | - | Pending |
+| MOBX-03 | - | Pending |
+| MOBX-04 | - | Pending |
+| MOBX-05 | - | Pending |
+| MOBX-06 | - | Pending |
+| SAVE-01 | - | Pending |
+| SAVE-02 | - | Pending |
 
 **Coverage:**
-- v1 requirements: 23 total
-- Mapped to phases: 23
-- Unmapped: 0
+- v1.1 requirements: 25 total
+- Mapped to phases: 0
+- Unmapped: 25
 
 ---
-*Requirements defined: 2026-03-08*
-*Last updated: 2026-03-08 after roadmap creation*
+*Requirements defined: 2026-03-14*
+*Last updated: 2026-03-14 after initial definition*
