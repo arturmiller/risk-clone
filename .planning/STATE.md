@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
 status: executing
-stopped_at: Completed 07-04-PLAN.md
-last_updated: "2026-03-15T06:53:53.380Z"
-last_activity: 2026-03-15 — Phase 7 Plan 01 complete; Wave 0 test infrastructure — 59 test stubs, FakeRandom, golden fixtures
+stopped_at: Completed 07-05-PLAN.md
+last_updated: "2026-03-15T08:09:18Z"
+last_activity: 2026-03-15 — Phase 7 Plan 05 complete; golden fixtures confirm Python-Dart parity — 81/81 tests green
 progress:
   total_phases: 7
   completed_phases: 1
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 7 of 7 (Dart Game Engine Port)
-Plan: 4 of 4 in current phase (complete)
-Status: In progress
-Last activity: 2026-03-15 — Phase 7 Plan 04 complete; PlayerAgent interface + turn.dart FSM with 12 tests — all DART requirements implemented
+Plan: 5 of 5 in current phase (complete)
+Status: Phase 7 complete
+Last activity: 2026-03-15 — Phase 7 Plan 05 complete; Python-generated golden fixtures confirm Dart engine parity — 81/81 tests green, all DART requirements validated
 
 Progress: [██████████] 100% (v1.1)
 
@@ -59,6 +59,9 @@ Progress: [██████████] 100% (v1.1)
 - [07-04]: FakeRandom.attackerWins() uses [5,5,5,0,0] sequence — attacker dice=6, defender dice=1, deterministic blitz conquest in tests
 - [07-04]: executeTurn takes Map<int, PlayerAgent> agents (indexed by player index) — supports multi-player game loop
 - [07-04]: PlayerAgent abstract class (5 methods) is the Phase 8/9 seam — bots implement it, HumanAgent wires through Riverpod
+- [07-05]: Fixtures embed full GameState JSON (state_to_dart_json) — Dart uses GameState.fromJson() directly, no state reconstruction
+- [07-05]: Fixture target_armies must match intended defender dice count — Python's defender_dice override not passed to Dart engine
+- [07-05]: golden_fixture_test.dart iterates fixtures in single parametric test per group — Flutter test dynamic registration limitation
 
 ### Pending Todos
 
@@ -73,6 +76,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T07:35:00.000Z
-Stopped at: Completed 07-04-PLAN.md
+Last session: 2026-03-15T08:09:18Z
+Stopped at: Completed 07-05-PLAN.md
 Resume file: None
