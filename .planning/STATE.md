@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
-status: completed
-stopped_at: Completed 08-03-PLAN.md — Phase 8 complete
-last_updated: "2026-03-15T18:47:00.229Z"
-last_activity: 2026-03-15 — Phase 8 Plan 03 complete; win rate validation + isolate boundary — 143/143 tests green, BOTS-07 and BOTS-08 complete, Phase 8 done
+status: in-progress
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-15T19:12:30Z"
+last_activity: 2026-03-15 — Phase 9 Plan 01 complete; GameConfig + UIState models + build_runner generated files + Wave 0 test stubs — 143/143 tests green, SAVE-01 and SAVE-02 complete
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 14
+  completed_plans: 12
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** AI bots that provide a challenging and fun single-player experience, with the hardest difficulty playing at human-competitive level.
-**Current focus:** Phase 8 — Bot Agents
+**Current focus:** Phase 9 — Riverpod Providers and Persistence
 
 ## Current Position
 
-Phase: 8 of 8 (Bot Agents) — COMPLETE
-Plan: 3 of 3 in current phase (complete)
-Status: Phase 8 complete — all phases complete
-Last activity: 2026-03-15 — Phase 8 Plan 03 complete; win rate validation + isolate boundary — 143/143 tests green, BOTS-07 and BOTS-08 complete, Phase 8 done
+Phase: 9 (Riverpod Providers and Persistence) — In Progress
+Plan: 1 of 3 complete
+Status: Plan 01 complete — GameConfig + UIState models and Wave 0 test stubs
+Last activity: 2026-03-15 — Phase 9 Plan 01 complete; GameConfig + UIState freezed model + build_runner generated files + 2 test stubs — 143/143 tests green, SAVE-01 and SAVE-02 complete
 
-Progress: [██████████] 100% (v1.1)
+Progress: [█████████░] 94% (v1.1)
 
 ## Accumulated Context
 
@@ -68,6 +68,8 @@ Progress: [██████████] 100% (v1.1)
 - [Phase 08-bot-agents]: attackProbabilities and _estimateWinProbability placed at file scope (not class scope) for Isolate.run() compatibility
 - [Phase 08-bot-agents]: MediumAgent/HardAgent tests are deterministic without FakeRandom — all choices are pure logic (unlike EasyAgent which shuffles/skips randomly)
 - [Phase 08-bot-agents]: win_rate_test.dart: File('assets/classic.json') path used — flutter test cwd is mobile/; Isolate.run() boundary confirmed for freezed GameState + MapGraph without JSON round-trip
+- [Phase 09-01]: UIState includes validSources alongside validTargets — map widget (Phase 10) needs both attack source and target highlighting without extra provider queries
+- [Phase 09-01]: GameConfig is plain Dart (not freezed) — one-shot parameter object, never stored or compared for equality
 
 ### Pending Todos
 
@@ -82,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T18:42:34.904Z
-Stopped at: Completed 08-03-PLAN.md — Phase 8 complete
+Last session: 2026-03-15T19:12:02.515Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None

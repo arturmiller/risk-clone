@@ -44,8 +44,8 @@ Requirements for Flutter mobile port. Each maps to roadmap phases.
 
 ### Persistence
 
-- [ ] **SAVE-01**: Auto-save game state when app is backgrounded
-- [ ] **SAVE-02**: Resume game automatically on app relaunch
+- [x] **SAVE-01**: Auto-save game state when app is backgrounded
+- [x] **SAVE-02**: Resume game automatically on app relaunch
 
 ## v2 Requirements
 
@@ -101,8 +101,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MOBX-04 | Phase 11 | Pending |
 | MOBX-05 | Phase 11 | Pending |
 | MOBX-06 | Phase 11 | Pending |
-| SAVE-01 | Phase 9 | Pending |
-| SAVE-02 | Phase 9 | Pending |
+| SAVE-01 | Phase 9 | Complete |
+| SAVE-02 | Phase 9 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 25 total
