@@ -110,7 +110,12 @@ Plans:
   3. All territories display their owner's color and current army count, updating immediately when game state changes
   4. Selected territory, valid attack/fortify sources, and valid targets are visually distinct from unselected territories
   5. Dense territories in Europe and SE Asia are tappable with a finger on a phone screen (6dp hit-region expansion; disambiguation popup when needed)
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — territory_data.dart (42 Rect constants, kPlayerColors), Wave 0 test stubs
+- [ ] 10-02-PLAN.md — MapBasePainter (static outlines) + MapOverlayPainter (owner colors, counts, highlights)
+- [ ] 10-03-PLAN.md — MapWidget (InteractiveViewer + GestureDetector + hit testing + Riverpod wiring)
 
 ### Phase 11: Screens, Widgets, and Mobile UX
 **Goal**: A complete, playable game UI from setup through game over, with responsive layout, accessible controls, and correct platform behavior on both iOS and Android.
@@ -148,6 +153,6 @@ Plans:
 | 7. Dart Game Engine Port | 5/5 | Complete   | 2026-03-15 | - |
 | 8. Bot Agents | 3/3 | Complete   | 2026-03-15 | - |
 | 9. Riverpod Providers and Persistence | 3/3 | Complete   | 2026-03-15 | - |
-| 10. Map Widget | v1.1 | 0/TBD | Not started | - |
+| 10. Map Widget | v1.1 | 0/3 | Not started | - |
 | 11. Screens, Widgets, and Mobile UX | v1.1 | 0/TBD | Not started | - |
 | 12. Simulation Mode and Integration | v1.1 | 0/TBD | Not started | - |
