@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
-status: in_progress
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-15T18:26:00Z"
-last_activity: 2026-03-15 — Phase 8 Plan 01 complete; EasyAgent (RandomAgent port) + simulation.dart + test stubs — 97/97 tests green, BOTS-05 complete
+status: executing
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-15T18:37:27.864Z"
+last_activity: 2026-03-15 — Phase 8 Plan 02 complete; MediumAgent + HardAgent ported — 137/137 tests green, BOTS-06 and BOTS-07 complete
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 11
-  completed_plans: 9
-  percent: 82
+  completed_plans: 10
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 8 of 8 (Bot Agents)
-Plan: 1 of 3 in current phase (complete)
+Plan: 2 of 3 in current phase (complete)
 Status: Phase 8 in progress
-Last activity: 2026-03-15 — Phase 8 Plan 01 complete; EasyAgent (RandomAgent port) + simulation.dart + test stubs — 97/97 tests green, BOTS-05 complete
+Last activity: 2026-03-15 — Phase 8 Plan 02 complete; MediumAgent + HardAgent ported — 137/137 tests green, BOTS-06 and BOTS-07 complete
 
-Progress: [████████░░] 82% (v1.1)
+Progress: [██████████] 97% (v1.1)
 
 ## Accumulated Context
 
@@ -65,6 +65,8 @@ Progress: [████████░░] 82% (v1.1)
 - [08-01]: EasyAgent uses nextInt(2)==1 for 50% fortify skip — Python rng.random() replaced for FakeRandom compatibility (FakeRandom throws on nextDouble)
 - [08-01]: EasyAgent uses nextInt(100)<15 for 15% attack abort — same reason; FakeRandom-safe API requires nextInt() variants only in bot logic
 - [08-01]: simulation.dart uses Fisher-Yates shuffle inline to consume the provided rng parameter
+- [Phase 08-bot-agents]: attackProbabilities and _estimateWinProbability placed at file scope (not class scope) for Isolate.run() compatibility
+- [Phase 08-bot-agents]: MediumAgent/HardAgent tests are deterministic without FakeRandom — all choices are pure logic (unlike EasyAgent which shuffles/skips randomly)
 
 ### Pending Todos
 
@@ -79,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T18:26:00Z
-Stopped at: Completed 08-01-PLAN.md
+Last session: 2026-03-15T18:37:27.855Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
