@@ -143,13 +143,14 @@ def generate_combat_fixtures(map_graph: MapGraph) -> None:
     })
 
     # Fixture 3: 1v1 attacker wins — [6] vs [5]
+    # target_armies=1 → defender gets 1 die automatically (no override needed)
     territories = {t: (1, 2) for t in map_graph.all_territories}
     territories["Alaska"] = (0, 3)
     territories["Alberta"] = (1, 1)
     state = make_game_state(territories)
     rng = FakeRandom([6, 5])
     action = AttackAction(source="Alaska", target="Alberta", num_dice=1)
-    new_state, result, conquered = execute_attack(state, map_graph, action, 0, rng, defender_dice=1)
+    new_state, result, conquered = execute_attack(state, map_graph, action, 0, rng)
     fixtures.append({
         "id": "combat_1v1_attacker_wins",
         "description": "1v1: attacker [6] vs defender [5] → attacker wins",
@@ -163,13 +164,14 @@ def generate_combat_fixtures(map_graph: MapGraph) -> None:
     })
 
     # Fixture 4: 1v1 tie goes to defender — [4] vs [4]
+    # target_armies=1 → defender gets 1 die automatically
     territories = {t: (1, 2) for t in map_graph.all_territories}
     territories["Alaska"] = (0, 3)
-    territories["Alberta"] = (1, 2)
+    territories["Alberta"] = (1, 1)
     state = make_game_state(territories)
     rng = FakeRandom([4, 4])
     action = AttackAction(source="Alaska", target="Alberta", num_dice=1)
-    new_state, result, conquered = execute_attack(state, map_graph, action, 0, rng, defender_dice=1)
+    new_state, result, conquered = execute_attack(state, map_graph, action, 0, rng)
     fixtures.append({
         "id": "combat_1v1_tie_defender_wins",
         "description": "1v1 tie: [4] vs [4] → defender wins (tie goes to defender)",
