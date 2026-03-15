@@ -59,7 +59,14 @@ Plans:
   3. Blitz attack auto-resolves a conquest correctly and leaves the attacker with the minimum legal army count
   4. Card trading escalates bonus amounts in sequence and forces trade at 5+ cards, matching Python behavior
   5. Turn FSM correctly cycles reinforce → attack → fortify, handles player elimination, and detects victory
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Wave 0 test infrastructure: 6 test stubs, FakeRandom helper, Python golden fixture generator
+- [ ] 07-02-PLAN.md — actions.dart sealed hierarchy, combat.dart (DART-01 + DART-06), setup.dart, MapGraph.continentNames
+- [ ] 07-03-PLAN.md — cards_engine.dart (DART-02), reinforcements.dart (DART-03), fortify.dart (DART-04)
+- [ ] 07-04-PLAN.md — PlayerAgent abstract class, turn.dart FSM (DART-05)
+- [ ] 07-05-PLAN.md — Run Python fixture generator, golden_fixture_test.dart validating Python-Dart parity
 
 ### Phase 8: Bot Agents
 **Goal**: All three AI difficulty levels running in Dart isolates, producing win-rate statistics consistent with the Python bots and without blocking the UI thread.
@@ -128,7 +135,7 @@ Plans:
 | 4. Easy and Medium Bots | v1.0 | 7/7 | Complete | 2026-03-09 |
 | 5. Hard Bot and AI Simulation | v1.0 | 4/4 | Complete | 2026-03-14 |
 | 6. Flutter Scaffold and Data Models | 3/3 | Complete   | 2026-03-15 | - |
-| 7. Dart Game Engine Port | v1.1 | 0/TBD | Not started | - |
+| 7. Dart Game Engine Port | v1.1 | 0/5 | Not started | - |
 | 8. Bot Agents | v1.1 | 0/TBD | Not started | - |
 | 9. Riverpod Providers and Persistence | v1.1 | 0/TBD | Not started | - |
 | 10. Map Widget | v1.1 | 0/TBD | Not started | - |
