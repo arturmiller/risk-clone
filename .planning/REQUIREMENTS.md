@@ -15,7 +15,7 @@ Requirements for Flutter mobile port. Each maps to roadmap phases.
 - [ ] **DART-04**: Fortification ported (move armies along connected friendly path)
 - [ ] **DART-05**: Turn FSM ported (reinforce → attack → fortify, player rotation, elimination, victory)
 - [ ] **DART-06**: Blitz attack mode (auto-resolve until conquest or attacker depleted)
-- [ ] **DART-07**: Map graph with BFS connectivity queries (adjacency, connected territories, continent control)
+- [x] **DART-07**: Map graph with BFS connectivity queries (adjacency, connected territories, continent control)
 
 ### AI Bots
 
@@ -84,7 +84,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DART-04 | Phase 7 | Pending |
 | DART-05 | Phase 7 | Pending |
 | DART-06 | Phase 7 | Pending |
-| DART-07 | Phase 6 | Pending |
+| DART-07 | Phase 6 | Complete |
 | BOTS-05 | Phase 8 | Pending |
 | BOTS-06 | Phase 8 | Pending |
 | BOTS-07 | Phase 8 | Pending |

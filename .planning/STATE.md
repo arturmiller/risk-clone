@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
-status: planning
-stopped_at: Phase 6 context gathered
-last_updated: "2026-03-14T21:04:53.904Z"
-last_activity: 2026-03-14 — v1.1 roadmap created; v1.0 shipped (phases 1-5, 20 plans)
+status: in-progress
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-15T06:02:17Z"
+last_activity: 2026-03-15 — Phase 6 Plan 01 complete; Flutter scaffold + test stubs
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 3
+  completed_plans: 1
+  percent: 14
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 6 of 12 (Flutter Scaffold and Data Models)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-14 — v1.1 roadmap created; v1.0 shipped (phases 1-5, 20 plans)
+Phase: 6 of 7 (Flutter Scaffold and Data Models)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-03-15 — Phase 6 Plan 01 complete; Flutter scaffold with Riverpod 3.x + freezed 3.x + ObjectBox 5.x
 
-Progress: [░░░░░░░░░░] 0% (v1.1)
+Progress: [█░░░░░░░░░] 14% (v1.1)
 
 ## Accumulated Context
 
@@ -41,6 +41,10 @@ Progress: [░░░░░░░░░░] 0% (v1.1)
 - [v1.1]: Flutter 3.41 + Riverpod 3.x (AsyncNotifier) + freezed + ObjectBox (see research/SUMMARY.md)
 - [v1.1]: Engine validated with golden fixtures before any UI is wired (prevents logic drift)
 - [v1.1]: Bot isolate architecture established in Phase 8, not retrofitted later
+- [06-01]: riverpod_generator: ^4.0.3 (not ^2.6.0 from STACK.md) — Riverpod 3.x requires 4.x generator
+- [06-01]: objectbox_flutter_libs: any (not path dep) — pub.dev package, no download-libs command
+- [06-01]: cards field uses Map<String, List<Card>> not Map<int, List<Card>> — JSON keys must be strings
+- [06-01]: classic.json copied (not symlinked) to mobile/assets/ — symlinks unreliable on Windows
 
 ### Pending Todos
 
@@ -49,11 +53,12 @@ None yet.
 ### Blockers/Concerns
 
 - Phase 10 flagged for research: CustomPainter + InteractiveViewer has known Flutter perf regression (#72066); pre-rasterization approach needs prototyping before coding.
-- Phase 6: Verify `objectbox_flutter_libs` path structure after `dart run objectbox:download-libs`.
+- Phase 6 blocker RESOLVED: objectbox_flutter_libs: any (pub.dev package) — no download-libs needed.
 - Phase 7: Dart `Random` != Python Mersenne Twister — golden fixtures must capture output states, not replay random draws.
+- Flutter SDK installed at /home/amiller/flutter-sdk/flutter — not in system PATH; add `export PATH="/home/amiller/flutter-sdk/flutter/bin:$PATH"` to .bashrc
 
 ## Session Continuity
 
-Last session: 2026-03-14T21:04:53.897Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-flutter-scaffold-and-data-models/06-CONTEXT.md
+Last session: 2026-03-15T06:02:17Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: .planning/phases/06-flutter-scaffold-and-data-models/06-01-SUMMARY.md
