@@ -22,7 +22,7 @@
 
 **Milestone Goal:** Port Risk to a fully on-device Flutter app for Android and iOS with a fresh mobile-first UI, rewriting the game engine in Dart and eliminating the Python/WebSocket backend entirely.
 
-- [ ] **Phase 6: Flutter Scaffold and Data Models** — Working Flutter project with freezed models, map graph, and code generation
+- [x] **Phase 6: Flutter Scaffold and Data Models** — Working Flutter project with freezed models, map graph, and code generation (completed 2026-03-15)
 - [ ] **Phase 7: Dart Game Engine Port** — Complete pure-Dart port of all game rules with golden-fixture test validation
 - [ ] **Phase 8: Bot Agents** — All three AI difficulty levels ported to Dart with isolate execution
 - [ ] **Phase 9: Riverpod Providers and Persistence** — State coordination layer with auto-save on app backgrounding
@@ -127,7 +127,7 @@ Plans:
 | 3. Web UI and Game Setup | v1.0 | 4/4 | Complete | 2026-03-08 |
 | 4. Easy and Medium Bots | v1.0 | 7/7 | Complete | 2026-03-09 |
 | 5. Hard Bot and AI Simulation | v1.0 | 4/4 | Complete | 2026-03-14 |
-| 6. Flutter Scaffold and Data Models | 2/3 | In Progress|  | - |
+| 6. Flutter Scaffold and Data Models | 3/3 | Complete   | 2026-03-15 | - |
 | 7. Dart Game Engine Port | v1.1 | 0/TBD | Not started | - |
 | 8. Bot Agents | v1.1 | 0/TBD | Not started | - |
 | 9. Riverpod Providers and Persistence | v1.1 | 0/TBD | Not started | - |
