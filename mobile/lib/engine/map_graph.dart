@@ -64,4 +64,6 @@ class MapGraph {
   int continentBonus(String continent) => _continentBonuses[continent] ?? 0;
 
   String? continentOf(String territory) => _continentByTerritory[territory];
+
+  List<String> get continentNames => _continentBonuses.keys.toList();
 }
