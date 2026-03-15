@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
 status: executing
-stopped_at: Completed 07-03-PLAN.md
-last_updated: "2026-03-15T06:53:17.729Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-15T06:53:53.380Z"
 last_activity: 2026-03-15 — Phase 7 Plan 01 complete; Wave 0 test infrastructure — 59 test stubs, FakeRandom, golden fixtures
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
   percent: 86
 ---
 
@@ -54,6 +54,8 @@ Progress: [████████░░] 86% (v1.1)
 - [Phase 07-03]: Dart records used for executeTrade return: (GameState, int, Map<String,int>) — avoids ad-hoc result class
 - [Phase 07-03]: continentNames getter added to map_graph.dart now (Plan 02 planned addition) — unblocked reinforcements.dart
 - [Phase 07-03]: String key pattern enforced: cards[playerIndex.toString()] throughout cards_engine.dart
+- [Phase 07]: Statistical tests use 100000 trials (not 10000) — 10k with seed 42 gave 0.3659 vs 0.3717 target, outside 0.5% tolerance; 100k converges reliably
+- [Phase 07]: validateAttack throws ArgumentError (not ValueError) — idiomatic Dart uses ArgumentError for invalid argument preconditions
 
 ### Pending Todos
 
@@ -68,6 +70,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T06:53:17.712Z
-Stopped at: Completed 07-03-PLAN.md
+Last session: 2026-03-15T06:53:53.373Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
