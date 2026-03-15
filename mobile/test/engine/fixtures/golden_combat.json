@@ -1,0 +1,153 @@
+[
+  {
+    "id": "combat_3v2_attacker_wins_both",
+    "description": "Attacker rolls [6,5,4], defender rolls [3,2]",
+    "injected_rolls": [
+      6,
+      5,
+      4,
+      3,
+      2
+    ],
+    "input_state": {
+      "source": "Alaska",
+      "source_armies": 5,
+      "source_owner": 0,
+      "target": "Alberta",
+      "target_armies": 3,
+      "target_owner": 1
+    },
+    "action": {
+      "source": "Alaska",
+      "target": "Alberta",
+      "num_dice": 3
+    },
+    "expected_attacker_losses": 0,
+    "expected_defender_losses": 2,
+    "expected_conquered": false,
+    "output_state": {
+      "source_armies": 5,
+      "target_armies": 1,
+      "target_owner": 1
+    }
+  },
+  {
+    "id": "combat_3v2_split",
+    "description": "Attacker rolls [5,4], defender rolls [6,3] \u2014 split result",
+    "injected_rolls": [
+      5,
+      4,
+      6,
+      3
+    ],
+    "input_state": {
+      "source": "Alaska",
+      "source_armies": 5,
+      "source_owner": 0,
+      "target": "Alberta",
+      "target_armies": 3,
+      "target_owner": 1
+    },
+    "action": {
+      "source": "Alaska",
+      "target": "Alberta",
+      "num_dice": 2
+    },
+    "expected_attacker_losses": 1,
+    "expected_defender_losses": 1,
+    "expected_conquered": false,
+    "output_state": {
+      "source_armies": 4,
+      "target_armies": 2,
+      "target_owner": 1
+    }
+  },
+  {
+    "id": "combat_1v1_attacker_wins",
+    "description": "1v1: attacker [6] vs defender [5] \u2192 attacker wins",
+    "injected_rolls": [
+      6,
+      5
+    ],
+    "input_state": {
+      "source": "Alaska",
+      "source_armies": 3,
+      "source_owner": 0,
+      "target": "Alberta",
+      "target_armies": 1,
+      "target_owner": 1
+    },
+    "action": {
+      "source": "Alaska",
+      "target": "Alberta",
+      "num_dice": 1
+    },
+    "expected_attacker_losses": 0,
+    "expected_defender_losses": 1,
+    "expected_conquered": true,
+    "output_state": {
+      "source_armies": 2,
+      "target_armies": 1,
+      "target_owner": 0
+    }
+  },
+  {
+    "id": "combat_1v1_tie_defender_wins",
+    "description": "1v1 tie: [4] vs [4] \u2192 defender wins (tie goes to defender)",
+    "injected_rolls": [
+      4,
+      4
+    ],
+    "input_state": {
+      "source": "Alaska",
+      "source_armies": 3,
+      "source_owner": 0,
+      "target": "Alberta",
+      "target_armies": 2,
+      "target_owner": 1
+    },
+    "action": {
+      "source": "Alaska",
+      "target": "Alberta",
+      "num_dice": 1
+    },
+    "expected_attacker_losses": 1,
+    "expected_defender_losses": 0,
+    "expected_conquered": false,
+    "output_state": {
+      "source_armies": 2,
+      "target_armies": 2,
+      "target_owner": 1
+    }
+  },
+  {
+    "id": "combat_blitz_conquest",
+    "description": "Blitz Alaska\u2192Alberta with [6,5,4] vs [3,2] \u2014 one-round conquest",
+    "injected_rolls": [
+      6,
+      5,
+      4,
+      3,
+      2
+    ],
+    "input_state": {
+      "source": "Alaska",
+      "source_armies": 6,
+      "source_owner": 0,
+      "target": "Alberta",
+      "target_armies": 2,
+      "target_owner": 1
+    },
+    "action": {
+      "source": "Alaska",
+      "target": "Alberta"
+    },
+    "expected_conquered": true,
+    "combat_rounds": 1,
+    "output_state": {
+      "source_armies": 3,
+      "target_armies": 3,
+      "target_owner": 0
+    }
+  }
+]

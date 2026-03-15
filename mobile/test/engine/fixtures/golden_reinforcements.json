@@ -1,0 +1,30 @@
+[
+  {
+    "id": "reinf_9_territories_minimum",
+    "description": "9 territories \u2192 base = max(9//3, 3) = 3 (at minimum threshold)",
+    "player_index": 0,
+    "territory_count": 9,
+    "continents_controlled": [],
+    "expected_reinforcements": 8,
+    "output": 8
+  },
+  {
+    "id": "reinf_12_territories_base4",
+    "description": "12 territories \u2192 base = max(12//3, 3) = 4",
+    "player_index": 0,
+    "territory_count": 12,
+    "expected_reinforcements": 9,
+    "output": 9
+  },
+  {
+    "id": "reinf_australia_continent_bonus",
+    "description": "Player 0 owns Australia (bonus 2) + 5 other territories",
+    "player_index": 0,
+    "territory_count": 9,
+    "continents_controlled": [
+      "Australia"
+    ],
+    "expected_reinforcements": 5,
+    "output": 5
+  }
+]

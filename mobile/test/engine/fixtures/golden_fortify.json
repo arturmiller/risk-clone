@@ -1,0 +1,42 @@
+[
+  {
+    "id": "fortify_valid_move",
+    "description": "Alaska (5 armies) \u2192 Alberta (3 armies), move 3 armies via connected path",
+    "player_index": 0,
+    "input_state": {
+      "source": "Alaska",
+      "source_armies": 5,
+      "target": "Alberta",
+      "target_armies": 3
+    },
+    "action": {
+      "source": "Alaska",
+      "target": "Alberta",
+      "armies": 3
+    },
+    "output_state": {
+      "source_armies": 2,
+      "target_armies": 6
+    },
+    "expected_source_armies": 2,
+    "expected_target_armies": 6
+  },
+  {
+    "id": "fortify_disconnected_path_raises",
+    "description": "Alaska \u2192 Eastern Australia disconnected \u2014 should raise ValueError",
+    "player_index": 0,
+    "input_state": {
+      "source": "Alaska",
+      "source_armies": 5,
+      "target": "Eastern Australia",
+      "target_armies": 3
+    },
+    "action": {
+      "source": "Alaska",
+      "target": "Eastern Australia",
+      "armies": 2
+    },
+    "expected_raises": true,
+    "expected_error_contains": "reachable"
+  }
+]

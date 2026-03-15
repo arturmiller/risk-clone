@@ -1,0 +1,21 @@
+[
+  {
+    "id": "turn_check_victory_single_owner",
+    "description": "All territories owned by player 0 \u2192 victory detected",
+    "expected_winner": 0,
+    "output": 0
+  },
+  {
+    "id": "turn_check_victory_multiple_owners",
+    "description": "Territories split between p0 and p1 \u2192 no winner (None)",
+    "expected_winner": null,
+    "output": null
+  },
+  {
+    "id": "turn_check_elimination_no_territories",
+    "description": "Player 0 owns 0 territories \u2192 eliminated",
+    "player_index": 0,
+    "expected_eliminated": true,
+    "output": true
+  }
+]
