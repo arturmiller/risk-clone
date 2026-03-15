@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
-status: in_progress
-stopped_at: Completed 10-01-PLAN.md
-last_updated: "2026-03-15T20:25:25Z"
-last_activity: 2026-03-15 — Phase 10 Plan 01 complete; territory_data.dart (42 TerritoryGeometry constants, kPlayerColors) + Wave 0 test stubs — 159/159 tests green, MAPW-03 implemented
+status: completed
+stopped_at: Completed 10-02-PLAN.md
+last_updated: "2026-03-15T20:31:42.052Z"
+last_activity: 2026-03-15 — Phase 10 Plan 02 complete; MapBasePainter + MapOverlayPainter two-layer CustomPainter architecture — 163 tests passing + 6 skipped, MAPW-03/MAPW-04 implemented
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 17
+  completed_plans: 16
   percent: 97
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 10 (Map Widget) — In Progress
-Plan: 1 of 4 complete
-Status: Plan 01 complete — territory_data.dart (42 TerritoryGeometry + kPlayerColors) + Wave 0 test stubs
-Last activity: 2026-03-15 — Phase 10 Plan 01 complete; territory_data.dart (42 TerritoryGeometry constants, kPlayerColors) + Wave 0 test stubs — 159 tests passing + 8 skipped, MAPW-03 data implemented
+Plan: 2 of 4 complete
+Status: Plan 02 complete — MapBasePainter (static outlines) + MapOverlayPainter (owner colors, army counts, selection highlights)
+Last activity: 2026-03-15 — Phase 10 Plan 02 complete; two-layer CustomPainter architecture — 163 tests passing + 6 skipped, MAPW-03/MAPW-04 implemented
 
 Progress: [██████████] 97% (v1.1)
 
@@ -77,6 +77,9 @@ Progress: [██████████] 97% (v1.1)
 - [Phase 09-03]: Human lifecycle test deferred to Phase 11 — SAVE-01/SAVE-02 validated by 14 ProviderContainer unit tests with real ObjectBox
 - [10-01]: testWidgets skip parameter is bool? (not Object?) in this Flutter version — use markTestSkipped('reason') in test body for skip-with-reason pattern
 - [10-01]: territory_data.dart uses dart:ui only (Color, Rect, Offset) — no flutter/material.dart dependency in pure data file
+- [Phase 10-02]: MapBasePainter uses flutter/rendering.dart (not flutter/material.dart) — layer-agnostic canvas code
+- [Phase 10-02]: MapOverlayPainter silently skips missing territory keys — no crash on partial GameState
+- [Phase 10-02]: shouldRepaint on overlay delegates to freezed != operator on GameState/UIState — correct value equality
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T20:25:25Z
-Stopped at: Completed 10-01-PLAN.md
+Last session: 2026-03-15T20:31:42.044Z
+Stopped at: Completed 10-02-PLAN.md
 Resume file: None
