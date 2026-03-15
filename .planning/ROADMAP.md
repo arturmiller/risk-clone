@@ -135,7 +135,7 @@ Plans:
 | 4. Easy and Medium Bots | v1.0 | 7/7 | Complete | 2026-03-09 |
 | 5. Hard Bot and AI Simulation | v1.0 | 4/4 | Complete | 2026-03-14 |
 | 6. Flutter Scaffold and Data Models | 3/3 | Complete   | 2026-03-15 | - |
-| 7. Dart Game Engine Port | v1.1 | 0/5 | Not started | - |
+| 7. Dart Game Engine Port | 1/5 | In Progress|  | - |
 | 8. Bot Agents | v1.1 | 0/TBD | Not started | - |
 | 9. Riverpod Providers and Persistence | v1.1 | 0/TBD | Not started | - |
 | 10. Map Widget | v1.1 | 0/TBD | Not started | - |

@@ -9,12 +9,12 @@ Requirements for Flutter mobile port. Each maps to roadmap phases.
 
 ### Game Engine (Dart Port)
 
-- [ ] **DART-01**: All combat rules ported (dice rolling, attacker/defender pairing, ties to defender)
-- [ ] **DART-02**: Card system ported (deck, drawing, trading with escalating bonus, forced trade at 5+)
-- [ ] **DART-03**: Reinforcement calculation ported (territory count / 3 + continent bonuses, minimum 3)
-- [ ] **DART-04**: Fortification ported (move armies along connected friendly path)
-- [ ] **DART-05**: Turn FSM ported (reinforce → attack → fortify, player rotation, elimination, victory)
-- [ ] **DART-06**: Blitz attack mode (auto-resolve until conquest or attacker depleted)
+- [x] **DART-01**: All combat rules ported (dice rolling, attacker/defender pairing, ties to defender)
+- [x] **DART-02**: Card system ported (deck, drawing, trading with escalating bonus, forced trade at 5+)
+- [x] **DART-03**: Reinforcement calculation ported (territory count / 3 + continent bonuses, minimum 3)
+- [x] **DART-04**: Fortification ported (move armies along connected friendly path)
+- [x] **DART-05**: Turn FSM ported (reinforce → attack → fortify, player rotation, elimination, victory)
+- [x] **DART-06**: Blitz attack mode (auto-resolve until conquest or attacker depleted)
 - [x] **DART-07**: Map graph with BFS connectivity queries (adjacency, connected territories, continent control)
 
 ### AI Bots
@@ -78,12 +78,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DART-01 | Phase 7 | Pending |
-| DART-02 | Phase 7 | Pending |
-| DART-03 | Phase 7 | Pending |
-| DART-04 | Phase 7 | Pending |
-| DART-05 | Phase 7 | Pending |
-| DART-06 | Phase 7 | Pending |
+| DART-01 | Phase 7 | Complete |
+| DART-02 | Phase 7 | Complete |
+| DART-03 | Phase 7 | Complete |
+| DART-04 | Phase 7 | Complete |
+| DART-05 | Phase 7 | Complete |
+| DART-06 | Phase 7 | Complete |
 | DART-07 | Phase 6 | Complete |
 | BOTS-05 | Phase 8 | Pending |
 | BOTS-06 | Phase 8 | Pending |

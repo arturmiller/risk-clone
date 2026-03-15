@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-03-15T06:21:16.789Z"
-last_activity: 2026-03-15 — Phase 6 Plan 03 complete; ObjectBox persistence layer (SaveSlot entity, AppStore, store wired in main.dart)
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-03-15T06:50:00.000Z"
+last_activity: 2026-03-15 — Phase 7 Plan 01 complete; Wave 0 test infrastructure — 59 test stubs, FakeRandom, golden fixtures
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 96
+  total_plans: 8
+  completed_plans: 5
+  percent: 86
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** AI bots that provide a challenging and fun single-player experience, with the hardest difficulty playing at human-competitive level.
-**Current focus:** Phase 6 — Flutter Scaffold and Data Models
+**Current focus:** Phase 7 — Dart Game Engine Port
 
 ## Current Position
 
-Phase: 6 of 7 (Flutter Scaffold and Data Models)
-Plan: 3 of 3 in current phase (complete)
+Phase: 7 of 7 (Dart Game Engine Port)
+Plan: 1 of 4 in current phase (complete)
 Status: In progress
-Last activity: 2026-03-15 — Phase 6 Plan 03 complete; ObjectBox persistence layer (SaveSlot entity, AppStore, store wired in main.dart)
+Last activity: 2026-03-15 — Phase 7 Plan 01 complete; Wave 0 test infrastructure — 59 test stubs, FakeRandom, golden fixtures
 
-Progress: [██████████] 96% (v1.1)
+Progress: [████████░░] 86% (v1.1)
 
 ## Accumulated Context
 
@@ -48,6 +48,9 @@ Progress: [██████████] 96% (v1.1)
 - [Phase 06]: objectbox.g.dart generated into lib/ not project root; import path '../objectbox.g.dart' from lib/persistence/ is correct
 - [Phase 06]: ObjectBox @Entity classes require plain Dart mutable fields — cannot use freezed
 - [Phase 06]: freezed 3.x requires abstract class declaration — plain class causes compiler errors for missing mixin implementations
+- [07-01]: Test stubs use commented imports (// ignore_for_file: unused_import) — compiles cleanly before implementation files exist
+- [07-01]: FakeRandom returns (value-1) for nextInt(max) — nextInt(6)+1 == die face value
+- [07-01]: golden_turn_sequence.json uses check_victory/check_elimination directly (no full FSM needed for Wave 0)
 
 ### Pending Todos
 
@@ -62,6 +65,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T06:17:04.107Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-03-15T06:50:00.000Z
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None
