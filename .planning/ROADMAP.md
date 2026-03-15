@@ -77,7 +77,12 @@ Plans:
   2. MediumAgent focuses reinforcements on continent borders and prioritizes continent completion in attacks
   3. HardAgent achieves a win rate within 5 percentage points of the Python HardAgent (baseline: ~80% vs Medium) over 500 simulated games
   4. Bot turns execute via `Isolate.run()` and the main isolate remains responsive (no UI frame drops) during bot computation
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Wave 0 test stubs, EasyAgent (BOTS-05), runGame() simulation helper
+- [ ] 08-02-PLAN.md — MediumAgent (BOTS-06), HardAgent (BOTS-07)
+- [ ] 08-03-PLAN.md — Win rate statistical test, Isolate.run() boundary validation (BOTS-08)
 
 ### Phase 9: Riverpod Providers and Persistence
 **Goal**: A fully wired state layer where `GameNotifier` owns canonical game state, all human and bot actions flow through it serially, and game state survives app backgrounding and cold restart.
@@ -136,7 +141,7 @@ Plans:
 | 5. Hard Bot and AI Simulation | v1.0 | 4/4 | Complete | 2026-03-14 |
 | 6. Flutter Scaffold and Data Models | 3/3 | Complete   | 2026-03-15 | - |
 | 7. Dart Game Engine Port | 5/5 | Complete   | 2026-03-15 | - |
-| 8. Bot Agents | v1.1 | 0/TBD | Not started | - |
+| 8. Bot Agents | v1.1 | 0/3 | Not started | - |
 | 9. Riverpod Providers and Persistence | v1.1 | 0/TBD | Not started | - |
 | 10. Map Widget | v1.1 | 0/TBD | Not started | - |
 | 11. Screens, Widgets, and Mobile UX | v1.1 | 0/TBD | Not started | - |
