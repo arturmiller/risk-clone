@@ -30,6 +30,13 @@ from risk.models.cards import TurnPhase
 FIXTURES_DIR = Path(__file__).parent.parent / "mobile" / "test" / "engine" / "fixtures"
 MAP_PATH = Path(__file__).parent.parent / "risk" / "data" / "classic.json"
 
+# TurnPhase numeric -> Dart string mapping
+TURN_PHASE_TO_DART = {
+    TurnPhase.REINFORCE: "reinforce",
+    TurnPhase.ATTACK: "attack",
+    TurnPhase.FORTIFY: "fortify",
+}
+
 
 class FakeRandom:
     """Deterministic RNG: returns specified values in sequence."""
@@ -58,6 +65,30 @@ def write_fixture(filename: str, data: object) -> None:
     print(f"  Wrote: {path}")
 
 
+def state_to_dart_json(state: GameState) -> dict:
+    """Serialize GameState to Dart-compatible JSON format (camelCase keys, string enums)."""
+    territories = {}
+    for name, ts in state.territories.items():
+        territories[name] = {"owner": ts.owner, "armies": ts.armies}
+
+    players = [
+        {"index": p.index, "name": p.name, "isAlive": p.is_alive}
+        for p in state.players
+    ]
+
+    return {
+        "territories": territories,
+        "players": players,
+        "currentPlayerIndex": state.current_player_index,
+        "turnNumber": state.turn_number,
+        "turnPhase": TURN_PHASE_TO_DART[state.turn_phase],
+        "tradeCount": state.trade_count,
+        "cards": {},
+        "deck": [],
+        "conqueredThisTurn": state.conquered_this_turn,
+    }
+
+
 def make_game_state(territories: dict[str, tuple[int, int]], player_count: int = 2) -> GameState:
     """Build a GameState from a dict of {territory_name: (owner, armies)}."""
     t_states = {name: TerritoryState(owner=owner, armies=armies)
@@ -83,19 +114,12 @@ def generate_combat_fixtures(map_graph: MapGraph) -> None:
         "id": "combat_3v2_attacker_wins_both",
         "description": "Attacker rolls [6,5,4], defender rolls [3,2]",
         "injected_rolls": [6, 5, 4, 3, 2],
-        "input_state": {
-            "source": "Alaska", "source_armies": 5, "source_owner": 0,
-            "target": "Alberta", "target_armies": 3, "target_owner": 1,
-        },
+        "input_state": state_to_dart_json(state),
         "action": {"source": "Alaska", "target": "Alberta", "num_dice": 3},
         "expected_attacker_losses": result.attacker_losses,
         "expected_defender_losses": result.defender_losses,
         "expected_conquered": conquered,
-        "output_state": {
-            "source_armies": new_state.territories["Alaska"].armies,
-            "target_armies": new_state.territories["Alberta"].armies,
-            "target_owner": new_state.territories["Alberta"].owner,
-        },
+        "output_state": state_to_dart_json(new_state),
     })
 
     # Fixture 2: 3v2 split — [5,4] vs [6,3] → attacker loses 1, defender loses 1
@@ -110,19 +134,12 @@ def generate_combat_fixtures(map_graph: MapGraph) -> None:
         "id": "combat_3v2_split",
         "description": "Attacker rolls [5,4], defender rolls [6,3] — split result",
         "injected_rolls": [5, 4, 6, 3],
-        "input_state": {
-            "source": "Alaska", "source_armies": 5, "source_owner": 0,
-            "target": "Alberta", "target_armies": 3, "target_owner": 1,
-        },
+        "input_state": state_to_dart_json(state),
         "action": {"source": "Alaska", "target": "Alberta", "num_dice": 2},
         "expected_attacker_losses": result.attacker_losses,
         "expected_defender_losses": result.defender_losses,
         "expected_conquered": conquered,
-        "output_state": {
-            "source_armies": new_state.territories["Alaska"].armies,
-            "target_armies": new_state.territories["Alberta"].armies,
-            "target_owner": new_state.territories["Alberta"].owner,
-        },
+        "output_state": state_to_dart_json(new_state),
     })
 
     # Fixture 3: 1v1 attacker wins — [6] vs [5]
@@ -137,19 +154,12 @@ def generate_combat_fixtures(map_graph: MapGraph) -> None:
         "id": "combat_1v1_attacker_wins",
         "description": "1v1: attacker [6] vs defender [5] → attacker wins",
         "injected_rolls": [6, 5],
-        "input_state": {
-            "source": "Alaska", "source_armies": 3, "source_owner": 0,
-            "target": "Alberta", "target_armies": 1, "target_owner": 1,
-        },
+        "input_state": state_to_dart_json(state),
         "action": {"source": "Alaska", "target": "Alberta", "num_dice": 1},
         "expected_attacker_losses": result.attacker_losses,
         "expected_defender_losses": result.defender_losses,
         "expected_conquered": conquered,
-        "output_state": {
-            "source_armies": new_state.territories["Alaska"].armies,
-            "target_armies": new_state.territories["Alberta"].armies,
-            "target_owner": new_state.territories["Alberta"].owner,
-        },
+        "output_state": state_to_dart_json(new_state),
     })
 
     # Fixture 4: 1v1 tie goes to defender — [4] vs [4]
@@ -164,19 +174,12 @@ def generate_combat_fixtures(map_graph: MapGraph) -> None:
         "id": "combat_1v1_tie_defender_wins",
         "description": "1v1 tie: [4] vs [4] → defender wins (tie goes to defender)",
         "injected_rolls": [4, 4],
-        "input_state": {
-            "source": "Alaska", "source_armies": 3, "source_owner": 0,
-            "target": "Alberta", "target_armies": 2, "target_owner": 1,
-        },
+        "input_state": state_to_dart_json(state),
         "action": {"source": "Alaska", "target": "Alberta", "num_dice": 1},
         "expected_attacker_losses": result.attacker_losses,
         "expected_defender_losses": result.defender_losses,
         "expected_conquered": conquered,
-        "output_state": {
-            "source_armies": new_state.territories["Alaska"].armies,
-            "target_armies": new_state.territories["Alberta"].armies,
-            "target_owner": new_state.territories["Alberta"].owner,
-        },
+        "output_state": state_to_dart_json(new_state),
     })
 
     # Fixture 5: Blitz conquest — pre-loaded dice ensure attacker wins
@@ -192,18 +195,11 @@ def generate_combat_fixtures(map_graph: MapGraph) -> None:
         "id": "combat_blitz_conquest",
         "description": "Blitz Alaska→Alberta with [6,5,4] vs [3,2] — one-round conquest",
         "injected_rolls": [6, 5, 4, 3, 2],
-        "input_state": {
-            "source": "Alaska", "source_armies": 6, "source_owner": 0,
-            "target": "Alberta", "target_armies": 2, "target_owner": 1,
-        },
+        "input_state": state_to_dart_json(state),
         "action": {"source": "Alaska", "target": "Alberta"},
         "expected_conquered": conquered,
         "combat_rounds": len(all_results),
-        "output_state": {
-            "source_armies": new_state.territories["Alaska"].armies,
-            "target_armies": new_state.territories["Alberta"].armies,
-            "target_owner": new_state.territories["Alberta"].owner,
-        },
+        "output_state": state_to_dart_json(new_state),
     })
 
     write_fixture("golden_combat.json", fixtures)
@@ -213,9 +209,9 @@ def generate_reinforcements_fixtures(map_graph: MapGraph) -> None:
     print("Generating golden_reinforcements.json...")
     fixtures = []
 
-    # Fixture 1: 9 territories → base 3 (minimum enforced)
-    # Assign player 0 exactly 9 territories (first 9 in Alaska region)
     all_terr = map_graph.all_territories
+
+    # Fixture 1: 9 territories → base 3 (minimum enforced)
     player0_terr = all_terr[:9]
     player1_terr = all_terr[9:]
     territories = {}
@@ -232,7 +228,7 @@ def generate_reinforcements_fixtures(map_graph: MapGraph) -> None:
         "territory_count": len(player0_terr),
         "continents_controlled": [],
         "expected_reinforcements": result,
-        "output": result,
+        "input_state": state_to_dart_json(state),
     })
 
     # Fixture 2: 12 territories → base 4
@@ -251,11 +247,10 @@ def generate_reinforcements_fixtures(map_graph: MapGraph) -> None:
         "player_index": 0,
         "territory_count": len(player0_terr),
         "expected_reinforcements": result,
-        "output": result,
+        "input_state": state_to_dart_json(state),
     })
 
     # Fixture 3: continent bonus — player 0 owns all of Australia (4 territories, bonus 2)
-    # Australia: Indonesia, New Guinea, Western Australia, Eastern Australia
     australia_terr = ["Indonesia", "New Guinea", "Western Australia", "Eastern Australia"]
     other_player0_terr = all_terr[:5]  # a few extra
     territories = {}
@@ -266,7 +261,7 @@ def generate_reinforcements_fixtures(map_graph: MapGraph) -> None:
     for t in other_player0_terr:
         territories[t] = (0, 3)
     state = make_game_state(territories)
-    total_p0 = len(australia_terr) + len(other_player0_terr)
+    total_p0 = len(set(australia_terr) | set(other_player0_terr))
     result = calculate_reinforcements(state, map_graph, 0)
     fixtures.append({
         "id": "reinf_australia_continent_bonus",
@@ -275,7 +270,7 @@ def generate_reinforcements_fixtures(map_graph: MapGraph) -> None:
         "territory_count": total_p0,
         "continents_controlled": ["Australia"],
         "expected_reinforcements": result,
-        "output": result,
+        "input_state": state_to_dart_json(state),
     })
 
     write_fixture("golden_reinforcements.json", fixtures)
@@ -285,8 +280,9 @@ def generate_fortify_fixtures(map_graph: MapGraph) -> None:
     print("Generating golden_fortify.json...")
     fixtures = []
 
-    # Fixture 1: valid fortify move — Alaska → Alberta (adjacent, both owned by player 0)
     all_terr = map_graph.all_territories
+
+    # Fixture 1: valid fortify move — Alaska → Alberta (connected via NWT)
     territories = {t: (1, 2) for t in all_terr}
     territories["Alaska"] = (0, 5)
     territories["Alberta"] = (0, 3)
@@ -299,15 +295,9 @@ def generate_fortify_fixtures(map_graph: MapGraph) -> None:
         "id": "fortify_valid_move",
         "description": "Alaska (5 armies) → Alberta (3 armies), move 3 armies via connected path",
         "player_index": 0,
-        "input_state": {
-            "source": "Alaska", "source_armies": 5,
-            "target": "Alberta", "target_armies": 3,
-        },
+        "input_state": state_to_dart_json(state),
         "action": {"source": "Alaska", "target": "Alberta", "armies": 3},
-        "output_state": {
-            "source_armies": new_state.territories["Alaska"].armies,
-            "target_armies": new_state.territories["Alberta"].armies,
-        },
+        "output_state": state_to_dart_json(new_state),
         "expected_source_armies": new_state.territories["Alaska"].armies,
         "expected_target_armies": new_state.territories["Alberta"].armies,
     })
@@ -322,6 +312,7 @@ def generate_fortify_fixtures(map_graph: MapGraph) -> None:
     try:
         validate_fortify(state, map_graph, action, 0)
         path_validation_raises = False
+        path_validation_error = ""
     except ValueError as e:
         path_validation_raises = True
         path_validation_error = str(e)
@@ -329,10 +320,7 @@ def generate_fortify_fixtures(map_graph: MapGraph) -> None:
         "id": "fortify_disconnected_path_raises",
         "description": "Alaska → Eastern Australia disconnected — should raise ValueError",
         "player_index": 0,
-        "input_state": {
-            "source": "Alaska", "source_armies": 5,
-            "target": "Eastern Australia", "target_armies": 3,
-        },
+        "input_state": state_to_dart_json(state),
         "action": {"source": "Alaska", "target": "Eastern Australia", "armies": 2},
         "expected_raises": path_validation_raises,
         "expected_error_contains": "reachable",

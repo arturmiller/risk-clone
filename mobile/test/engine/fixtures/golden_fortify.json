@@ -4,10 +4,195 @@
     "description": "Alaska (5 armies) \u2192 Alberta (3 armies), move 3 armies via connected path",
     "player_index": 0,
     "input_state": {
-      "source": "Alaska",
-      "source_armies": 5,
-      "target": "Alberta",
-      "target_armies": 3
+      "territories": {
+        "Alaska": {
+          "owner": 0,
+          "armies": 5
+        },
+        "Northwest Territory": {
+          "owner": 0,
+          "armies": 2
+        },
+        "Greenland": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Alberta": {
+          "owner": 0,
+          "armies": 3
+        },
+        "Ontario": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Quebec": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western United States": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Eastern United States": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Central America": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Venezuela": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Peru": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Brazil": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Argentina": {
+          "owner": 1,
+          "armies": 2
+        },
+        "North Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Egypt": {
+          "owner": 1,
+          "armies": 2
+        },
+        "East Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Congo": {
+          "owner": 1,
+          "armies": 2
+        },
+        "South Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Madagascar": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Iceland": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Scandinavia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Ukraine": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Great Britain": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Northern Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Southern Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Indonesia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "New Guinea": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western Australia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Eastern Australia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Siam": {
+          "owner": 1,
+          "armies": 2
+        },
+        "India": {
+          "owner": 1,
+          "armies": 2
+        },
+        "China": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Mongolia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Japan": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Irkutsk": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Yakutsk": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Kamchatka": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Siberia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Afghanistan": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Ural": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Middle East": {
+          "owner": 1,
+          "armies": 2
+        }
+      },
+      "players": [
+        {
+          "index": 0,
+          "name": "P0",
+          "isAlive": true
+        },
+        {
+          "index": 1,
+          "name": "P1",
+          "isAlive": true
+        }
+      ],
+      "currentPlayerIndex": 0,
+      "turnNumber": 0,
+      "turnPhase": "reinforce",
+      "tradeCount": 0,
+      "cards": {},
+      "deck": [],
+      "conqueredThisTurn": false
     },
     "action": {
       "source": "Alaska",
@@ -15,8 +200,195 @@
       "armies": 3
     },
     "output_state": {
-      "source_armies": 2,
-      "target_armies": 6
+      "territories": {
+        "Alaska": {
+          "owner": 0,
+          "armies": 2
+        },
+        "Northwest Territory": {
+          "owner": 0,
+          "armies": 2
+        },
+        "Greenland": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Alberta": {
+          "owner": 0,
+          "armies": 6
+        },
+        "Ontario": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Quebec": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western United States": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Eastern United States": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Central America": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Venezuela": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Peru": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Brazil": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Argentina": {
+          "owner": 1,
+          "armies": 2
+        },
+        "North Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Egypt": {
+          "owner": 1,
+          "armies": 2
+        },
+        "East Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Congo": {
+          "owner": 1,
+          "armies": 2
+        },
+        "South Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Madagascar": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Iceland": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Scandinavia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Ukraine": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Great Britain": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Northern Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Southern Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Indonesia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "New Guinea": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western Australia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Eastern Australia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Siam": {
+          "owner": 1,
+          "armies": 2
+        },
+        "India": {
+          "owner": 1,
+          "armies": 2
+        },
+        "China": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Mongolia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Japan": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Irkutsk": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Yakutsk": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Kamchatka": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Siberia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Afghanistan": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Ural": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Middle East": {
+          "owner": 1,
+          "armies": 2
+        }
+      },
+      "players": [
+        {
+          "index": 0,
+          "name": "P0",
+          "isAlive": true
+        },
+        {
+          "index": 1,
+          "name": "P1",
+          "isAlive": true
+        }
+      ],
+      "currentPlayerIndex": 0,
+      "turnNumber": 0,
+      "turnPhase": "reinforce",
+      "tradeCount": 0,
+      "cards": {},
+      "deck": [],
+      "conqueredThisTurn": false
     },
     "expected_source_armies": 2,
     "expected_target_armies": 6
@@ -26,10 +398,195 @@
     "description": "Alaska \u2192 Eastern Australia disconnected \u2014 should raise ValueError",
     "player_index": 0,
     "input_state": {
-      "source": "Alaska",
-      "source_armies": 5,
-      "target": "Eastern Australia",
-      "target_armies": 3
+      "territories": {
+        "Alaska": {
+          "owner": 0,
+          "armies": 5
+        },
+        "Northwest Territory": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Greenland": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Alberta": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Ontario": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Quebec": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western United States": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Eastern United States": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Central America": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Venezuela": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Peru": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Brazil": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Argentina": {
+          "owner": 1,
+          "armies": 2
+        },
+        "North Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Egypt": {
+          "owner": 1,
+          "armies": 2
+        },
+        "East Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Congo": {
+          "owner": 1,
+          "armies": 2
+        },
+        "South Africa": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Madagascar": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Iceland": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Scandinavia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Ukraine": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Great Britain": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Northern Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Southern Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western Europe": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Indonesia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "New Guinea": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Western Australia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Eastern Australia": {
+          "owner": 0,
+          "armies": 3
+        },
+        "Siam": {
+          "owner": 1,
+          "armies": 2
+        },
+        "India": {
+          "owner": 1,
+          "armies": 2
+        },
+        "China": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Mongolia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Japan": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Irkutsk": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Yakutsk": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Kamchatka": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Siberia": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Afghanistan": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Ural": {
+          "owner": 1,
+          "armies": 2
+        },
+        "Middle East": {
+          "owner": 1,
+          "armies": 2
+        }
+      },
+      "players": [
+        {
+          "index": 0,
+          "name": "P0",
+          "isAlive": true
+        },
+        {
+          "index": 1,
+          "name": "P1",
+          "isAlive": true
+        }
+      ],
+      "currentPlayerIndex": 0,
+      "turnNumber": 0,
+      "turnPhase": "reinforce",
+      "tradeCount": 0,
+      "cards": {},
+      "deck": [],
+      "conqueredThisTurn": false
     },
     "action": {
       "source": "Alaska",
