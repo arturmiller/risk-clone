@@ -127,7 +127,16 @@ Plans:
   3. All game actions — place armies, attack (single and blitz), end attack, skip fortify, trade cards — are accessible via on-screen controls and execute correctly
   4. The game log updates in real time showing attacks, conquests, eliminations, and card trades in readable form
   5. The game over screen appears when a player wins or the human is eliminated, shows the winner, and offers a new game option
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+- [ ] 11-01-PLAN.md — Wave 0 test stubs: 8 test files for all Phase 11 components
+- [ ] 11-02-PLAN.md — GameMode enum + GameConfig field, LogEntry model, gameLogProvider notifier
+- [ ] 11-03-PLAN.md — HumanAgent one-shot adapter, GameNotifier.humanMove(), HomeScreen setup form upgrade
+- [ ] 11-04-PLAN.md — ActionPanel (phase-aware controls), GameLogWidget (auto-scrolling event list)
+- [ ] 11-05-PLAN.md — ContinentPanel (bonus display), GameOverDialog (winner modal)
+- [ ] 11-06-PLAN.md — GameScreen responsive scaffold (portrait/landscape), PopScope, game-over detection, HomeScreen navigation
+- [ ] 11-07-PLAN.md — Human verify: full game playthrough confirming all MOBX requirements
 
 ### Phase 12: Simulation Mode and Integration
 **Goal**: A fully functional AI-vs-AI simulation mode wired through the complete stack, with end-to-end integration validated and performance confirmed on target hardware.
@@ -154,5 +163,5 @@ Plans:
 | 8. Bot Agents | 3/3 | Complete   | 2026-03-15 | - |
 | 9. Riverpod Providers and Persistence | 3/3 | Complete   | 2026-03-15 | - |
 | 10. Map Widget | 3/3 | Complete    | 2026-03-15 | - |
-| 11. Screens, Widgets, and Mobile UX | v1.1 | 0/TBD | Not started | - |
+| 11. Screens, Widgets, and Mobile UX | v1.1 | 0/7 | Not started | - |
 | 12. Simulation Mode and Integration | v1.1 | 0/TBD | Not started | - |
