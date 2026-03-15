@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
-status: in-progress
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-15T06:02:17Z"
-last_activity: 2026-03-15 — Phase 6 Plan 01 complete; Flutter scaffold + test stubs
+status: executing
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-03-15T06:15:20.505Z"
+last_activity: 2026-03-15 — Phase 6 Plan 03 complete; ObjectBox persistence layer wired into Flutter app
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 14
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 6 of 7 (Flutter Scaffold and Data Models)
-Plan: 1 of 3 in current phase
+Plan: 3 of 3 in current phase (complete)
 Status: In progress
-Last activity: 2026-03-15 — Phase 6 Plan 01 complete; Flutter scaffold with Riverpod 3.x + freezed 3.x + ObjectBox 5.x
+Last activity: 2026-03-15 — Phase 6 Plan 03 complete; ObjectBox persistence layer (SaveSlot entity, AppStore, store wired in main.dart)
 
-Progress: [█░░░░░░░░░] 14% (v1.1)
+Progress: [██████████] 96% (v1.1)
 
 ## Accumulated Context
 
@@ -45,6 +45,8 @@ Progress: [█░░░░░░░░░] 14% (v1.1)
 - [06-01]: objectbox_flutter_libs: any (not path dep) — pub.dev package, no download-libs command
 - [06-01]: cards field uses Map<String, List<Card>> not Map<int, List<Card>> — JSON keys must be strings
 - [06-01]: classic.json copied (not symlinked) to mobile/assets/ — symlinks unreliable on Windows
+- [Phase 06]: objectbox.g.dart generated into lib/ not project root; import path '../objectbox.g.dart' from lib/persistence/ is correct
+- [Phase 06]: ObjectBox @Entity classes require plain Dart mutable fields — cannot use freezed
 
 ### Pending Todos
 
@@ -59,6 +61,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T06:02:17Z
-Stopped at: Completed 06-01-PLAN.md
-Resume file: .planning/phases/06-flutter-scaffold-and-data-models/06-01-SUMMARY.md
+Last session: 2026-03-15T06:15:20.491Z
+Stopped at: Completed 06-03-PLAN.md
+Resume file: .planning/phases/06-flutter-scaffold-and-data-models/06-03-SUMMARY.md
