@@ -1,0 +1,170 @@
+// ignore_for_file: avoid_print
+
+import 'dart:convert';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:risk_mobile/engine/map_graph.dart';
+import 'package:risk_mobile/engine/models/map_schema.dart';
+
+// Embedded classic.json fixture — do NOT use rootBundle in unit tests.
+const String _classicJsonString = '''
+{
+  "name": "Classic",
+  "territories": [
+    "Alaska", "Northwest Territory", "Greenland", "Alberta", "Ontario",
+    "Quebec", "Western United States", "Eastern United States", "Central America",
+    "Venezuela", "Peru", "Brazil", "Argentina",
+    "North Africa", "Egypt", "East Africa", "Congo", "South Africa", "Madagascar",
+    "Iceland", "Scandinavia", "Ukraine", "Great Britain", "Northern Europe",
+    "Southern Europe", "Western Europe",
+    "Indonesia", "New Guinea", "Western Australia", "Eastern Australia",
+    "Siam", "India", "China", "Mongolia", "Japan",
+    "Irkutsk", "Yakutsk", "Kamchatka", "Siberia", "Afghanistan", "Ural", "Middle East"
+  ],
+  "continents": [
+    {
+      "name": "North America",
+      "bonus": 5,
+      "territories": [
+        "Alaska", "Northwest Territory", "Greenland", "Alberta", "Ontario",
+        "Quebec", "Western United States", "Eastern United States", "Central America"
+      ]
+    },
+    {
+      "name": "South America",
+      "bonus": 2,
+      "territories": ["Venezuela", "Peru", "Brazil", "Argentina"]
+    },
+    {
+      "name": "Europe",
+      "bonus": 5,
+      "territories": [
+        "Iceland", "Scandinavia", "Ukraine", "Great Britain",
+        "Northern Europe", "Southern Europe", "Western Europe"
+      ]
+    },
+    {
+      "name": "Africa",
+      "bonus": 3,
+      "territories": [
+        "North Africa", "Egypt", "East Africa", "Congo", "South Africa", "Madagascar"
+      ]
+    },
+    {
+      "name": "Asia",
+      "bonus": 7,
+      "territories": [
+        "Siam", "India", "China", "Mongolia", "Japan",
+        "Irkutsk", "Yakutsk", "Kamchatka", "Siberia", "Afghanistan", "Ural", "Middle East"
+      ]
+    },
+    {
+      "name": "Australia",
+      "bonus": 2,
+      "territories": ["Indonesia", "New Guinea", "Western Australia", "Eastern Australia"]
+    }
+  ],
+  "adjacencies": [
+    ["Alaska", "Alberta"], ["Alaska", "Northwest Territory"], ["Alaska", "Kamchatka"],
+    ["Alberta", "Northwest Territory"], ["Alberta", "Ontario"], ["Alberta", "Western United States"],
+    ["Ontario", "Northwest Territory"], ["Ontario", "Quebec"], ["Ontario", "Eastern United States"],
+    ["Ontario", "Western United States"], ["Ontario", "Greenland"],
+    ["Quebec", "Eastern United States"], ["Quebec", "Greenland"],
+    ["Greenland", "Northwest Territory"],
+    ["Eastern United States", "Western United States"],
+    ["Central America", "Eastern United States"], ["Central America", "Western United States"],
+    ["Venezuela", "Brazil"], ["Venezuela", "Peru"],
+    ["Brazil", "Peru"], ["Brazil", "Argentina"], ["Argentina", "Peru"],
+    ["Iceland", "Scandinavia"], ["Iceland", "Great Britain"],
+    ["Scandinavia", "Great Britain"], ["Scandinavia", "Northern Europe"], ["Scandinavia", "Ukraine"],
+    ["Great Britain", "Northern Europe"], ["Great Britain", "Western Europe"],
+    ["Northern Europe", "Southern Europe"], ["Northern Europe", "Ukraine"],
+    ["Northern Europe", "Western Europe"],
+    ["Southern Europe", "Ukraine"], ["Southern Europe", "Western Europe"],
+    ["North Africa", "Egypt"], ["North Africa", "East Africa"], ["North Africa", "Congo"],
+    ["Egypt", "East Africa"],
+    ["East Africa", "Congo"], ["East Africa", "South Africa"], ["East Africa", "Madagascar"],
+    ["Congo", "South Africa"], ["Madagascar", "South Africa"],
+    ["Afghanistan", "China"], ["Afghanistan", "India"], ["Afghanistan", "Middle East"],
+    ["Afghanistan", "Ural"], ["China", "India"], ["China", "Mongolia"],
+    ["China", "Siam"], ["China", "Siberia"], ["China", "Ural"],
+    ["India", "Middle East"], ["India", "Siam"],
+    ["Irkutsk", "Kamchatka"], ["Irkutsk", "Mongolia"], ["Irkutsk", "Siberia"], ["Irkutsk", "Yakutsk"],
+    ["Japan", "Kamchatka"], ["Japan", "Mongolia"],
+    ["Kamchatka", "Mongolia"], ["Kamchatka", "Yakutsk"],
+    ["Siberia", "Ural"], ["Siberia", "Yakutsk"],
+    ["Indonesia", "New Guinea"], ["Indonesia", "Western Australia"],
+    ["New Guinea", "Eastern Australia"], ["New Guinea", "Western Australia"],
+    ["Eastern Australia", "Western Australia"],
+    ["Greenland", "Iceland"], ["Central America", "Venezuela"],
+    ["Brazil", "North Africa"], ["North Africa", "Southern Europe"], ["North Africa", "Western Europe"],
+    ["Egypt", "Southern Europe"], ["Egypt", "Middle East"],
+    ["East Africa", "Middle East"], ["Southern Europe", "Middle East"],
+    ["Ukraine", "Afghanistan"], ["Ukraine", "Middle East"], ["Ukraine", "Ural"],
+    ["Siam", "Indonesia"]
+  ]
+}
+''';
+
+MapData get _classicMap =>
+    MapData.fromJson(jsonDecode(_classicJsonString) as Map<String, dynamic>);
+
+void main() {
+  late MapGraph mapGraph;
+
+  setUp(() {
+    mapGraph = MapGraph(_classicMap);
+  });
+
+  group('adjacency', () {
+    test('42 territories loaded', () {
+      expect(mapGraph.allTerritories.length, equals(42));
+    });
+
+    test('bidirectional adjacency', () {
+      expect(mapGraph.areAdjacent('Alaska', 'Kamchatka'), isTrue);
+      expect(mapGraph.areAdjacent('Kamchatka', 'Alaska'), isTrue);
+    });
+
+    test('non-adjacent territories', () {
+      expect(mapGraph.areAdjacent('Alaska', 'Brazil'), isFalse);
+    });
+
+    test('Alaska has exactly 3 neighbors (Northwest Territory, Alberta, Kamchatka)', () {
+      final neighbors = mapGraph.neighbors('Alaska');
+      expect(neighbors.length, equals(3));
+      expect(neighbors, containsAll(['Northwest Territory', 'Alberta', 'Kamchatka']));
+    });
+  });
+
+  group('BFS connected territories', () {
+    test('isolated friendly territory returns only itself', () {
+      // Alaska and Brazil are not adjacent, so BFS from Alaska over {Alaska, Brazil}
+      // returns only {Alaska}.
+      final result = mapGraph.connectedTerritories('Alaska', {'Alaska', 'Brazil'});
+      expect(result, equals({'Alaska'}));
+    });
+
+    test('full South America continent is reachable', () {
+      const sa = {'Venezuela', 'Peru', 'Brazil', 'Argentina'};
+      final result = mapGraph.connectedTerritories('Venezuela', sa);
+      expect(result, equals(sa));
+    });
+  });
+
+  group('continent queries', () {
+    test('Australia bonus is 2', () {
+      expect(mapGraph.continentBonus('Australia'), equals(2));
+    });
+
+    test('controls continent when owning all 4 Australia territories', () {
+      const australia = {
+        'Indonesia',
+        'New Guinea',
+        'Western Australia',
+        'Eastern Australia',
+      };
+      expect(mapGraph.controlsContinent('Australia', australia), isTrue);
+    });
+  });
+}
