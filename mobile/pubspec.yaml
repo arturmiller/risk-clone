@@ -1,0 +1,38 @@
+name: risk_mobile
+description: "Risk board game for mobile — pure Dart engine, Flutter UI."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.41.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.3.1
+  riverpod_annotation: ^4.0.2
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+  objectbox: ^5.2.0
+  objectbox_flutter_libs: any
+  shared_preferences: ^2.5.4
+  path_parsing: ^1.1.0
+  flutter_svg: ^2.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.4.0
+  riverpod_generator: ^4.0.3
+  freezed: ^3.2.5
+  json_serializable: ^6.13.0
+  objectbox_generator: any
+  mocktail: ^1.0.4
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/classic.json
