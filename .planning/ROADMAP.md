@@ -93,7 +93,12 @@ Plans:
   2. Backgrounding the app (home button or phone call) saves current `GameState` to ObjectBox before the app is potentially killed
   3. Relaunching the app after backgrounding prompts the user to resume and restores the exact game state
   4. All notifier state transitions are covered by `ProviderContainer` unit tests
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — GameConfig + UIState models, Wave 0 test stubs, build_runner generation
+- [ ] 09-02-PLAN.md — GameNotifier + UIStateNotifier implementation, ProviderContainer tests green
+- [ ] 09-03-PLAN.md — HomeScreen provider wiring, human-verify lifecycle save/restore checkpoint
 
 ### Phase 10: Map Widget
 **Goal**: An interactive territory map that renders all 42 territories with correct owner colors and army counts, supports pinch-zoom and pan, and correctly identifies which territory the user tapped — including in dense regions on small phone screens.
@@ -142,7 +147,7 @@ Plans:
 | 6. Flutter Scaffold and Data Models | 3/3 | Complete   | 2026-03-15 | - |
 | 7. Dart Game Engine Port | 5/5 | Complete   | 2026-03-15 | - |
 | 8. Bot Agents | 3/3 | Complete   | 2026-03-15 | - |
-| 9. Riverpod Providers and Persistence | v1.1 | 0/TBD | Not started | - |
+| 9. Riverpod Providers and Persistence | v1.1 | 0/3 | Not started | - |
 | 10. Map Widget | v1.1 | 0/TBD | Not started | - |
 | 11. Screens, Widgets, and Mobile UX | v1.1 | 0/TBD | Not started | - |
 | 12. Simulation Mode and Integration | v1.1 | 0/TBD | Not started | - |
