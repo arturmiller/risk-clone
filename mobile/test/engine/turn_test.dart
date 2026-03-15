@@ -9,18 +9,41 @@ import 'package:risk_mobile/engine/map_graph.dart';
 import 'package:risk_mobile/engine/models/map_schema.dart';
 import 'package:risk_mobile/bots/player_agent.dart';
 
-/// A simple fake random that always returns values deterministically.
-/// Returns [value % max] for nextInt.
+/// A simple fake random that cycles through a sequence of values.
+/// Useful for deterministic testing where attacker must win.
 class FakeRandom implements Random {
-  int _callCount = 0;
-  final int returnValue; // nextInt(max) returns min(returnValue, max-1)
+  final List<int> _sequence;
+  int _idx = 0;
 
-  FakeRandom({this.returnValue = 6}); // defaults to high roll (attacker wins)
+  /// [alwaysHigh]: all dice roll 5 (face 6). Useful for attack scenarios
+  /// when attacker dice count > defender dice count (attacker wins most).
+  /// [alwaysLow]: all dice roll 0 (face 1). Useful for defense wins.
+  FakeRandom({bool alwaysHigh = false, bool alwaysLow = false, List<int>? sequence})
+      : _sequence = sequence ??
+            (alwaysHigh
+                ? List.filled(1000, 5)
+                : alwaysLow
+                    ? List.filled(1000, 0)
+                    : List.filled(1000, 0));
+
+  /// Returns values alternating high/low so attacker (rolling first, more dice)
+  /// consistently wins: attacker dice = 5 (face 6), defender dice = 0 (face 1).
+  factory FakeRandom.attackerWins() {
+    // Pattern: attacker rolls 3 dice first (high), defender rolls 1-2 dice (low)
+    // We use: high, high, high, low, low, high, high, high, low, low, ...
+    // = [5,5,5,0,0] repeated
+    final seq = <int>[];
+    for (int i = 0; i < 200; i++) {
+      seq.addAll([5, 5, 5, 0, 0]);
+    }
+    return FakeRandom(sequence: seq);
+  }
 
   @override
   int nextInt(int max) {
-    _callCount++;
-    return returnValue < max ? returnValue : max - 1;
+    final val = _sequence[_idx % _sequence.length];
+    _idx++;
+    return val < max ? val : max - 1;
   }
 
   @override
@@ -72,8 +95,7 @@ class FakePlayerAgent extends PlayerAgent {
 }
 
 /// Build a minimal 2-player MapGraph with 4 territories.
-/// A-B are adjacent, C-D are adjacent; AB vs CD owned by each player.
-/// A-C are also adjacent so player 0 can attack player 1.
+/// A-B are adjacent, C-D are adjacent; A-C and A-D are cross-player adjacent.
 MapGraph buildTestMap() {
   final mapData = MapData(
     name: 'Test',
@@ -82,6 +104,7 @@ MapGraph buildTestMap() {
       ['A', 'B'],
       ['C', 'D'],
       ['A', 'C'], // cross-player adjacency
+      ['A', 'D'], // also adjacent so player 0 can attack D
     ],
     continents: [
       ContinentData(name: 'North', territories: ['A', 'B'], bonus: 2),
@@ -202,7 +225,6 @@ void main() {
       'executeTurn fsm: turn starts in REINFORCE, transitions to ATTACK, then FORTIFY',
       () {
         final mapGraph = buildTestMap();
-        final rng = FakeRandom(returnValue: 5); // attacker always wins
 
         // Track phases seen
         final phases = <TurnPhase>[];
@@ -289,7 +311,7 @@ void main() {
         );
 
         final agents = {0: agent, 1: FakePlayerAgent()};
-        final rng = FakeRandom(returnValue: 5); // attacker always wins (6 > any def)
+        final rng = FakeRandom.attackerWins();
         final (newState, victory) = executeTurn(state, mapGraph, agents, rng);
 
         expect(newState.players[1].isAlive, isFalse);
@@ -333,7 +355,7 @@ void main() {
         );
 
         final agents = {0: agent, 1: FakePlayerAgent()};
-        final rng = FakeRandom(returnValue: 5);
+        final rng = FakeRandom.attackerWins();
         final (newState, _) = executeTurn(state, mapGraph, agents, rng);
 
         expect(newState.cards['1'] ?? [], isEmpty);
@@ -415,7 +437,7 @@ void main() {
         );
 
         final agents = {0: agent, 1: FakePlayerAgent()};
-        final rng = FakeRandom(returnValue: 5);
+        final rng = FakeRandom.attackerWins();
         final (_, victory) = executeTurn(state, mapGraph, agents, rng);
 
         expect(victory, isTrue);
@@ -454,7 +476,7 @@ void main() {
         );
 
         final agents = {0: agent, 1: FakePlayerAgent()};
-        final rng = FakeRandom(returnValue: 5);
+        final rng = FakeRandom.attackerWins();
         final (newState, _) = executeTurn(state, mapGraph, agents, rng);
 
         // Player 0 should have drawn the card
