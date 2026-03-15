@@ -153,6 +153,6 @@ Plans:
 | 7. Dart Game Engine Port | 5/5 | Complete   | 2026-03-15 | - |
 | 8. Bot Agents | 3/3 | Complete   | 2026-03-15 | - |
 | 9. Riverpod Providers and Persistence | 3/3 | Complete   | 2026-03-15 | - |
-| 10. Map Widget | v1.1 | 0/3 | Not started | - |
+| 10. Map Widget | 1/3 | In Progress|  | - |
 | 11. Screens, Widgets, and Mobile UX | v1.1 | 0/TBD | Not started | - |
 | 12. Simulation Mode and Integration | v1.1 | 0/TBD | Not started | - |

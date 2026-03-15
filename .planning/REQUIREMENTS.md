@@ -29,7 +29,7 @@ Requirements for Flutter mobile port. Each maps to roadmap phases.
 
 - [ ] **MAPW-01**: Interactive map widget with pinch-zoom and pan
 - [ ] **MAPW-02**: Tap territory to select (attack source/target, fortify source/target)
-- [ ] **MAPW-03**: Territories colored by owning player with army counts displayed
+- [x] **MAPW-03**: Territories colored by owning player with army counts displayed
 - [ ] **MAPW-04**: Territory highlighting (valid sources, valid targets, selected)
 - [ ] **MAPW-05**: Hit-test expansion for small territories on phone screens
 
@@ -92,7 +92,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOTS-09 | Phase 12 | Pending |
 | MAPW-01 | Phase 10 | Pending |
 | MAPW-02 | Phase 10 | Pending |
-| MAPW-03 | Phase 10 | Pending |
+| MAPW-03 | Phase 10 | Complete |
 | MAPW-04 | Phase 10 | Pending |
 | MAPW-05 | Phase 10 | Pending |
 | MOBX-01 | Phase 11 | Pending |
