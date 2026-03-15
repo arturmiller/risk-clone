@@ -101,7 +101,10 @@ class GameNotifier extends _$GameNotifier {
         return nextState;
       });
 
-      state = AsyncData(newState);
+      // Guard against provider disposal during async gap
+      if (ref.mounted) {
+        state = AsyncData(newState);
+      }
     } finally {
       _processing = false;
     }
