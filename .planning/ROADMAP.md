@@ -147,7 +147,7 @@ Plans:
 | 6. Flutter Scaffold and Data Models | 3/3 | Complete   | 2026-03-15 | - |
 | 7. Dart Game Engine Port | 5/5 | Complete   | 2026-03-15 | - |
 | 8. Bot Agents | 3/3 | Complete   | 2026-03-15 | - |
-| 9. Riverpod Providers and Persistence | v1.1 | 0/3 | Not started | - |
+| 9. Riverpod Providers and Persistence | 2/3 | In Progress|  | - |
 | 10. Map Widget | v1.1 | 0/TBD | Not started | - |
 | 11. Screens, Widgets, and Mobile UX | v1.1 | 0/TBD | Not started | - |
 | 12. Simulation Mode and Integration | v1.1 | 0/TBD | Not started | - |

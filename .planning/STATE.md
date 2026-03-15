@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
-status: in-progress
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-03-15T19:12:30Z"
-last_activity: 2026-03-15 — Phase 9 Plan 01 complete; GameConfig + UIState models + build_runner generated files + Wave 0 test stubs — 143/143 tests green, SAVE-01 and SAVE-02 complete
+status: completed
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-03-15T19:28:53.841Z"
+last_activity: 2026-03-15 — Phase 9 Plan 02 complete; GameNotifier + UIStateNotifier providers + 14 ProviderContainer tests — 157/157 tests green, SAVE-01 and SAVE-02 implemented
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 14
-  completed_plans: 12
-  percent: 100
+  completed_plans: 13
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 9 (Riverpod Providers and Persistence) — In Progress
-Plan: 1 of 3 complete
-Status: Plan 01 complete — GameConfig + UIState models and Wave 0 test stubs
-Last activity: 2026-03-15 — Phase 9 Plan 01 complete; GameConfig + UIState freezed model + build_runner generated files + 2 test stubs — 143/143 tests green, SAVE-01 and SAVE-02 complete
+Plan: 2 of 3 complete
+Status: Plan 02 complete — GameNotifier + UIStateNotifier providers + 14 ProviderContainer tests
+Last activity: 2026-03-15 — Phase 9 Plan 02 complete; GameNotifier + UIStateNotifier providers + 14 ProviderContainer tests — 157/157 tests green, SAVE-01 and SAVE-02 implemented
 
-Progress: [█████████░] 94% (v1.1)
+Progress: [██████████] 97% (v1.1)
 
 ## Accumulated Context
 
@@ -70,6 +70,9 @@ Progress: [█████████░] 94% (v1.1)
 - [Phase 08-bot-agents]: win_rate_test.dart: File('assets/classic.json') path used — flutter test cwd is mobile/; Isolate.run() boundary confirmed for freezed GameState + MapGraph without JSON round-trip
 - [Phase 09-01]: UIState includes validSources alongside validTargets — map widget (Phase 10) needs both attack source and target highlighting without extra provider queries
 - [Phase 09-01]: GameConfig is plain Dart (not freezed) — one-shot parameter object, never stored or compared for equality
+- [Phase 09-02]: Generated provider names are gameProvider/uIStateProvider (not gameNotifierProvider/uIStateNotifierProvider) — Riverpod 3.x generator strips Notifier suffix
+- [Phase 09-02]: ref.mounted guard required after Isolate.run — isAutoDispose provider can dispose during async Isolate gap
+- [Phase 09-02]: saveNow() public method added as test seam for AppLifecycleListener._saveState() (lifecycle not triggerable in unit tests)
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T19:12:02.515Z
-Stopped at: Completed 09-01-PLAN.md
+Last session: 2026-03-15T19:28:53.834Z
+Stopped at: Completed 09-02-PLAN.md
 Resume file: None
