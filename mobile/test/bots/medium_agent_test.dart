@@ -72,16 +72,17 @@ void main() {
       final mapGraph = _testMap;
       final agent = MediumAgent(mapGraph: mapGraph);
 
-      // Player 0 owns T1, T2, T3 (continent A = fraction 3/3 = 1.0) plus T4 from B.
+      // Player 0 owns T1, T2, T3 (continent A = fraction 3/3 = 1.0).
+      // Player 1 owns T4, T5, T6.
       // T3 borders T4 (enemy) — cross-continent external border.
-      // T4 borders T3 (enemy in A direction) and T5 (enemy).
-      // T2 borders T3 (friendly) and T1 (friendly) — interior!
-      // Top continent: A has fraction 1.0, B has fraction 1/3.
-      // In continent A, owned borders: T3 (borders T4 enemy). T1 borders T2 only (friendly), T2 borders T1, T3 (both friendly).
-      // So only T3 is a border in continent A. All armies go to T3.
+      // T2 borders T1 (friendly) and T3 (friendly) — interior!
+      // T1 borders T2 (friendly) only — interior.
+      // Top continent: A has fraction 1.0, B has fraction 0.
+      // In continent A, owned borders: T3 (borders T4 enemy).
+      // All armies go to T3 (only border in top continent).
       final state = _buildState(
-        player0Territories: {'T1': 2, 'T2': 2, 'T3': 1, 'T4': 3},
-        player1Territories: ['T5', 'T6'],
+        player0Territories: {'T1': 2, 'T2': 2, 'T3': 1},
+        player1Territories: ['T4', 'T5', 'T6'],
       );
 
       final action =
