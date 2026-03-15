@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
-status: completed
-stopped_at: Completed 07-05-PLAN.md
-last_updated: "2026-03-15T07:14:51.169Z"
-last_activity: 2026-03-15 — Phase 7 Plan 05 complete; Python-generated golden fixtures confirm Dart engine parity — 81/81 tests green, all DART requirements validated
+status: in_progress
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-03-15T18:26:00Z"
+last_activity: 2026-03-15 — Phase 8 Plan 01 complete; EasyAgent (RandomAgent port) + simulation.dart + test stubs — 97/97 tests green, BOTS-05 complete
 progress:
-  total_phases: 7
-  completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_phases: 8
+  completed_phases: 7
+  total_plans: 11
+  completed_plans: 9
+  percent: 82
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** AI bots that provide a challenging and fun single-player experience, with the hardest difficulty playing at human-competitive level.
-**Current focus:** Phase 7 — Dart Game Engine Port
+**Current focus:** Phase 8 — Bot Agents
 
 ## Current Position
 
-Phase: 7 of 7 (Dart Game Engine Port)
-Plan: 5 of 5 in current phase (complete)
-Status: Phase 7 complete
-Last activity: 2026-03-15 — Phase 7 Plan 05 complete; Python-generated golden fixtures confirm Dart engine parity — 81/81 tests green, all DART requirements validated
+Phase: 8 of 8 (Bot Agents)
+Plan: 1 of 3 in current phase (complete)
+Status: Phase 8 in progress
+Last activity: 2026-03-15 — Phase 8 Plan 01 complete; EasyAgent (RandomAgent port) + simulation.dart + test stubs — 97/97 tests green, BOTS-05 complete
 
-Progress: [██████████] 100% (v1.1)
+Progress: [████████░░] 82% (v1.1)
 
 ## Accumulated Context
 
@@ -62,6 +62,9 @@ Progress: [██████████] 100% (v1.1)
 - [07-05]: Fixtures embed full GameState JSON (state_to_dart_json) — Dart uses GameState.fromJson() directly, no state reconstruction
 - [07-05]: Fixture target_armies must match intended defender dice count — Python's defender_dice override not passed to Dart engine
 - [07-05]: golden_fixture_test.dart iterates fixtures in single parametric test per group — Flutter test dynamic registration limitation
+- [08-01]: EasyAgent uses nextInt(2)==1 for 50% fortify skip — Python rng.random() replaced for FakeRandom compatibility (FakeRandom throws on nextDouble)
+- [08-01]: EasyAgent uses nextInt(100)<15 for 15% attack abort — same reason; FakeRandom-safe API requires nextInt() variants only in bot logic
+- [08-01]: simulation.dart uses Fisher-Yates shuffle inline to consume the provided rng parameter
 
 ### Pending Todos
 
@@ -76,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T08:09:18Z
-Stopped at: Completed 07-05-PLAN.md
+Last session: 2026-03-15T18:26:00Z
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None

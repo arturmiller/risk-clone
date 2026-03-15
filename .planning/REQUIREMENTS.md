@@ -19,7 +19,7 @@ Requirements for Flutter mobile port. Each maps to roadmap phases.
 
 ### AI Bots
 
-- [ ] **BOTS-05**: Easy bot ported (random valid moves)
+- [x] **BOTS-05**: Easy bot ported (random valid moves)
 - [ ] **BOTS-06**: Medium bot ported (continent focus, border reinforcement)
 - [ ] **BOTS-07**: Hard bot ported (multi-factor heuristic scoring, threat assessment)
 - [ ] **BOTS-08**: Bot computation runs in isolate (no UI thread blocking)
@@ -85,7 +85,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DART-05 | Phase 7 | Complete |
 | DART-06 | Phase 7 | Complete |
 | DART-07 | Phase 6 | Complete |
-| BOTS-05 | Phase 8 | Pending |
+| BOTS-05 | Phase 8 | Complete |
 | BOTS-06 | Phase 8 | Pending |
 | BOTS-07 | Phase 8 | Pending |
 | BOTS-08 | Phase 8 | Pending |
