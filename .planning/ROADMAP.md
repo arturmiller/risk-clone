@@ -24,7 +24,7 @@
 
 - [x] **Phase 6: Flutter Scaffold and Data Models** — Working Flutter project with freezed models, map graph, and code generation (completed 2026-03-15)
 - [x] **Phase 7: Dart Game Engine Port** — Complete pure-Dart port of all game rules with golden-fixture test validation (completed 2026-03-15)
-- [ ] **Phase 8: Bot Agents** — All three AI difficulty levels ported to Dart with isolate execution
+- [x] **Phase 8: Bot Agents** — All three AI difficulty levels ported to Dart with isolate execution (completed 2026-03-15)
 - [ ] **Phase 9: Riverpod Providers and Persistence** — State coordination layer with auto-save on app backgrounding
 - [ ] **Phase 10: Map Widget** — Interactive territory map with CustomPainter rendering, pinch-zoom, and touch hit-testing
 - [ ] **Phase 11: Screens, Widgets, and Mobile UX** — Complete game UI: setup, gameplay controls, sidebar, responsive layout, game over
@@ -141,7 +141,7 @@ Plans:
 | 5. Hard Bot and AI Simulation | v1.0 | 4/4 | Complete | 2026-03-14 |
 | 6. Flutter Scaffold and Data Models | 3/3 | Complete   | 2026-03-15 | - |
 | 7. Dart Game Engine Port | 5/5 | Complete   | 2026-03-15 | - |
-| 8. Bot Agents | 2/3 | In Progress|  | - |
+| 8. Bot Agents | 3/3 | Complete   | 2026-03-15 | - |
 | 9. Riverpod Providers and Persistence | v1.1 | 0/TBD | Not started | - |
 | 10. Map Widget | v1.1 | 0/TBD | Not started | - |
 | 11. Screens, Widgets, and Mobile UX | v1.1 | 0/TBD | Not started | - |
