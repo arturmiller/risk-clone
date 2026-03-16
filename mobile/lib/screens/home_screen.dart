@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/game_provider.dart';
 import '../engine/models/game_config.dart';
+import 'game_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -17,15 +18,26 @@ class HomeScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (gameState) {
           if (gameState == null) {
-            // No active game — show new game options
-            return _NewGamePrompt(onStart: (config) {
-              ref.read(gameProvider.notifier).setupGame(config);
-            });
+            return Center(
+              child: SingleChildScrollView(
+                child: SetupForm(onStart: (config) async {
+                  await ref.read(gameProvider.notifier).setupGame(config);
+                  if (context.mounted) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const GameScreen()),
+                    );
+                  }
+                }),
+              ),
+            );
           }
-          // Game in progress — show resume / new game options
           return _ResumePrompt(
             gameState: gameState,
-            onResume: () {}, // Phase 11 will navigate to game screen
+            onResume: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const GameScreen()),
+              );
+            },
             onNewGame: () {
               ref.read(gameProvider.notifier).clearSave();
             },
@@ -36,26 +48,79 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _NewGamePrompt extends StatelessWidget {
+/// Setup form for starting a new game. Public (no underscore prefix) for
+/// testability in unit tests.
+class SetupForm extends StatefulWidget {
   final void Function(GameConfig) onStart;
-  const _NewGamePrompt({required this.onStart});
+  const SetupForm({super.key, required this.onStart});
+
+  @override
+  State<SetupForm> createState() => _SetupFormState();
+}
+
+class _SetupFormState extends State<SetupForm> {
+  int _playerCount = 3;
+  Difficulty _difficulty = Difficulty.medium;
+  GameMode _gameMode = GameMode.vsBot;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Risk Mobile',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          const Text('Risk Mobile',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 32),
+
+          // Player count
+          Text('Players: $_playerCount'),
+          Slider(
+            value: _playerCount.toDouble(),
+            min: 2,
+            max: 6,
+            divisions: 4,
+            label: '$_playerCount',
+            onChanged: (v) => setState(() => _playerCount = v.round()),
+          ),
+          const SizedBox(height: 16),
+
+          // Difficulty
+          const Text('Difficulty'),
+          const SizedBox(height: 8),
+          SegmentedButton<Difficulty>(
+            segments: const [
+              ButtonSegment(value: Difficulty.easy, label: Text('Easy')),
+              ButtonSegment(value: Difficulty.medium, label: Text('Medium')),
+              ButtonSegment(value: Difficulty.hard, label: Text('Hard')),
+            ],
+            selected: {_difficulty},
+            onSelectionChanged: (s) => setState(() => _difficulty = s.first),
+          ),
+          const SizedBox(height: 16),
+
+          // Game mode
+          const Text('Mode'),
+          const SizedBox(height: 8),
+          SegmentedButton<GameMode>(
+            segments: const [
+              ButtonSegment(value: GameMode.vsBot, label: Text('vs Bots')),
+              ButtonSegment(
+                  value: GameMode.simulation, label: Text('Simulation')),
+            ],
+            selected: {_gameMode},
+            onSelectionChanged: (s) => setState(() => _gameMode = s.first),
           ),
           const SizedBox(height: 32),
+
           ElevatedButton(
-            onPressed: () => onStart(
-              const GameConfig(playerCount: 3, difficulty: Difficulty.medium),
-            ),
-            child: const Text('New Game (3 Players, Medium)'),
+            onPressed: () => widget.onStart(GameConfig(
+              playerCount: _playerCount,
+              difficulty: _difficulty,
+              gameMode: _gameMode,
+            )),
+            child: const Text('Start Game'),
           ),
         ],
       ),
