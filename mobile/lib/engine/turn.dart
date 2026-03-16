@@ -322,7 +322,7 @@ GameState executeFortifyPhase(
 }
 
 /// Find the next alive player after currentPlayerIndex.
-int _nextAlivePlayer(GameState state) {
+int nextAlivePlayer(GameState state) {
   final numPlayers = state.players.length;
   int idx = state.currentPlayerIndex;
   for (int i = 0; i < numPlayers; i++) {
@@ -364,7 +364,7 @@ int _nextAlivePlayer(GameState state) {
   state = executeFortifyPhase(state, mapGraph, agent, playerIndex);
 
   // Advance to next alive player
-  final nextPlayer = _nextAlivePlayer(state);
+  final nextPlayer = nextAlivePlayer(state);
   state = state.copyWith(
     currentPlayerIndex: nextPlayer,
     turnNumber: state.turnNumber + 1,
