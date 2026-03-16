@@ -163,5 +163,5 @@ Plans:
 | 8. Bot Agents | 3/3 | Complete   | 2026-03-15 | - |
 | 9. Riverpod Providers and Persistence | 3/3 | Complete   | 2026-03-15 | - |
 | 10. Map Widget | 3/3 | Complete    | 2026-03-15 | - |
-| 11. Screens, Widgets, and Mobile UX | 5/7 | In Progress|  | - |
+| 11. Screens, Widgets, and Mobile UX | 6/7 | In Progress|  | - |
 | 12. Simulation Mode and Integration | v1.1 | 0/TBD | Not started | - |

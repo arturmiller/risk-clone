@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
 status: completed
-stopped_at: Completed 11-05-PLAN.md
-last_updated: "2026-03-16T21:10:00.000Z"
+stopped_at: Completed 11-06-PLAN.md
+last_updated: "2026-03-16T21:00:03.007Z"
 last_activity: 2026-03-16 — Phase 11 Plan 05 complete; ContinentPanel + GameOverDialog — 5 tests pass, 1 skipped
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 24
-  completed_plans: 22
+  completed_plans: 23
   percent: 93
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 11 (Screens, Widgets, and Mobile UX) — In Progress
-Plan: 5 of 7 complete
-Status: Plan 05 complete — ContinentPanel (continent bonus display with player-controlled star indicators) and GameOverDialog (winner modal with clearSave + gameLog.clear)
-Last activity: 2026-03-16 — Phase 11 Plan 05 complete; ContinentPanel + GameOverDialog — 5 tests pass, 1 skipped
+Plan: 6 of 7 complete
+Status: Plan 06 complete — Full GameScreen (responsive layout, PopScope abandon dialog, game-over detection, reinforce init) + HomeScreen navigation tests; 195 tests pass
+Last activity: 2026-03-16 — Phase 11 Plan 06 complete; GameScreen + HomeScreen navigation tests — 195 tests pass, 4 informational skips
 
-Progress: [█████████░] 93% (v1.1)
+Progress: [██████████] 98% (v1.1)
 
 ## Accumulated Context
 
@@ -90,6 +90,8 @@ Progress: [█████████░] 93% (v1.1)
 - [Phase 11-05]: GameOverDialog uses shared _handleDismiss for both Home and New Game buttons — both paths call clearSave() + gameLog.clear() then popUntil(first route)
 - [Phase 11-04]: ActionPanel uses gameProvider.select() to minimize rebuilds on non-phase GameState changes
 - [Phase 11-04]: Blitz dispatch test deferred to Plan 06 integration checkpoint
+- [Phase 11-06]: mounted (State getter) not context.mounted satisfies use_build_context_synchronously lint after await in ConsumerState method
+- [Phase 11-06]: LayoutBuilder at 600dp used for portrait/landscape breakpoint in GameScreen
 
 ### Pending Todos
 
@@ -104,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-16T21:10:00.000Z
-Stopped at: Completed 11-05-PLAN.md
+Last session: 2026-03-16T21:00:03.000Z
+Stopped at: Completed 11-06-PLAN.md
 Resume file: None
