@@ -41,4 +41,4 @@ final class MapGraphProvider
   }
 }
 
-String _$mapGraphHash() => r'a2dbe2c69bebff3471de325987dc94aaf733dd29';
+String _$mapGraphHash() => r'72c364ad5deafa43bcff697f476433f7dd6119b2';

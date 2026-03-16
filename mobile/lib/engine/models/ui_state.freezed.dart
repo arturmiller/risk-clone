@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UIState {
 
- String? get selectedTerritory; Set<String> get validTargets; Set<String> get validSources;
+ String? get selectedTerritory; Set<String> get validTargets; Set<String> get validSources; int get pendingArmies; Map<String, int> get proposedPlacements;
 /// Create a copy of UIState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $UIStateCopyWith<UIState> get copyWith => _$UIStateCopyWithImpl<UIState>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UIState&&(identical(other.selectedTerritory, selectedTerritory) || other.selectedTerritory == selectedTerritory)&&const DeepCollectionEquality().equals(other.validTargets, validTargets)&&const DeepCollectionEquality().equals(other.validSources, validSources));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UIState&&(identical(other.selectedTerritory, selectedTerritory) || other.selectedTerritory == selectedTerritory)&&const DeepCollectionEquality().equals(other.validTargets, validTargets)&&const DeepCollectionEquality().equals(other.validSources, validSources)&&(identical(other.pendingArmies, pendingArmies) || other.pendingArmies == pendingArmies)&&const DeepCollectionEquality().equals(other.proposedPlacements, proposedPlacements));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedTerritory,const DeepCollectionEquality().hash(validTargets),const DeepCollectionEquality().hash(validSources));
+int get hashCode => Object.hash(runtimeType,selectedTerritory,const DeepCollectionEquality().hash(validTargets),const DeepCollectionEquality().hash(validSources),pendingArmies,const DeepCollectionEquality().hash(proposedPlacements));
 
 @override
 String toString() {
-  return 'UIState(selectedTerritory: $selectedTerritory, validTargets: $validTargets, validSources: $validSources)';
+  return 'UIState(selectedTerritory: $selectedTerritory, validTargets: $validTargets, validSources: $validSources, pendingArmies: $pendingArmies, proposedPlacements: $proposedPlacements)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $UIStateCopyWith<$Res>  {
   factory $UIStateCopyWith(UIState value, $Res Function(UIState) _then) = _$UIStateCopyWithImpl;
 @useResult
 $Res call({
- String? selectedTerritory, Set<String> validTargets, Set<String> validSources
+ String? selectedTerritory, Set<String> validTargets, Set<String> validSources, int pendingArmies, Map<String, int> proposedPlacements
 });
 
 
@@ -62,12 +62,14 @@ class _$UIStateCopyWithImpl<$Res>
 
 /// Create a copy of UIState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? selectedTerritory = freezed,Object? validTargets = null,Object? validSources = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? selectedTerritory = freezed,Object? validTargets = null,Object? validSources = null,Object? pendingArmies = null,Object? proposedPlacements = null,}) {
   return _then(_self.copyWith(
 selectedTerritory: freezed == selectedTerritory ? _self.selectedTerritory : selectedTerritory // ignore: cast_nullable_to_non_nullable
 as String?,validTargets: null == validTargets ? _self.validTargets : validTargets // ignore: cast_nullable_to_non_nullable
 as Set<String>,validSources: null == validSources ? _self.validSources : validSources // ignore: cast_nullable_to_non_nullable
-as Set<String>,
+as Set<String>,pendingArmies: null == pendingArmies ? _self.pendingArmies : pendingArmies // ignore: cast_nullable_to_non_nullable
+as int,proposedPlacements: null == proposedPlacements ? _self.proposedPlacements : proposedPlacements // ignore: cast_nullable_to_non_nullable
+as Map<String, int>,
   ));
 }
 
@@ -152,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? selectedTerritory,  Set<String> validTargets,  Set<String> validSources)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? selectedTerritory,  Set<String> validTargets,  Set<String> validSources,  int pendingArmies,  Map<String, int> proposedPlacements)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UIState() when $default != null:
-return $default(_that.selectedTerritory,_that.validTargets,_that.validSources);case _:
+return $default(_that.selectedTerritory,_that.validTargets,_that.validSources,_that.pendingArmies,_that.proposedPlacements);case _:
   return orElse();
 
 }
@@ -173,10 +175,10 @@ return $default(_that.selectedTerritory,_that.validTargets,_that.validSources);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? selectedTerritory,  Set<String> validTargets,  Set<String> validSources)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? selectedTerritory,  Set<String> validTargets,  Set<String> validSources,  int pendingArmies,  Map<String, int> proposedPlacements)  $default,) {final _that = this;
 switch (_that) {
 case _UIState():
-return $default(_that.selectedTerritory,_that.validTargets,_that.validSources);case _:
+return $default(_that.selectedTerritory,_that.validTargets,_that.validSources,_that.pendingArmies,_that.proposedPlacements);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +195,10 @@ return $default(_that.selectedTerritory,_that.validTargets,_that.validSources);c
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? selectedTerritory,  Set<String> validTargets,  Set<String> validSources)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? selectedTerritory,  Set<String> validTargets,  Set<String> validSources,  int pendingArmies,  Map<String, int> proposedPlacements)?  $default,) {final _that = this;
 switch (_that) {
 case _UIState() when $default != null:
-return $default(_that.selectedTerritory,_that.validTargets,_that.validSources);case _:
+return $default(_that.selectedTerritory,_that.validTargets,_that.validSources,_that.pendingArmies,_that.proposedPlacements);case _:
   return null;
 
 }
@@ -208,7 +210,7 @@ return $default(_that.selectedTerritory,_that.validTargets,_that.validSources);c
 
 
 class _UIState implements UIState {
-  const _UIState({this.selectedTerritory, final  Set<String> validTargets = const {}, final  Set<String> validSources = const {}}): _validTargets = validTargets,_validSources = validSources;
+  const _UIState({this.selectedTerritory, final  Set<String> validTargets = const {}, final  Set<String> validSources = const {}, this.pendingArmies = 0, final  Map<String, int> proposedPlacements = const {}}): _validTargets = validTargets,_validSources = validSources,_proposedPlacements = proposedPlacements;
   
 
 @override final  String? selectedTerritory;
@@ -226,6 +228,14 @@ class _UIState implements UIState {
   return EqualUnmodifiableSetView(_validSources);
 }
 
+@override@JsonKey() final  int pendingArmies;
+ final  Map<String, int> _proposedPlacements;
+@override@JsonKey() Map<String, int> get proposedPlacements {
+  if (_proposedPlacements is EqualUnmodifiableMapView) return _proposedPlacements;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_proposedPlacements);
+}
+
 
 /// Create a copy of UIState
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +247,16 @@ _$UIStateCopyWith<_UIState> get copyWith => __$UIStateCopyWithImpl<_UIState>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UIState&&(identical(other.selectedTerritory, selectedTerritory) || other.selectedTerritory == selectedTerritory)&&const DeepCollectionEquality().equals(other._validTargets, _validTargets)&&const DeepCollectionEquality().equals(other._validSources, _validSources));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UIState&&(identical(other.selectedTerritory, selectedTerritory) || other.selectedTerritory == selectedTerritory)&&const DeepCollectionEquality().equals(other._validTargets, _validTargets)&&const DeepCollectionEquality().equals(other._validSources, _validSources)&&(identical(other.pendingArmies, pendingArmies) || other.pendingArmies == pendingArmies)&&const DeepCollectionEquality().equals(other._proposedPlacements, _proposedPlacements));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,selectedTerritory,const DeepCollectionEquality().hash(_validTargets),const DeepCollectionEquality().hash(_validSources));
+int get hashCode => Object.hash(runtimeType,selectedTerritory,const DeepCollectionEquality().hash(_validTargets),const DeepCollectionEquality().hash(_validSources),pendingArmies,const DeepCollectionEquality().hash(_proposedPlacements));
 
 @override
 String toString() {
-  return 'UIState(selectedTerritory: $selectedTerritory, validTargets: $validTargets, validSources: $validSources)';
+  return 'UIState(selectedTerritory: $selectedTerritory, validTargets: $validTargets, validSources: $validSources, pendingArmies: $pendingArmies, proposedPlacements: $proposedPlacements)';
 }
 
 
@@ -257,7 +267,7 @@ abstract mixin class _$UIStateCopyWith<$Res> implements $UIStateCopyWith<$Res> {
   factory _$UIStateCopyWith(_UIState value, $Res Function(_UIState) _then) = __$UIStateCopyWithImpl;
 @override @useResult
 $Res call({
- String? selectedTerritory, Set<String> validTargets, Set<String> validSources
+ String? selectedTerritory, Set<String> validTargets, Set<String> validSources, int pendingArmies, Map<String, int> proposedPlacements
 });
 
 
@@ -274,12 +284,14 @@ class __$UIStateCopyWithImpl<$Res>
 
 /// Create a copy of UIState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? selectedTerritory = freezed,Object? validTargets = null,Object? validSources = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? selectedTerritory = freezed,Object? validTargets = null,Object? validSources = null,Object? pendingArmies = null,Object? proposedPlacements = null,}) {
   return _then(_UIState(
 selectedTerritory: freezed == selectedTerritory ? _self.selectedTerritory : selectedTerritory // ignore: cast_nullable_to_non_nullable
 as String?,validTargets: null == validTargets ? _self._validTargets : validTargets // ignore: cast_nullable_to_non_nullable
 as Set<String>,validSources: null == validSources ? _self._validSources : validSources // ignore: cast_nullable_to_non_nullable
-as Set<String>,
+as Set<String>,pendingArmies: null == pendingArmies ? _self.pendingArmies : pendingArmies // ignore: cast_nullable_to_non_nullable
+as int,proposedPlacements: null == proposedPlacements ? _self._proposedPlacements : proposedPlacements // ignore: cast_nullable_to_non_nullable
+as Map<String, int>,
   ));
 }
 
