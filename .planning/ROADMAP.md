@@ -27,7 +27,7 @@
 - [x] **Phase 8: Bot Agents** — All three AI difficulty levels ported to Dart with isolate execution (completed 2026-03-15)
 - [x] **Phase 9: Riverpod Providers and Persistence** — State coordination layer with auto-save on app backgrounding (completed 2026-03-15)
 - [x] **Phase 10: Map Widget** — Interactive territory map with CustomPainter rendering, pinch-zoom, and touch hit-testing (completed 2026-03-15)
-- [ ] **Phase 11: Screens, Widgets, and Mobile UX** — Complete game UI: setup, gameplay controls, sidebar, responsive layout, game over
+- [x] **Phase 11: Screens, Widgets, and Mobile UX** — Complete game UI: setup, gameplay controls, sidebar, responsive layout, game over (completed 2026-03-16)
 - [ ] **Phase 12: Simulation Mode and Integration** — All-bot simulation mode wired end-to-end with performance validation
 
 ## Phase Details
@@ -163,5 +163,5 @@ Plans:
 | 8. Bot Agents | 3/3 | Complete   | 2026-03-15 | - |
 | 9. Riverpod Providers and Persistence | 3/3 | Complete   | 2026-03-15 | - |
 | 10. Map Widget | 3/3 | Complete    | 2026-03-15 | - |
-| 11. Screens, Widgets, and Mobile UX | 6/7 | In Progress|  | - |
+| 11. Screens, Widgets, and Mobile UX | 7/7 | Complete   | 2026-03-16 | - |
 | 12. Simulation Mode and Integration | v1.1 | 0/TBD | Not started | - |
