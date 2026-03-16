@@ -1,18 +1,28 @@
 import 'package:flutter_test/flutter_test.dart';
-// ignore_for_file: unused_import
+import 'package:risk_mobile/engine/models/game_config.dart';
 
 void main() {
   group('GameConfig + GameMode (MOBX-01)', () {
     test('GameMode enum has vsBot and simulation values', () {
-      markTestSkipped('not yet implemented — Phase 11 Plan 02');
+      expect(GameMode.values, contains(GameMode.vsBot));
+      expect(GameMode.values, contains(GameMode.simulation));
     });
 
     test('GameConfig defaults gameMode to vsBot', () {
-      markTestSkipped('not yet implemented — Phase 11 Plan 02');
+      const config = GameConfig(
+        playerCount: 3,
+        difficulty: Difficulty.medium,
+      );
+      expect(config.gameMode, GameMode.vsBot);
     });
 
     test('GameConfig accepts explicit gameMode', () {
-      markTestSkipped('not yet implemented — Phase 11 Plan 02');
+      const config = GameConfig(
+        playerCount: 3,
+        difficulty: Difficulty.medium,
+        gameMode: GameMode.simulation,
+      );
+      expect(config.gameMode, GameMode.simulation);
     });
   });
 }
