@@ -130,9 +130,9 @@ Plans:
 **Plans**: 7 plans
 
 Plans:
-- [ ] 11-01-PLAN.md — Wave 0 test stubs: 8 test files for all Phase 11 components
-- [ ] 11-02-PLAN.md — GameMode enum + GameConfig field, LogEntry model, gameLogProvider notifier
-- [ ] 11-03-PLAN.md — HumanAgent one-shot adapter, GameNotifier.humanMove(), HomeScreen setup form upgrade
+- [x] 11-01-PLAN.md — Wave 0 test stubs: 8 test files for all Phase 11 components
+- [x] 11-02-PLAN.md — GameMode enum + GameConfig field, LogEntry model, gameLogProvider notifier
+- [x] 11-03-PLAN.md — HumanAgent one-shot adapter, GameNotifier.humanMove(), HomeScreen setup form upgrade
 - [ ] 11-04-PLAN.md — ActionPanel (phase-aware controls), GameLogWidget (auto-scrolling event list)
 - [ ] 11-05-PLAN.md — ContinentPanel (bonus display), GameOverDialog (winner modal)
 - [ ] 11-06-PLAN.md — GameScreen responsive scaffold (portrait/landscape), PopScope, game-over detection, HomeScreen navigation

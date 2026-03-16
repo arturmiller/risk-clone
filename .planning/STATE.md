@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
 status: completed
-stopped_at: Completed 11-02-PLAN.md
-last_updated: "2026-03-16T20:23:59.750Z"
-last_activity: 2026-03-16 — Phase 11 Plan 02 complete; GameMode enum + LogEntry + gameLogProvider — 5 tests pass, 2 skipped
+stopped_at: Completed 11-03-PLAN.md
+last_updated: "2026-03-16T21:00:00.000Z"
+last_activity: 2026-03-16 — Phase 11 Plan 03 complete; HumanAgent + humanMove() + HomeScreen SetupForm — 7 tests pass, 2 skipped
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 24
-  completed_plans: 19
+  completed_plans: 20
   percent: 97
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 11 (Screens, Widgets, and Mobile UX) — In Progress
-Plan: 2 of 7 complete
-Status: Plan 02 complete — GameMode enum, LogEntry model, gameLogProvider notifier with generated .g.dart
-Last activity: 2026-03-16 — Phase 11 Plan 02 complete; GameMode enum + LogEntry + gameLogProvider — 5 tests pass (3 game_config + 2 provider), 2 skipped
+Plan: 3 of 7 complete
+Status: Plan 03 complete — HumanAgent one-shot adapter, GameNotifier.humanMove(), HomeScreen SetupForm with slider + SegmentedButtons, GameScreen placeholder
+Last activity: 2026-03-16 — Phase 11 Plan 03 complete; HumanAgent + humanMove() + SetupForm — 7 tests pass, 2 skipped
 
 Progress: [██████████] 97% (v1.1)
 
@@ -84,6 +84,9 @@ Progress: [██████████] 97% (v1.1)
 - [Phase 11-01]: Phase 11 plan 01: test/screens/ directory created fresh (no prior screen tests existed)
 - [Phase 11-screens-widgets-and-mobile-ux]: LogEntry is plain Dart (no freezed, no ObjectBox) — ephemeral log entries are never persisted
 - [Phase 11-screens-widgets-and-mobile-ux]: gameLogProvider separate notifier for ephemeral session data — not mixed into serialized GameState
+- [Phase 11-03]: HumanAgent is one-shot: one instance per humanMove() call, wraps a single decision; never passed to Isolate.run()
+- [Phase 11-03]: nextAlivePlayer() made public in turn.dart — game_provider.dart needs it after human fortify phase to advance player index
+- [Phase 11-03]: SetupForm is public class (no underscore) — required for widget test imports; private classes not accessible from test files
 
 ### Pending Todos
 
