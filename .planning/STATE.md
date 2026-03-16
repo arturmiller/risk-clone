@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
 status: completed
-stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-03-16T20:17:04.765Z"
-last_activity: 2026-03-16 — Phase 11 Plan 01 complete; Wave 0 test stubs — 8 stub files, all 29 tests skipped, Nyquist compliance established
+stopped_at: Completed 11-02-PLAN.md
+last_updated: "2026-03-16T20:23:59.750Z"
+last_activity: 2026-03-16 — Phase 11 Plan 02 complete; GameMode enum + LogEntry + gameLogProvider — 5 tests pass, 2 skipped
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 24
-  completed_plans: 18
+  completed_plans: 19
   percent: 97
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 11 (Screens, Widgets, and Mobile UX) — In Progress
-Plan: 1 of 7 complete
-Status: Plan 01 complete — Wave 0 test stubs for all Phase 11 components (8 files, 29 skipped tests, MOBX-01 through MOBX-06)
-Last activity: 2026-03-16 — Phase 11 Plan 01 complete; Wave 0 test stubs — 8 stub files, all 29 tests skipped, Nyquist compliance established
+Plan: 2 of 7 complete
+Status: Plan 02 complete — GameMode enum, LogEntry model, gameLogProvider notifier with generated .g.dart
+Last activity: 2026-03-16 — Phase 11 Plan 02 complete; GameMode enum + LogEntry + gameLogProvider — 5 tests pass (3 game_config + 2 provider), 2 skipped
 
 Progress: [██████████] 97% (v1.1)
 
@@ -82,6 +82,8 @@ Progress: [██████████] 97% (v1.1)
 - [Phase 10-02]: shouldRepaint on overlay delegates to freezed != operator on GameState/UIState — correct value equality
 - [Phase 10-map-widget]: GestureDetector inside InteractiveViewer child so toScene() inverts transform correctly; constrained: false required for 1200x700 pan/zoom
 - [Phase 11-01]: Phase 11 plan 01: test/screens/ directory created fresh (no prior screen tests existed)
+- [Phase 11-screens-widgets-and-mobile-ux]: LogEntry is plain Dart (no freezed, no ObjectBox) — ephemeral log entries are never persisted
+- [Phase 11-screens-widgets-and-mobile-ux]: gameLogProvider separate notifier for ephemeral session data — not mixed into serialized GameState
 
 ### Pending Todos
 
@@ -96,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-16T20:17:04.759Z
-Stopped at: Completed 11-01-PLAN.md
+Last session: 2026-03-16T20:23:59.736Z
+Stopped at: Completed 11-02-PLAN.md
 Resume file: None
