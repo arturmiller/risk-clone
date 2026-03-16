@@ -141,8 +141,8 @@ void main() {
 
     testWidgets('landscape layout (600dp+ width): map left, sidebar right',
         (tester) async {
-      // Wide landscape: 800dp logical width
-      tester.view.physicalSize = const Size(800 * 3, 400 * 3);
+      // Wide landscape: 800dp logical width, tall enough to avoid overflow
+      tester.view.physicalSize = const Size(800 * 3, 600 * 3);
       tester.view.devicePixelRatio = 3.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
