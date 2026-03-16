@@ -35,12 +35,12 @@ Requirements for Flutter mobile port. Each maps to roadmap phases.
 
 ### Mobile UX
 
-- [ ] **MOBX-01**: Game setup screen (player count, difficulty, game mode)
-- [ ] **MOBX-02**: Responsive layout for phone and tablet
-- [ ] **MOBX-03**: Game action controls (dice selection, blitz, end attack, skip fortify, card trade)
-- [ ] **MOBX-04**: Game log showing events (attacks, conquests, eliminations, card trades)
-- [ ] **MOBX-05**: Continent info with bonus display
-- [ ] **MOBX-06**: Game over screen with new game option
+- [x] **MOBX-01**: Game setup screen (player count, difficulty, game mode)
+- [x] **MOBX-02**: Responsive layout for phone and tablet
+- [x] **MOBX-03**: Game action controls (dice selection, blitz, end attack, skip fortify, card trade)
+- [x] **MOBX-04**: Game log showing events (attacks, conquests, eliminations, card trades)
+- [x] **MOBX-05**: Continent info with bonus display
+- [x] **MOBX-06**: Game over screen with new game option
 
 ### Persistence
 
@@ -95,12 +95,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAPW-03 | Phase 10 | Complete |
 | MAPW-04 | Phase 10 | Complete |
 | MAPW-05 | Phase 10 | Complete |
-| MOBX-01 | Phase 11 | Pending |
-| MOBX-02 | Phase 11 | Pending |
-| MOBX-03 | Phase 11 | Pending |
-| MOBX-04 | Phase 11 | Pending |
-| MOBX-05 | Phase 11 | Pending |
-| MOBX-06 | Phase 11 | Pending |
+| MOBX-01 | Phase 11 | Complete |
+| MOBX-02 | Phase 11 | Complete |
+| MOBX-03 | Phase 11 | Complete |
+| MOBX-04 | Phase 11 | Complete |
+| MOBX-05 | Phase 11 | Complete |
+| MOBX-06 | Phase 11 | Complete |
 | SAVE-01 | Phase 9 | Complete |
 | SAVE-02 | Phase 9 | Complete |
 

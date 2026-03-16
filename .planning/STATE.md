@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
 status: completed
-stopped_at: Completed 10-03-PLAN.md
-last_updated: "2026-03-15T20:45:44.249Z"
-last_activity: 2026-03-15 — Phase 10 Plan 03 complete; MapWidget interactive map widget — 168 tests passing + 2 skipped, MAPW-01/MAPW-02/MAPW-05 implemented
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-03-16T20:17:04.765Z"
+last_activity: 2026-03-16 — Phase 11 Plan 01 complete; Wave 0 test stubs — 8 stub files, all 29 tests skipped, Nyquist compliance established
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 17
-  completed_plans: 17
+  total_plans: 24
+  completed_plans: 18
   percent: 97
 ---
 
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 10 (Map Widget) — In Progress
-Plan: 3 of 4 complete
-Status: Plan 03 complete — MapWidget ConsumerStatefulWidget with InteractiveViewer, hit testing, disambiguation AlertDialog, Riverpod wiring
-Last activity: 2026-03-15 — Phase 10 Plan 03 complete; MapWidget interactive map widget — 168 tests passing + 2 skipped, MAPW-01/MAPW-02/MAPW-05 implemented
+Phase: 11 (Screens, Widgets, and Mobile UX) — In Progress
+Plan: 1 of 7 complete
+Status: Plan 01 complete — Wave 0 test stubs for all Phase 11 components (8 files, 29 skipped tests, MOBX-01 through MOBX-06)
+Last activity: 2026-03-16 — Phase 11 Plan 01 complete; Wave 0 test stubs — 8 stub files, all 29 tests skipped, Nyquist compliance established
 
 Progress: [██████████] 97% (v1.1)
 
@@ -81,6 +81,7 @@ Progress: [██████████] 97% (v1.1)
 - [Phase 10-02]: MapOverlayPainter silently skips missing territory keys — no crash on partial GameState
 - [Phase 10-02]: shouldRepaint on overlay delegates to freezed != operator on GameState/UIState — correct value equality
 - [Phase 10-map-widget]: GestureDetector inside InteractiveViewer child so toScene() inverts transform correctly; constrained: false required for 1200x700 pan/zoom
+- [Phase 11-01]: Phase 11 plan 01: test/screens/ directory created fresh (no prior screen tests existed)
 
 ### Pending Todos
 
@@ -95,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T20:38:18.134Z
-Stopped at: Completed 10-03-PLAN.md
+Last session: 2026-03-16T20:17:04.759Z
+Stopped at: Completed 11-01-PLAN.md
 Resume file: None
