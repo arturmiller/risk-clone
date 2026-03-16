@@ -100,7 +100,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         ],
       ),
     );
-    if (confirmed == true && context.mounted) {
+    if (confirmed == true && mounted) {
       Navigator.pop(context);
     }
   }
