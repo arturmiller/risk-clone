@@ -35,13 +35,12 @@ Declared values (must be multiples of 4):
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline padding, log entry vertical padding |
 | sm | 8px | Compact element spacing, horizontal padding in log entries |
-| md | 12px | Panel internal padding (matches existing ActionPanel) |
-| lg | 16px | Default element spacing, SizedBox between controls |
-| xl | 24px | Section padding, setup form outer padding |
-| 2xl | 32px | Major section breaks, spacing before CTA |
-| 3xl | 64px | Not used in this phase |
+| md | 16px | Panel internal padding, default element spacing, SizedBox between controls |
+| lg | 24px | Section padding, setup form outer padding |
+| xl | 32px | Major section breaks, spacing before CTA |
+| 2xl | 64px | Not used in this phase |
 
-Exceptions: 12px used as panel padding (inherited from existing ActionPanel pattern). 44px minimum touch target height for speed control buttons (accessibility).
+Exceptions: 12px used as a component-specific hardcoded value in SimulationControlBar internal padding to match existing ActionPanel pattern; it is not part of the declared spacing scale. 44px minimum touch target height for speed control buttons (accessibility).
 
 ---
 
@@ -50,9 +49,9 @@ Exceptions: 12px used as panel padding (inherited from existing ActionPanel patt
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 (regular) | 1.5 |
-| Label | 12px | 500 (medium) | 1.4 |
+| Label | 12px | 400 (regular) | 1.4 |
 | Heading | 20px | 600 (semibold) | 1.2 |
-| Display | 32px | 700 (bold) | 1.2 |
+| Display | 32px | 600 (semibold) | 1.2 |
 
 Implementation: Use Material `Theme.of(context).textTheme` tokens throughout:
 - Body = `bodyMedium` (14px)
@@ -60,7 +59,7 @@ Implementation: Use Material `Theme.of(context).textTheme` tokens throughout:
 - Heading = `titleLarge` (20px)
 - Display = `headlineMedium` (32px, used only on HomeScreen title "Risk Mobile")
 
-Source: Existing codebase uses `bodySmall` for log entries, `titleMedium` for panel headers, `headlineSmall` for game over winner name. Phase 12 follows these same tokens.
+Source: Existing codebase uses `bodySmall` for log entries, `titleMedium` for panel headers, `headlineSmall` for game over winner name. Phase 12 follows these same tokens. Material theme applies weight via textTheme; the contract constrains custom weight overrides to 400 and 600 only.
 
 ---
 
@@ -118,7 +117,7 @@ Player colors (unchanged from Phase 10): `kPlayerColors` array in `territory_dat
 - Play/Pause IconButton toggles simulation loop on/off
 - Stop IconButton (destructive color) halts simulation and shows GameOverDialog with current leader or "Simulation Stopped" state
 - Minimum touch target: 44px height for all buttons
-- Layout: Single row, horizontally centered, 12px internal padding
+- Layout: Single row, horizontally centered, 12px internal padding (component-specific, not from scale)
 
 **TerritoryInspector**
 - Triggered by tapping a territory on the map during simulation (or when paused)
@@ -159,6 +158,8 @@ Player colors (unchanged from Phase 10): `kPlayerColors` array in `territory_dat
 ---
 
 ## Layout Contracts
+
+Primary focal point: MapWidget dominates the layout in both orientations; all other elements (StatusBar, ControlBar, GameLog) are secondary framing that supports map observation.
 
 ### Portrait (width < 600dp)
 
