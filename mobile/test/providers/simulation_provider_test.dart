@@ -251,16 +251,16 @@ void main() {
       await container.read(gameProvider.future);
 
       final notifier = container.read(simulationProvider.notifier);
-      // Use fast mode with a short run
+      // Use instant mode so the simulation completes and definitely logs
+      notifier.setSpeed(SimulationSpeed.instant);
       notifier.start(const GameConfig(
         playerCount: 4,
         difficulty: Difficulty.easy,
         gameMode: GameMode.simulation,
       ));
 
-      // Wait for at least one turn to complete
-      await Future.delayed(const Duration(milliseconds: 500));
-      notifier.stop();
+      // Wait for instant mode to complete
+      await Future.delayed(const Duration(seconds: 5));
 
       final logs = container.read(gameLogProvider);
       expect(logs, isNotEmpty,

@@ -116,6 +116,11 @@ class GameNotifier extends _$GameNotifier {
     }
   }
 
+  /// Direct state update for simulation mode (no save, no bot advance).
+  void updateState(GameState newState) {
+    state = AsyncData(newState);
+  }
+
   /// Clear the save slot and reset to null game state.
   Future<void> clearSave() async {
     final store = ref.read(storeProvider);
