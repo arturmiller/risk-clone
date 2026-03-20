@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
 status: completed
-stopped_at: Completed 12-02-PLAN.md
-last_updated: "2026-03-20T08:30:33.711Z"
-last_activity: 2026-03-20 — Phase 12 Plan 02 complete; 3 simulation-mode widgets with speed/play/stop controls, territory inspector, status bar
+stopped_at: Completed 12-03-PLAN.md
+last_updated: "2026-03-20T10:25:37.310Z"
+last_activity: 2026-03-20 — Phase 12 Plan 03 complete; GameScreen integration, MapWidget tap-to-inspect, HomeScreen auto-start, 226 tests passing
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 27
-  completed_plans: 26
-  percent: 67
+  completed_plans: 27
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 12 (Simulation Mode and Integration)
-Plan: 2 of 3 complete
-Status: Plan 02 complete — SimulationControlBar, TerritoryInspector, SimulationStatusBar widgets with 16 tests
-Last activity: 2026-03-20 — Phase 12 Plan 02 complete; 3 simulation-mode widgets with speed/play/stop controls, territory inspector, status bar
+Plan: 3 of 3 complete
+Status: Phase 12 complete — BOTS-09 simulation mode functional end-to-end
+Last activity: 2026-03-20 — Phase 12 Plan 03 complete; GameScreen integration, MapWidget tap-to-inspect, HomeScreen auto-start, 226 tests passing
 
-Progress: [███████---] 67% (Phase 12)
+Progress: [██████████] 100% (Phase 12)
 
 ## Accumulated Context
 
@@ -98,6 +98,7 @@ Progress: [███████---] 67% (Phase 12)
 - [Phase 12-01]: GameNotifier.updateState() added for simulation state injection — avoids _processing guard conflict with runBotTurn()
 - [Phase 12-01]: SimulationState is plain Dart (not freezed) — ephemeral one-shot, never serialized or compared
 - [Phase 12]: TerritoryInspector uses mapGraphProvider.continentOf() for continent lookup -- TerritoryGeometry has no continent field
+- [Phase Phase 12-03]: GameMode passed as constructor param through widget tree (GameScreen -> layouts -> MapWidget) rather than read from provider
 
 ### Pending Todos
 
@@ -112,6 +113,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T08:30:33.705Z
-Stopped at: Completed 12-02-PLAN.md
+Last session: 2026-03-20T10:24:05Z
+Stopped at: Completed 12-03-PLAN.md
 Resume file: None
