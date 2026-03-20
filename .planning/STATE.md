@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** AI bots that provide a challenging and fun single-player experience, with the hardest difficulty playing at human-competitive level.
-**Current focus:** Phase 9 — Riverpod Providers and Persistence
+**Current focus:** Phase 12 — Simulation Mode and Integration
 
 ## Current Position
 
-Phase: 11 (Screens, Widgets, and Mobile UX) — COMPLETE
-Plan: 7 of 7 complete
-Status: Plan 07 complete — Human verification approved; all MOBX requirements confirmed; 195 tests pass; v1.1 milestone complete
-Last activity: 2026-03-16 — Phase 11 Plan 07 complete; human verification approved — 195 tests pass, v1.1 milestone complete
+Phase: 12 (Simulation Mode and Integration)
+Plan: 1 of 3 complete
+Status: Plan 01 complete — SimulationNotifier provider with lifecycle control, 10 tests passing
+Last activity: 2026-03-20 — Phase 12 Plan 01 complete; SimulationNotifier with start/pause/resume/stop/setSpeed, Stopwatch instrumentation, 10 tests pass
 
-Progress: [██████████] 100% (v1.1)
+Progress: [███-------] 33% (Phase 12)
 
 ## Accumulated Context
 
@@ -93,6 +93,10 @@ Progress: [██████████] 100% (v1.1)
 - [Phase 11-06]: mounted (State getter) not context.mounted satisfies use_build_context_synchronously lint after await in ConsumerState method
 - [Phase 11-06]: LayoutBuilder at 600dp used for portrait/landscape breakpoint in GameScreen
 - [Phase 11-screens-widgets-and-mobile-ux]: WSL2 env has no Android emulator — user approved Phase 11 on strength of 195/195 passing tests and code review
+- [Phase 12-01]: SimulationNotifier is separate provider (not GameNotifier extension) — clean separation of simulation loop vs game state
+- [Phase 12-01]: buildSimulationAgents() duplicates agent construction as top-level function — Isolate.run compatibility (private _buildAgents not accessible)
+- [Phase 12-01]: GameNotifier.updateState() added for simulation state injection — avoids _processing guard conflict with runBotTurn()
+- [Phase 12-01]: SimulationState is plain Dart (not freezed) — ephemeral one-shot, never serialized or compared
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T07:48:54.291Z
-Stopped at: Phase 12 context gathered
-Resume file: .planning/phases/12-simulation-mode-and-integration/12-CONTEXT.md
+Last session: 2026-03-20T08:22:39Z
+Stopped at: Completed 12-01-PLAN.md
+Resume file: .planning/phases/12-simulation-mode-and-integration/12-02-PLAN.md

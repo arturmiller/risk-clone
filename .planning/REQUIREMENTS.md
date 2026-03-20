@@ -23,7 +23,7 @@ Requirements for Flutter mobile port. Each maps to roadmap phases.
 - [x] **BOTS-06**: Medium bot ported (continent focus, border reinforcement)
 - [x] **BOTS-07**: Hard bot ported (multi-factor heuristic scoring, threat assessment)
 - [x] **BOTS-08**: Bot computation runs in isolate (no UI thread blocking)
-- [ ] **BOTS-09**: AI-vs-AI simulation mode (all bots, no human player)
+- [x] **BOTS-09**: AI-vs-AI simulation mode (all bots, no human player)
 
 ### Map & Interaction
 
@@ -89,7 +89,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOTS-06 | Phase 8 | Complete |
 | BOTS-07 | Phase 8 | Complete |
 | BOTS-08 | Phase 8 | Complete |
-| BOTS-09 | Phase 12 | Pending |
+| BOTS-09 | Phase 12 | Complete |
 | MAPW-01 | Phase 10 | Complete |
 | MAPW-02 | Phase 10 | Complete |
 | MAPW-03 | Phase 10 | Complete |
