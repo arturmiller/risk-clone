@@ -24,24 +24,27 @@ class SimulationControlBar extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Speed selector
-            SegmentedButton<SimulationSpeed>(
-              segments: const [
-                ButtonSegment(
-                    value: SimulationSpeed.slow, label: Text('Slow')),
-                ButtonSegment(
-                    value: SimulationSpeed.fast, label: Text('Fast')),
-                ButtonSegment(
-                    value: SimulationSpeed.instant, label: Text('Instant')),
-              ],
-              selected: {simState.speed},
-              onSelectionChanged: (isComplete || isInstantRunning)
-                  ? null
-                  : (s) => ref
-                      .read(simulationProvider.notifier)
-                      .setSpeed(s.first),
+            // Speed selector — Flexible to prevent overflow on narrow screens
+            Flexible(
+              child: SegmentedButton<SimulationSpeed>(
+                showSelectedIcon: false,
+                segments: const [
+                  ButtonSegment(
+                      value: SimulationSpeed.slow, label: Text('Slow')),
+                  ButtonSegment(
+                      value: SimulationSpeed.fast, label: Text('Fast')),
+                  ButtonSegment(
+                      value: SimulationSpeed.instant, label: Text('Instant')),
+                ],
+                selected: {simState.speed},
+                onSelectionChanged: (isComplete || isInstantRunning)
+                    ? null
+                    : (s) => ref
+                        .read(simulationProvider.notifier)
+                        .setSpeed(s.first),
+              ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
             // Play/Pause toggle
             SizedBox(
               height: 44,

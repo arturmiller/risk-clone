@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../engine/models/game_config.dart';
 import '../../engine/models/game_state.dart';
 import '../../engine/map_graph.dart';
 import '../../providers/game_provider.dart';
@@ -10,7 +11,8 @@ import 'map_overlay_painter.dart';
 import 'territory_data.dart';
 
 class MapWidget extends ConsumerStatefulWidget {
-  const MapWidget({super.key});
+  final GameMode gameMode;
+  const MapWidget({super.key, this.gameMode = GameMode.vsBot});
 
   @override
   ConsumerState<MapWidget> createState() => _MapWidgetState();
@@ -51,12 +53,22 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
       }
     }
 
-    if (hits.isEmpty) return;
+    if (hits.isEmpty) {
+      // Tapping empty space clears the selection (dismisses TerritoryInspector)
+      ref.read(uIStateProvider.notifier).clearSelection();
+      return;
+    }
 
     if (hits.length == 1) {
-      ref
-          .read(uIStateProvider.notifier)
-          .selectTerritory(hits.first, gameState, mapGraph);
+      // Toggle-off: if tapping already-selected territory, clear selection
+      final currentSelection = ref.read(uIStateProvider).selectedTerritory;
+      if (currentSelection == hits.first) {
+        ref.read(uIStateProvider.notifier).clearSelection();
+      } else {
+        ref
+            .read(uIStateProvider.notifier)
+            .selectTerritory(hits.first, gameState, mapGraph);
+      }
     } else {
       _showDisambiguationDialog(hits, gameState, mapGraph);
     }

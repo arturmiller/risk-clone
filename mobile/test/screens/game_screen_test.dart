@@ -12,13 +12,17 @@ import 'package:risk_mobile/persistence/app_store.dart';
 import 'package:risk_mobile/providers/game_provider.dart';
 import 'package:risk_mobile/providers/map_provider.dart';
 import 'package:risk_mobile/providers/ui_provider.dart';
+import 'package:risk_mobile/providers/simulation_provider.dart';
 import 'package:risk_mobile/engine/models/cards.dart';
+import 'package:risk_mobile/engine/models/game_config.dart';
 import 'package:risk_mobile/engine/models/game_state.dart';
 import 'package:risk_mobile/engine/models/map_schema.dart';
 import 'package:risk_mobile/engine/map_graph.dart';
 import 'package:risk_mobile/screens/game_screen.dart';
 import 'package:risk_mobile/widgets/action_panel.dart';
 import 'package:risk_mobile/widgets/continent_panel.dart';
+import 'package:risk_mobile/widgets/simulation_control_bar.dart';
+import 'package:risk_mobile/widgets/simulation_status_bar.dart';
 
 // Minimal map for tests — 6 territories, 2 continents
 const String _minimalMapJson = '''
@@ -90,6 +94,7 @@ class _FakeGameNotifier extends GameNotifier {
 Widget _buildGameScreen(
   Store store, {
   GameState? gameState,
+  GameMode gameMode = GameMode.vsBot,
 }) {
   return ProviderScope(
     overrides: [
@@ -98,7 +103,7 @@ Widget _buildGameScreen(
       gameProvider.overrideWith(
           () => _FakeGameNotifier(fakeState: gameState ?? _makeGameState())),
     ],
-    child: const MaterialApp(home: GameScreen()),
+    child: MaterialApp(home: GameScreen(gameMode: gameMode)),
   );
 }
 
@@ -170,6 +175,111 @@ void main() {
 
       // Abandon dialog should appear
       expect(find.text('Abandon game?'), findsOneWidget);
+    });
+  });
+
+  group('GameScreen simulation mode (BOTS-09)', () {
+    late Store store;
+    late Directory tempDir;
+
+    setUp(() {
+      final name = 'gs_sim_${DateTime.now().microsecondsSinceEpoch}';
+      tempDir = Directory(
+          path.join(Directory.systemTemp.path, 'obx_test_$name'));
+      tempDir.createSync(recursive: true);
+      store = Store(getObjectBoxModel(), directory: tempDir.path);
+    });
+
+    tearDown(() {
+      store.close();
+      tempDir.deleteSync(recursive: true);
+    });
+
+    testWidgets(
+        'portrait simulation renders SimulationStatusBar and SimulationControlBar',
+        (tester) async {
+      tester.view.physicalSize = const Size(375 * 3, 812 * 3);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+          _buildGameScreen(store, gameMode: GameMode.simulation));
+      await tester.pump();
+
+      expect(find.byType(SimulationStatusBar), findsOneWidget);
+      expect(find.byType(SimulationControlBar), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('simulation mode does NOT render ActionPanel', (tester) async {
+      tester.view.physicalSize = const Size(375 * 3, 812 * 3);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+          _buildGameScreen(store, gameMode: GameMode.simulation));
+      await tester.pump();
+
+      expect(find.byType(ActionPanel), findsNothing);
+    });
+
+    testWidgets('vsBot mode still renders ActionPanel (no regression)',
+        (tester) async {
+      tester.view.physicalSize = const Size(375 * 3, 812 * 3);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester
+          .pumpWidget(_buildGameScreen(store, gameMode: GameMode.vsBot));
+      await tester.pump();
+
+      expect(find.byType(ActionPanel), findsOneWidget);
+      expect(find.byType(SimulationControlBar), findsNothing);
+      expect(find.byType(SimulationStatusBar), findsNothing);
+    });
+
+    testWidgets(
+        'landscape simulation renders StatusBar and ControlBar in sidebar',
+        (tester) async {
+      tester.view.physicalSize = const Size(800 * 3, 600 * 3);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+          _buildGameScreen(store, gameMode: GameMode.simulation));
+      await tester.pump();
+
+      expect(find.byType(SimulationStatusBar), findsOneWidget);
+      expect(find.byType(SimulationControlBar), findsOneWidget);
+      expect(find.byType(ActionPanel), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+        'simulation PopScope shows stop confirmation (not abandon dialog)',
+        (tester) async {
+      tester.view.physicalSize = const Size(375 * 3, 812 * 3);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+          _buildGameScreen(store, gameMode: GameMode.simulation));
+      await tester.pump();
+
+      // Simulate system back button
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      // Should show simulation stop dialog, not abandon dialog
+      expect(find.text('Stop Simulation'), findsOneWidget);
+      expect(find.text('End this simulation and return to the home screen?'),
+          findsOneWidget);
+      expect(find.text('Abandon game?'), findsNothing);
     });
   });
 }

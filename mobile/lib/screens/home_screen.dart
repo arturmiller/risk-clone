@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/game_provider.dart';
+import '../providers/simulation_provider.dart';
 import '../engine/models/game_config.dart';
 import 'game_screen.dart';
 
@@ -23,8 +24,13 @@ class HomeScreen extends ConsumerWidget {
                 child: SetupForm(onStart: (config) async {
                   await ref.read(gameProvider.notifier).setupGame(config);
                   if (context.mounted) {
+                    if (config.gameMode == GameMode.simulation) {
+                      ref.read(simulationProvider.notifier).start(config);
+                    }
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const GameScreen()),
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              GameScreen(gameMode: config.gameMode)),
                     );
                   }
                 }),
