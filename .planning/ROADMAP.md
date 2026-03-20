@@ -169,4 +169,4 @@ Plans:
 | 9. Riverpod Providers and Persistence | 3/3 | Complete   | 2026-03-15 | - |
 | 10. Map Widget | 3/3 | Complete    | 2026-03-15 | - |
 | 11. Screens, Widgets, and Mobile UX | 7/7 | Complete    | 2026-03-16 | - |
-| 12. Simulation Mode and Integration | 1/3 | In Progress|  | - |
+| 12. Simulation Mode and Integration | 2/3 | In Progress|  | - |

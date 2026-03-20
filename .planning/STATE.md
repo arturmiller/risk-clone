@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Mobile App
-status: verifying
-stopped_at: Phase 12 context gathered
-last_updated: "2026-03-20T07:48:54.305Z"
-last_activity: 2026-03-16 — Phase 11 Plan 07 complete; human verification approved — 195 tests pass, v1.1 milestone complete
+status: completed
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-03-20T08:30:33.711Z"
+last_activity: 2026-03-20 — Phase 12 Plan 02 complete; 3 simulation-mode widgets with speed/play/stop controls, territory inspector, status bar
 progress:
   total_phases: 7
   completed_phases: 6
-  total_plans: 24
-  completed_plans: 24
-  percent: 100
+  total_plans: 27
+  completed_plans: 26
+  percent: 67
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 12 (Simulation Mode and Integration)
-Plan: 1 of 3 complete
-Status: Plan 01 complete — SimulationNotifier provider with lifecycle control, 10 tests passing
-Last activity: 2026-03-20 — Phase 12 Plan 01 complete; SimulationNotifier with start/pause/resume/stop/setSpeed, Stopwatch instrumentation, 10 tests pass
+Plan: 2 of 3 complete
+Status: Plan 02 complete — SimulationControlBar, TerritoryInspector, SimulationStatusBar widgets with 16 tests
+Last activity: 2026-03-20 — Phase 12 Plan 02 complete; 3 simulation-mode widgets with speed/play/stop controls, territory inspector, status bar
 
-Progress: [███-------] 33% (Phase 12)
+Progress: [███████---] 67% (Phase 12)
 
 ## Accumulated Context
 
@@ -97,6 +97,7 @@ Progress: [███-------] 33% (Phase 12)
 - [Phase 12-01]: buildSimulationAgents() duplicates agent construction as top-level function — Isolate.run compatibility (private _buildAgents not accessible)
 - [Phase 12-01]: GameNotifier.updateState() added for simulation state injection — avoids _processing guard conflict with runBotTurn()
 - [Phase 12-01]: SimulationState is plain Dart (not freezed) — ephemeral one-shot, never serialized or compared
+- [Phase 12]: TerritoryInspector uses mapGraphProvider.continentOf() for continent lookup -- TerritoryGeometry has no continent field
 
 ### Pending Todos
 
@@ -111,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T08:22:39Z
-Stopped at: Completed 12-01-PLAN.md
-Resume file: .planning/phases/12-simulation-mode-and-integration/12-02-PLAN.md
+Last session: 2026-03-20T08:30:33.705Z
+Stopped at: Completed 12-02-PLAN.md
+Resume file: None
