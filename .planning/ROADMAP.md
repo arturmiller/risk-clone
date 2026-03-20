@@ -147,7 +147,12 @@ Plans:
   2. The user can watch the simulation at configurable speeds (Slow/Fast/Instant) and tap any territory to inspect its state
   3. A complete simulated game runs start-to-finish without crashes, state corruption, or premature victory detection
   4. Performance on low-end Android (Pixel 3a equivalent) meets targets: 60fps during map zoom, under 16ms per bot turn, stable memory over a 20-game simulation run
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — SimulationNotifier provider with start/pause/stop/speed control and Isolate execution
+- [ ] 12-02-PLAN.md — SimulationControlBar, TerritoryInspector, SimulationStatusBar widgets
+- [ ] 12-03-PLAN.md — GameScreen integration, HomeScreen auto-start, human verification
 
 ## Progress
 
@@ -164,4 +169,4 @@ Plans:
 | 9. Riverpod Providers and Persistence | 3/3 | Complete   | 2026-03-15 | - |
 | 10. Map Widget | 3/3 | Complete    | 2026-03-15 | - |
 | 11. Screens, Widgets, and Mobile UX | 7/7 | Complete    | 2026-03-16 | - |
-| 12. Simulation Mode and Integration | v1.1 | 0/TBD | Not started | - |
+| 12. Simulation Mode and Integration | v1.1 | 0/3 | Not started | - |
