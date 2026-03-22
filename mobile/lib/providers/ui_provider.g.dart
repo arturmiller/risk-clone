@@ -20,7 +20,7 @@ final class UIStateNotifierProvider
         argument: null,
         retry: null,
         name: r'uIStateProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -41,7 +41,7 @@ final class UIStateNotifierProvider
   }
 }
 
-String _$uIStateNotifierHash() => r'ca2842ba1c982618f5c5f6b782924330cebc432a';
+String _$uIStateNotifierHash() => r'a624da4c12367a596d5b709f78563e0fd463de88';
 
 abstract class _$UIStateNotifier extends $Notifier<UIState> {
   UIState build();

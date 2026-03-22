@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../engine/models/cards.dart';
 import '../engine/models/game_config.dart';
+import '../engine/models/game_state.dart';
 import '../engine/reinforcements.dart';
 import '../providers/game_provider.dart';
 import '../providers/map_provider.dart';
@@ -30,44 +31,89 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   int? _lastPlayerIndex;
   bool _gameOverShown = false;
 
+  void _maybeInitReinforce(GameState gameState) {
+    if (widget.gameMode == GameMode.simulation) return;
+    debugPrint('[REINFORCE] check: player=${gameState.currentPlayerIndex} '
+        'phase=${gameState.turnPhase} lastPhase=$_lastPhase lastPlayer=$_lastPlayerIndex');
+    if (gameState.currentPlayerIndex == 0 &&
+        gameState.turnPhase == TurnPhase.reinforce &&
+        (gameState.turnPhase != _lastPhase ||
+            gameState.currentPlayerIndex != _lastPlayerIndex)) {
+      _lastPhase = gameState.turnPhase;
+      _lastPlayerIndex = gameState.currentPlayerIndex;
+      debugPrint('[REINFORCE] scheduling mapGraph read...');
+      ref.read(mapGraphProvider.future).then((mapGraph) {
+        debugPrint('[REINFORCE] mapGraph resolved, mounted=$mounted');
+        if (!mounted) return;
+        final armies = calculateReinforcements(gameState, mapGraph, 0);
+        debugPrint('[REINFORCE] armies=$armies, calling initReinforce');
+        ref.read(uIStateProvider.notifier).initReinforce(armies);
+      }).catchError((e) {
+        debugPrint('[REINFORCE] ERROR: $e');
+      });
+    } else if (gameState.turnPhase != TurnPhase.reinforce) {
+      _lastPhase = gameState.turnPhase;
+      _lastPlayerIndex = gameState.currentPlayerIndex;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Watch for game-over condition and reinforce phase init
-    ref.listen(gameProvider, (prev, next) {
-      final gameState = next.value;
-      if (gameState == null) return;
+    // Watch the game state — this also provides the initial value
+    final gameAsync = ref.watch(gameProvider);
+    final gameState = gameAsync.value;
 
-      // Game over detection: only one alive player
-      final alive = gameState.players.where((p) => p.isAlive).toList();
-      if (alive.length == 1 && !_gameOverShown) {
+    // Initialize reinforce on every build where conditions match
+    // (idempotent: _lastPhase/_lastPlayerIndex guard prevents re-init)
+    debugPrint('[BUILD] gameAsync=${gameAsync.runtimeType} gameState=${gameState != null ? "present(player=${gameState.currentPlayerIndex}, phase=${gameState.turnPhase})" : "null"}');
+    if (gameState != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _maybeInitReinforce(gameState);
+      });
+    }
+
+    // Listen for game-over, phase changes, and subsequent state changes
+    ref.listen(gameProvider, (prev, next) {
+      final gs = next.value;
+      if (gs == null) return;
+      final prevGs = prev?.value;
+
+      // Clear stale UI selections when phase or player changes
+      // BUT not when entering reinforce (initReinforce will set it up)
+      if (prevGs != null &&
+          (gs.turnPhase != prevGs.turnPhase ||
+              gs.currentPlayerIndex != prevGs.currentPlayerIndex)) {
+        if (gs.turnPhase != TurnPhase.reinforce || gs.currentPlayerIndex != 0) {
+          ref.read(uIStateProvider.notifier).resetAll();
+        }
+      }
+
+      // Re-init reinforce when it's human's turn again
+      _maybeInitReinforce(gs);
+
+      // Game over detection: single winner OR human player eliminated
+      final alive = gs.players.where((p) => p.isAlive).toList();
+      final humanDead = !gs.players[0].isAlive;
+      if ((alive.length == 1 || humanDead) && !_gameOverShown) {
         _gameOverShown = true;
+        // Pick the winner: if only one alive, that's the winner.
+        // If human died but bots are still fighting, pick the leading bot.
+        final winner = alive.length == 1
+            ? alive.first
+            : alive.reduce((a, b) {
+                final aCount = gs.territories.values.where((t) => t.owner == a.index).length;
+                final bCount = gs.territories.values.where((t) => t.owner == b.index).length;
+                return aCount >= bCount ? a : b;
+              });
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!context.mounted) return;
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (_) => GameOverDialog(winner: alive.first),
+            builder: (_) => GameOverDialog(winner: winner),
           ).then((_) => _gameOverShown = false);
         });
-      }
-
-      // Reinforce phase init for human player (player 0) — skip in simulation mode
-      if (widget.gameMode != GameMode.simulation) {
-        if (gameState.currentPlayerIndex == 0 &&
-            gameState.turnPhase == TurnPhase.reinforce &&
-            (gameState.turnPhase != _lastPhase ||
-                gameState.currentPlayerIndex != _lastPlayerIndex)) {
-          _lastPhase = gameState.turnPhase;
-          _lastPlayerIndex = gameState.currentPlayerIndex;
-          ref.read(mapGraphProvider.future).then((mapGraph) {
-            if (!context.mounted) return;
-            final armies = calculateReinforcements(gameState, mapGraph, 0);
-            ref.read(uIStateProvider.notifier).initReinforce(armies);
-          });
-        } else if (gameState.turnPhase != TurnPhase.reinforce) {
-          _lastPhase = gameState.turnPhase;
-          _lastPlayerIndex = gameState.currentPlayerIndex;
-        }
       }
     });
 

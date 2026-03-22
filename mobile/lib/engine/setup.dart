@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'cards_engine.dart';
 import 'map_graph.dart';
 import 'models/game_state.dart';
 
@@ -65,5 +66,8 @@ GameState setupGame(MapGraph mapGraph, int numPlayers, {Random? rng}) {
     (i) => PlayerState(index: i, name: 'Player ${i + 1}'),
   );
 
-  return GameState(territories: territoryStates, players: players);
+  // Create and shuffle the card deck
+  final deck = createDeck(mapGraph.allTerritories)..shuffle(random);
+
+  return GameState(territories: territoryStates, players: players, deck: deck);
 }

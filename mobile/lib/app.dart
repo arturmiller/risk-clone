@@ -8,7 +8,11 @@ class RiskApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Risk',
-      theme: ThemeData(colorSchemeSeed: Colors.red),
+      debugShowCheckedModeBanner: true,
+      theme: ThemeData(
+        colorSchemeSeed: Colors.red,
+        scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+      ),
       home: const HomeScreen(),
     );
   }

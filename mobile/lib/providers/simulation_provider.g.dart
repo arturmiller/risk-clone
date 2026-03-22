@@ -20,7 +20,7 @@ final class SimulationNotifierProvider
         argument: null,
         retry: null,
         name: r'simulationProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -42,7 +42,7 @@ final class SimulationNotifierProvider
 }
 
 String _$simulationNotifierHash() =>
-    r'2d2f2eb1c254c25178b25603507442c705510440';
+    r'0934f1778b38b90041342f49abc3ee5ef017461c';
 
 abstract class _$SimulationNotifier extends $Notifier<SimulationState> {
   SimulationState build();

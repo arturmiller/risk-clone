@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../engine/models/cards.dart';
 import '../../engine/models/game_config.dart';
 import '../../engine/models/game_state.dart';
 import '../../engine/map_graph.dart';
@@ -60,14 +61,38 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
     }
 
     if (hits.length == 1) {
+      final territory = hits.first;
+
+      // In vsBot reinforce phase, tapping own territory places an army
+      if (widget.gameMode == GameMode.vsBot &&
+          gameState.currentPlayerIndex == 0 &&
+          gameState.turnPhase == TurnPhase.reinforce) {
+        final ts = gameState.territories[territory];
+        if (ts != null && ts.owner == 0) {
+          ref.read(uIStateProvider.notifier).addProposedArmy(territory);
+          return;
+        }
+      }
+
+      final uiState = ref.read(uIStateProvider);
+      final currentSelection = uiState.selectedTerritory;
+
       // Toggle-off: if tapping already-selected territory, clear selection
-      final currentSelection = ref.read(uIStateProvider).selectedTerritory;
-      if (currentSelection == hits.first) {
+      if (currentSelection == territory) {
         ref.read(uIStateProvider.notifier).clearSelection();
-      } else {
+      }
+      // In attack/fortify: if a source is selected and tap is on a valid target, select it as target
+      else if (currentSelection != null &&
+          uiState.validTargets.contains(territory) &&
+          (gameState.turnPhase == TurnPhase.attack ||
+              gameState.turnPhase == TurnPhase.fortify)) {
+        ref.read(uIStateProvider.notifier).selectTarget(territory);
+      }
+      // Otherwise select as new source
+      else {
         ref
             .read(uIStateProvider.notifier)
-            .selectTerritory(hits.first, gameState, mapGraph);
+            .selectTerritory(territory, gameState, mapGraph);
       }
     } else {
       _showDisambiguationDialog(hits, gameState, mapGraph);

@@ -58,7 +58,7 @@ class MapOverlayPainter extends CustomPainter {
         );
       }
 
-      // Selection highlight (white overlay)
+      // Selection highlight (white overlay for source, orange for target)
       if (name == uiState.selectedTerritory) {
         canvas.drawRect(
           geom.rect,
@@ -66,12 +66,20 @@ class MapOverlayPainter extends CustomPainter {
             ..color = const Color(0x66FFFFFF)
             ..style = PaintingStyle.fill,
         );
+      } else if (name == uiState.selectedTarget) {
+        canvas.drawRect(
+          geom.rect,
+          Paint()
+            ..color = const Color(0x66FF7043)
+            ..style = PaintingStyle.fill,
+        );
       }
 
-      // Army count label
+      // Army count label (show proposed placements from reinforce phase)
+      final proposed = uiState.proposedPlacements[name] ?? 0;
       final tp = TextPainter(
         text: TextSpan(
-          text: '${ts.armies}',
+          text: '${ts.armies}${proposed > 0 ? ' +$proposed' : ''}',
           style: const TextStyle(
             color: Color(0xFFFFFFFF),
             fontSize: 10,

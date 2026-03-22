@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'dart:math';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,6 +12,7 @@ import '../engine/models/game_config.dart';
 import '../engine/models/game_state.dart';
 import '../engine/simulation.dart';
 import '../engine/turn.dart';
+import '../utils/compute.dart';
 import 'game_log_provider.dart';
 import 'game_provider.dart';
 import 'map_provider.dart';
@@ -87,7 +87,7 @@ PlayerAgent _makeBot(Difficulty d, MapGraph mg) => switch (d) {
       Difficulty.hard => HardAgent(mapGraph: mg),
     };
 
-@riverpod
+@Riverpod(keepAlive: true)
 class SimulationNotifier extends _$SimulationNotifier {
   GameConfig? _config;
 
@@ -161,7 +161,7 @@ class SimulationNotifier extends _$SimulationNotifier {
       final turnNumber = state.turnCount;
 
       final sw = Stopwatch()..start();
-      final newState = await Isolate.run(() {
+      final newState = await runCompute(() {
         final agents = buildSimulationAgents(current, mapGraph, difficulty);
         final (nextState, _) = executeTurn(current, mapGraph, agents, Random());
         return nextState;
@@ -174,12 +174,41 @@ class SimulationNotifier extends _$SimulationNotifier {
       // Update game state
       ref.read(gameProvider.notifier).updateState(newState);
 
-      // Log turn with timing
-      final playerName =
-          current.players[current.currentPlayerIndex].name;
-      ref.read(gameLogProvider.notifier).add(
-            'Turn ${turnNumber + 1}: $playerName (${current.turnPhase.name}) [${sw.elapsedMilliseconds}ms]',
-          );
+      // Generate rich log by diffing before/after state
+      final playerIdx = current.currentPlayerIndex;
+      final playerName = current.players[playerIdx].name;
+      final log = ref.read(gameLogProvider.notifier);
+
+      // Count territories before and after
+      final oldCount = current.territories.values.where((t) => t.owner == playerIdx).length;
+      final newCount = newState.territories.values.where((t) => t.owner == playerIdx).length;
+      final conquered = newCount - oldCount;
+
+      // Count total armies before and after
+      final oldArmies = current.territories.values.where((t) => t.owner == playerIdx).fold(0, (a, t) => a + t.armies);
+      final newArmies = newState.territories.values.where((t) => t.owner == playerIdx).fold(0, (a, t) => a + t.armies);
+
+      // Check which players were eliminated
+      final eliminated = <String>[];
+      for (final p in newState.players) {
+        if (p.isAlive) continue;
+        if (current.players[p.index].isAlive) {
+          eliminated.add(p.name);
+        }
+      }
+
+      // Build log message
+      final parts = <String>['T${turnNumber + 1} $playerName:'];
+      if (conquered > 0) {
+        parts.add('+$conquered territory${conquered > 1 ? 's' : ''}');
+      } else if (conquered < 0) {
+        parts.add('${conquered} territory${conquered < -1 ? 's' : ''}');
+      }
+      parts.add('${newCount} terr, ${newArmies} armies');
+      if (eliminated.isNotEmpty) {
+        parts.add('eliminated ${eliminated.join(', ')}!');
+      }
+      log.add(parts.join(' | '));
 
       state = state.copyWith(turnCount: turnNumber + 1);
 
@@ -204,7 +233,7 @@ class SimulationNotifier extends _$SimulationNotifier {
     final difficulty = _config?.difficulty ?? Difficulty.easy;
 
     final sw = Stopwatch()..start();
-    final finalState = await Isolate.run(() {
+    final finalState = await runCompute(() {
       final agents =
           buildSimulationAgents(current, mapGraph, difficulty);
       return runGame(mapGraph, agents, Random());

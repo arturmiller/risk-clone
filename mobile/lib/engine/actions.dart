@@ -7,14 +7,14 @@ class AttackAction extends AttackChoice {
   final String source;
   final String target;
   final int numDice; // 1, 2, or 3
-  const AttackAction(
+  AttackAction(
       {required this.source, required this.target, required this.numDice});
 }
 
 class BlitzAction extends AttackChoice {
   final String source;
   final String target;
-  const BlitzAction({required this.source, required this.target});
+  BlitzAction({required this.source, required this.target});
 }
 
 class FortifyAction {
@@ -28,6 +28,14 @@ class FortifyAction {
 class ReinforcePlacementAction {
   final Map<String, int> placements;
   const ReinforcePlacementAction({required this.placements});
+}
+
+class AdvanceArmiesAction {
+  final String source;
+  final String target;
+  final int armies;
+  const AdvanceArmiesAction(
+      {required this.source, required this.target, required this.armies});
 }
 
 class TradeCardsAction {

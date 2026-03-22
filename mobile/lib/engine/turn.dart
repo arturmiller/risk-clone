@@ -368,6 +368,8 @@ int nextAlivePlayer(GameState state) {
   state = state.copyWith(
     currentPlayerIndex: nextPlayer,
     turnNumber: state.turnNumber + 1,
+    turnPhase: TurnPhase.reinforce,
+    conqueredThisTurn: false,
   );
 
   return (state, false);

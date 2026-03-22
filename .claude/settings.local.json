@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "WebSearch",
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(lsof -i:8000 2>/dev/null | head -5)",
+      "WebFetch(domain:localhost)",
+      "Bash(python3 -c \"\nimport json\nfrom risk.engine.map_graph import MapGraph\nfrom risk.models.map_schema import MapData\nfrom risk.models.game_state import GameState, TerritoryState, PlayerState\nfrom risk.server.messages import state_to_message\n\nwith open\\('risk/data/classic.json'\\) as f:\n    md = MapData.model_validate\\(json.load\\(f\\)\\)\nmg = MapGraph\\(md\\)\n\nterritories = {}\nfor i, t in enumerate\\(md.territories\\):\n    territories[t] = TerritoryState\\(owner=0 if i % 3 == 0 else 1, armies=3\\)\n\nstate = GameState\\(\n    territories=territories,\n    players=[PlayerState\\(index=0, name='You'\\), PlayerState\\(index=1, name='Bot 1'\\)],\n\\)\n\nmsg = state_to_message\\(state, mg, 'test'\\)\nci = msg['continent_info']\nst = msg['state']\n\nfor c in ci:\n    owned = sum\\(1 for t in c['territories'] if st['territories'][t]['owner'] == 0\\)\n    print\\(c['name'] + ': ' + str\\(owned\\) + '/' + str\\(len\\(c['territories']\\)\\)\\)\n\nsample = list\\(st['territories'].keys\\(\\)\\)[0]\nprint\\('Sample key:', repr\\(sample\\), 'owner type:', type\\(st['territories'][sample]['owner']\\)\\)\n\")",
+      "Bash(lsof -ti:8000 2>/dev/null | head -1)",
+      "WebFetch(domain:pub.dev)",
+      "WebFetch(domain:medium.com)",
+      "Read(//home/amiller/Android/**)",
+      "Bash(export PATH=/home/amiller/flutter-sdk/flutter/bin:$PATH)",
+      "Bash(flutter doctor:*)",
+      "Bash(export:*)"
+    ]
+  }
+}
