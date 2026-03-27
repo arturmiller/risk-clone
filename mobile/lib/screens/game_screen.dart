@@ -14,6 +14,7 @@ import '../widgets/continent_panel.dart';
 import '../widgets/game_log.dart';
 import '../widgets/game_over_dialog.dart';
 import '../widgets/map/map_widget.dart';
+import '../widgets/mobile_game_overlay.dart';
 import '../widgets/simulation_control_bar.dart';
 import '../widgets/simulation_status_bar.dart';
 import '../widgets/territory_inspector.dart';
@@ -122,14 +123,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       onPopInvokedWithResult: _handlePop,
       child: Scaffold(
         body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth >= 600) {
-                return _LandscapeLayout(gameMode: widget.gameMode);
-              }
-              return _PortraitLayout(gameMode: widget.gameMode);
-            },
-          ),
+          child: _PortraitLayout(gameMode: widget.gameMode),
         ),
       ),
     );
@@ -213,10 +207,12 @@ class _PortraitLayout extends StatelessWidget {
         ],
       );
     }
-    return const Column(
+    // Mobile-optimized overlay layout for vsBot mode
+    return Stack(
+      fit: StackFit.expand,
       children: [
-        Expanded(child: MapWidget()),
-        SizedBox(height: 200, child: ActionPanel()),
+        MapWidget(gameMode: gameMode),
+        ...MobileGameOverlay.buildOverlayWidgets(),
       ],
     );
   }

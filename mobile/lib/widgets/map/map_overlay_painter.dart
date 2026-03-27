@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import '../../engine/models/game_state.dart';
@@ -38,40 +39,14 @@ class MapOverlayPainter extends CustomPainter {
           ..style = PaintingStyle.fill,
       );
 
-      // Valid source tint (yellow)
-      if (uiState.validSources.contains(name)) {
-        canvas.drawRect(
-          geom.rect,
-          Paint()
-            ..color = const Color(0x55FDD835)
-            ..style = PaintingStyle.fill,
-        );
-      }
-
-      // Valid target tint (green)
-      if (uiState.validTargets.contains(name)) {
-        canvas.drawRect(
-          geom.rect,
-          Paint()
-            ..color = const Color(0x5543A047)
-            ..style = PaintingStyle.fill,
-        );
-      }
-
-      // Selection highlight (white overlay for source, orange for target)
+      // Selected attacker: thick white border (no color overlay)
       if (name == uiState.selectedTerritory) {
         canvas.drawRect(
           geom.rect,
           Paint()
-            ..color = const Color(0x66FFFFFF)
-            ..style = PaintingStyle.fill,
-        );
-      } else if (name == uiState.selectedTarget) {
-        canvas.drawRect(
-          geom.rect,
-          Paint()
-            ..color = const Color(0x66FF7043)
-            ..style = PaintingStyle.fill,
+            ..color = const Color(0xFF000000)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 3.0,
         );
       }
 
@@ -93,6 +68,60 @@ class MapOverlayPainter extends CustomPainter {
         geom.labelOffset - Offset(tp.width / 2, tp.height / 2),
       );
     }
+
+    // Draw arrow from attacker to target
+    if (uiState.selectedTerritory != null && uiState.selectedTarget != null) {
+      final sourceGeom = territoryData[uiState.selectedTerritory];
+      final targetGeom = territoryData[uiState.selectedTarget];
+      if (sourceGeom != null && targetGeom != null) {
+        _drawArrow(canvas, sourceGeom.labelOffset, targetGeom.labelOffset);
+      }
+    }
+  }
+
+  void _drawArrow(Canvas canvas, Offset from, Offset to) {
+    final arrowPaint = Paint()
+      ..color = const Color(0xFFFF3D00)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round;
+
+    final arrowHeadPaint = Paint()
+      ..color = const Color(0xFFFF3D00)
+      ..style = PaintingStyle.fill;
+
+    // Shorten the line slightly so it doesn't overlap the labels
+    final direction = (to - from);
+    final distance = direction.distance;
+    if (distance < 1) return;
+    final unit = direction / distance;
+    final shortenedFrom = from + unit * 12;
+    final shortenedTo = to - unit * 12;
+
+    // Draw line
+    canvas.drawLine(shortenedFrom, shortenedTo, arrowPaint);
+
+    // Draw arrowhead
+    const headLength = 12.0;
+    const headAngle = 0.45; // ~25 degrees
+    final angle = math.atan2(unit.dy, unit.dx);
+    final p1 = shortenedTo -
+        Offset(
+          headLength * math.cos(angle - headAngle),
+          headLength * math.sin(angle - headAngle),
+        );
+    final p2 = shortenedTo -
+        Offset(
+          headLength * math.cos(angle + headAngle),
+          headLength * math.sin(angle + headAngle),
+        );
+
+    final path = Path()
+      ..moveTo(shortenedTo.dx, shortenedTo.dy)
+      ..lineTo(p1.dx, p1.dy)
+      ..lineTo(p2.dx, p2.dy)
+      ..close();
+    canvas.drawPath(path, arrowHeadPaint);
   }
 
   @override

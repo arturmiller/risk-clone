@@ -78,9 +78,10 @@ class UIStateNotifier extends _$UIStateNotifier {
   }
 
   /// Initialize reinforce phase with available armies to place.
+  /// Resets all selection state to avoid stale data from prior round.
   void initReinforce(int armies) {
     debugPrint('[UI_STATE] initReinforce($armies) — pendingArmies was ${state.pendingArmies}');
-    state = state.copyWith(pendingArmies: armies, proposedPlacements: {});
+    state = UIState(pendingArmies: armies);
     debugPrint('[UI_STATE] initReinforce done — pendingArmies now ${state.pendingArmies}');
   }
 
@@ -119,6 +120,7 @@ class UIStateNotifier extends _$UIStateNotifier {
   void clearSelection() {
     state = state.copyWith(
       selectedTerritory: null,
+      selectedTarget: null,
       validTargets: {},
       validSources: {},
     );
