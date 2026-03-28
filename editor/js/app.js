@@ -9,6 +9,7 @@ import { findFaces } from './faces.js';
 import { UndoStack } from './history.js';
 import { TerritoryManager } from './territories.js';
 import { updateTerritoryList, updateContinentList, updateAdjacencyList, setupPanelEvents } from './ui-panel.js';
+import { saveEditorJson, loadEditorJson, exportGameJson, downloadJson } from './io.js';
 
 const canvas = document.getElementById('editor-canvas');
 const renderer = new Renderer(canvas);
@@ -102,6 +103,8 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); document.getElementById('btn-save').click(); return; }
+  if (e.ctrlKey && e.key === 'e') { e.preventDefault(); document.getElementById('btn-export').click(); return; }
   if (e.ctrlKey && e.key === 'z') { e.preventDefault(); restoreSnapshot(undoStack.undo()); return; }
   if (e.ctrlKey && e.key === 'y') { e.preventDefault(); restoreSnapshot(undoStack.redo()); return; }
   if (!e.ctrlKey) {
@@ -120,6 +123,39 @@ document.getElementById('btn-redo').addEventListener('click', () => restoreSnaps
 
 // Right panel
 setupPanelEvents(territories, () => { saveSnapshot(); updatePanel(); });
+
+// Save / Load / Export
+document.getElementById('btn-save').addEventListener('click', () => {
+  downloadJson(saveEditorJson(graph, territories, renderer.mapWidth, renderer.mapHeight), 'map.risk.json');
+});
+document.getElementById('btn-export').addEventListener('click', () => {
+  downloadJson(exportGameJson(graph, faces, territories, renderer.mapWidth, renderer.mapHeight), 'map.json');
+});
+document.getElementById('btn-load').addEventListener('click', () => document.getElementById('file-load').click());
+document.getElementById('file-load').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const r = loadEditorJson(reader.result);
+    graph.vertices.clear(); graph.edges.clear();
+    for (const [id, v] of r.graph.vertices) graph.vertices.set(id, v);
+    for (const [id, e] of r.graph.edges) graph.edges.set(id, e);
+    territories.territories.clear(); territories.continents.clear();
+    for (const [n, t] of r.territories.territories) territories.territories.set(n, t);
+    for (const [n, c] of r.territories.continents) territories.continents.set(n, c);
+    territories.manualAdjacencies = r.territories.manualAdjacencies;
+    territories.manualNonAdjacencies = r.territories.manualNonAdjacencies;
+    renderer.setMapSize(r.mapWidth, r.mapHeight);
+    document.getElementById('canvas-width').value = r.mapWidth;
+    document.getElementById('canvas-height').value = r.mapHeight;
+    renderer.fitToView();
+    recomputeFaces();
+    saveSnapshot();
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
 
 // Canvas size inputs
 document.getElementById('canvas-width').addEventListener('change', e => {
