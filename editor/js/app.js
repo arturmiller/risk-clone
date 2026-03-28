@@ -3,6 +3,7 @@ import { Renderer } from './renderer.js';
 import { PlanarGraph } from './graph.js';
 import { PanTool } from './tools/pan-tool.js';
 import { DrawTool } from './tools/draw-tool.js';
+import { SelectTool } from './tools/select-tool.js';
 import { findFaces } from './faces.js';
 
 const canvas = document.getElementById('editor-canvas');
@@ -23,6 +24,8 @@ function createDrawTool() {
     recomputeFaces();
   });
 }
+
+function createSelectTool() { return new SelectTool(renderer, graph, () => recomputeFaces()); }
 
 function setTool(tool) {
   activeTool = tool;
@@ -48,7 +51,8 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
     switch (btn.dataset.tool) {
       case 'draw': setTool(createDrawTool()); break;
       case 'pan': setTool(new PanTool(renderer)); break;
-      // select and territory added in later tasks
+      case 'select': setTool(createSelectTool()); break;
+      // territory added in later tasks
     }
   });
 });
@@ -59,7 +63,8 @@ document.addEventListener('keydown', e => {
   if (!e.ctrlKey) {
     switch (e.key) {
       case 'd': setTool(createDrawTool()); break;
-      // v, t added in later tasks
+      case 'v': setTool(createSelectTool()); break;
+      // t added in later tasks
     }
   }
   activeTool.onKeyDown(e);
@@ -125,6 +130,38 @@ function frame() {
       ctx.setLineDash([]);
       ctx.restore();
     }
+  }
+
+  // Selection highlight
+  if (activeTool.getSelection) {
+    const sel = activeTool.getSelection();
+    const ctx = renderer.ctx;
+    ctx.save();
+    ctx.translate(renderer.offsetX, renderer.offsetY);
+    ctx.scale(renderer.zoom, renderer.zoom);
+    if (sel.vertexId) {
+      const v = graph.vertices.get(sel.vertexId);
+      if (v) {
+        ctx.beginPath();
+        ctx.arc(v.x, v.y, 6 / renderer.zoom, 0, Math.PI * 2);
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 2 / renderer.zoom;
+        ctx.stroke();
+      }
+    }
+    if (sel.edgeId) {
+      const edge = graph.edges.get(sel.edgeId);
+      if (edge) {
+        const verts = edge.vertices.map(vid => graph.vertices.get(vid)).filter(Boolean);
+        ctx.beginPath();
+        ctx.moveTo(verts[0].x, verts[0].y);
+        for (let i = 1; i < verts.length; i++) ctx.lineTo(verts[i].x, verts[i].y);
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 3 / renderer.zoom;
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
   }
 
   updateStatus();
