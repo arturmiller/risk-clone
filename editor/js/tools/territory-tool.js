@@ -3,10 +3,10 @@ import { pointInPolygon } from '../snap.js';
 import { TerritoryManager } from '../territories.js';
 
 export class TerritoryTool {
-  constructor(renderer, graph, faces, territories, onChange) {
+  constructor(renderer, graph, getFaces, territories, onChange) {
     this.renderer = renderer;
     this.graph = graph;
-    this.faces = faces;
+    this.getFaces = getFaces;
     this.territories = territories;
     this.onChange = onChange;
   }
@@ -24,7 +24,7 @@ export class TerritoryTool {
     const rect = this.renderer.canvas.getBoundingClientRect();
     const mapPt = this.renderer.screenToMap(e.clientX - rect.left, e.clientY - rect.top);
 
-    for (const face of this.faces) {
+    for (const face of this.getFaces()) {
       if (face.outer) continue;
       if (pointInPolygon(mapPt, face.points)) {
         const existing = this.territories.getByFaceId(face.id);
@@ -56,7 +56,7 @@ export class TerritoryTool {
     const rect = this.renderer.canvas.getBoundingClientRect();
     const mapPt = this.renderer.screenToMap(e.clientX - rect.left, e.clientY - rect.top);
 
-    for (const face of this.faces) {
+    for (const face of this.getFaces()) {
       if (face.outer) continue;
       if (pointInPolygon(mapPt, face.points)) {
         const existing = this.territories.getByFaceId(face.id);

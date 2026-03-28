@@ -9,6 +9,7 @@ export class DrawTool {
     this.currentVertices = [];
     this.previewPoint = null;
     this.snapResult = null;
+    this.graphSnapshotBeforeDraw = null;
   }
 
   get name() { return 'draw'; }
@@ -18,6 +19,13 @@ export class DrawTool {
     if (e.button !== 0) return;
     const rect = this.renderer.canvas.getBoundingClientRect();
     const mapPt = this.renderer.screenToMap(e.clientX - rect.left, e.clientY - rect.top);
+
+    if (this.currentVertices.length === 0) {
+      this.graphSnapshotBeforeDraw = {
+        vertices: new Map([...this.graph.vertices].map(([id, v]) => [id, {...v}])),
+        edges: new Map([...this.graph.edges].map(([id, e]) => [id, {vertices: [...e.vertices]}])),
+      };
+    }
 
     let vid;
     const snap = findSnap(this.graph, mapPt, 8, this.renderer);
@@ -72,11 +80,19 @@ export class DrawTool {
   onKeyUp() {}
 
   _finishPolyline() {
+    this.graphSnapshotBeforeDraw = null;
     if (this.onComplete) this.onComplete(this.currentVertices);
     this.currentVertices = [];
   }
 
   _cancel() {
+    if (this.graphSnapshotBeforeDraw) {
+      this.graph.vertices.clear();
+      this.graph.edges.clear();
+      for (const [id, v] of this.graphSnapshotBeforeDraw.vertices) this.graph.vertices.set(id, {...v});
+      for (const [id, e] of this.graphSnapshotBeforeDraw.edges) this.graph.edges.set(id, {vertices: [...e.vertices]});
+      this.graphSnapshotBeforeDraw = null;
+    }
     this.currentVertices = [];
   }
 

@@ -10,6 +10,7 @@ import { UndoStack } from './history.js';
 import { TerritoryManager } from './territories.js';
 import { updateTerritoryList, updateContinentList, updateAdjacencyList, setupPanelEvents } from './ui-panel.js';
 import { saveEditorJson, loadEditorJson, exportGameJson, downloadJson } from './io.js';
+import { pointInPolygon } from './snap.js';
 
 const canvas = document.getElementById('editor-canvas');
 const renderer = new Renderer(canvas);
@@ -56,6 +57,19 @@ function updatePanel() {
 
 function recomputeFaces() {
   faces = findFaces(graph);
+  // Re-resolve territory face IDs (faces get new IDs each time)
+  for (const [, t] of territories.territories) {
+    let resolved = false;
+    for (const face of faces) {
+      if (face.outer) continue;
+      if (pointInPolygon(t.labelPosition, face.points)) {
+        t.faceId = face.id;
+        resolved = true;
+        break;
+      }
+    }
+    if (!resolved) t.faceId = null;
+  }
   updatePanel();
   updateStatus();
 }
@@ -67,9 +81,16 @@ function createDrawTool() {
   });
 }
 
-function createSelectTool() { return new SelectTool(renderer, graph, () => { recomputeFaces(); saveSnapshot(); }); }
+function createSelectTool() {
+  return new SelectTool(renderer, graph,
+    () => { recomputeFaces(); saveSnapshot(); },  // onChange (on mouseUp / delete)
+    () => { faces = findFaces(graph); }            // onDragMove (lightweight, no snapshot)
+  );
+}
 
-function createTerritoryTool() { return new TerritoryTool(renderer, graph, faces, territories, () => { saveSnapshot(); updatePanel(); }); }
+function createTerritoryTool() {
+  return new TerritoryTool(renderer, graph, () => faces, territories, () => { saveSnapshot(); updatePanel(); });
+}
 
 function updateCursor() {
   const c = document.getElementById('canvas-container');
@@ -163,21 +184,25 @@ document.getElementById('file-load').addEventListener('change', (e) => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    const r = loadEditorJson(reader.result);
-    graph.vertices.clear(); graph.edges.clear();
-    for (const [id, v] of r.graph.vertices) graph.vertices.set(id, v);
-    for (const [id, e] of r.graph.edges) graph.edges.set(id, e);
-    territories.territories.clear(); territories.continents.clear();
-    for (const [n, t] of r.territories.territories) territories.territories.set(n, t);
-    for (const [n, c] of r.territories.continents) territories.continents.set(n, c);
-    territories.manualAdjacencies = r.territories.manualAdjacencies;
-    territories.manualNonAdjacencies = r.territories.manualNonAdjacencies;
-    renderer.setMapSize(r.mapWidth, r.mapHeight);
-    document.getElementById('canvas-width').value = r.mapWidth;
-    document.getElementById('canvas-height').value = r.mapHeight;
-    renderer.fitToView();
-    recomputeFaces();
-    saveSnapshot();
+    try {
+      const r = loadEditorJson(reader.result);
+      graph.vertices.clear(); graph.edges.clear();
+      for (const [id, v] of r.graph.vertices) graph.vertices.set(id, v);
+      for (const [id, e] of r.graph.edges) graph.edges.set(id, e);
+      territories.territories.clear(); territories.continents.clear();
+      for (const [n, t] of r.territories.territories) territories.territories.set(n, t);
+      for (const [n, c] of r.territories.continents) territories.continents.set(n, c);
+      territories.manualAdjacencies = r.territories.manualAdjacencies;
+      territories.manualNonAdjacencies = r.territories.manualNonAdjacencies;
+      renderer.setMapSize(r.mapWidth, r.mapHeight);
+      document.getElementById('canvas-width').value = r.mapWidth;
+      document.getElementById('canvas-height').value = r.mapHeight;
+      renderer.fitToView();
+      recomputeFaces();
+      saveSnapshot();
+    } catch (err) {
+      alert('Failed to load file: ' + err.message);
+    }
   };
   reader.readAsText(file);
   e.target.value = '';
@@ -201,7 +226,10 @@ document.getElementById('file-image').addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
   const img = new Image();
-  img.onload = () => renderer.setBackgroundImage(img);
+  img.onload = () => {
+    renderer.setBackgroundImage(img);
+    URL.revokeObjectURL(img.src);
+  };
   img.src = URL.createObjectURL(file);
 });
 document.getElementById('bg-opacity').addEventListener('input', e => {

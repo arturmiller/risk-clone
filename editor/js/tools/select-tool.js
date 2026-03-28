@@ -2,10 +2,11 @@
 import { findSnap } from '../snap.js';
 
 export class SelectTool {
-  constructor(renderer, graph, onChange) {
+  constructor(renderer, graph, onChange, onDragMove) {
     this.renderer = renderer;
     this.graph = graph;
     this.onChange = onChange;
+    this.onDragMove = onDragMove;
     this.selectedVertex = null;
     this.selectedEdge = null;
     this.dragging = false;
@@ -38,7 +39,8 @@ export class SelectTool {
 
     if (this.dragging && this.selectedVertex) {
       this.graph.moveVertex(this.selectedVertex, mapPt.x, mapPt.y);
-      if (this.onChange) this.onChange();
+      // Use lightweight drag callback — onChange (with snapshot) fires on mouseUp
+      if (this.onDragMove) this.onDragMove();
     }
 
     this.snapResult = findSnap(this.graph, mapPt, 8, this.renderer);
@@ -47,7 +49,7 @@ export class SelectTool {
   onMouseUp() {
     if (this.dragging) {
       this.dragging = false;
-      if (this.onChange) this.onChange();
+      if (this.onChange) this.onChange(); // saves snapshot after drag completes
     }
   }
 

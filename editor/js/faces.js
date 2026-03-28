@@ -17,13 +17,18 @@ export function findFaces(graph) {
     const vLast = graph.vertices.get(last);
     if (!vFirst || !vLast) continue;
 
+    const vSecond = graph.vertices.get(verts[1]);
+    const vSecondLast = graph.vertices.get(verts[verts.length - 2]);
+
+    // Forward half-edge: first→last, angle based on first segment
     halfEdges.push({
       from: first, to: last, edgeId: eid, forward: true,
-      angle: Math.atan2(vLast.y - vFirst.y, vLast.x - vFirst.x),
+      angle: Math.atan2(vSecond.y - vFirst.y, vSecond.x - vFirst.x),
     });
+    // Backward half-edge: last→first, angle based on last segment
     halfEdges.push({
       from: last, to: first, edgeId: eid, forward: false,
-      angle: Math.atan2(vFirst.y - vLast.y, vFirst.x - vLast.x),
+      angle: Math.atan2(vSecondLast.y - vLast.y, vSecondLast.x - vLast.x),
     });
   }
 

@@ -11,9 +11,8 @@ export class UndoStack {
     this.stack.push({ graph: graphClone, territories: territoriesClone });
     if (this.stack.length > this.maxSize) {
       this.stack.shift();
-    } else {
-      this.index++;
     }
+    this.index = this.stack.length - 1;
   }
 
   canUndo() { return this.index > 0; }
