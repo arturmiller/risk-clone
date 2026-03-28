@@ -4,18 +4,22 @@ import { PlanarGraph } from './graph.js';
 import { PanTool } from './tools/pan-tool.js';
 import { DrawTool } from './tools/draw-tool.js';
 import { SelectTool } from './tools/select-tool.js';
+import { TerritoryTool } from './tools/territory-tool.js';
 import { findFaces } from './faces.js';
 import { UndoStack } from './history.js';
+import { TerritoryManager } from './territories.js';
 
 const canvas = document.getElementById('editor-canvas');
 const renderer = new Renderer(canvas);
 const graph = new PlanarGraph();
 
+const territories = new TerritoryManager();
+
 const undoStack = new UndoStack();
-undoStack.push(graph.clone(), null);
+undoStack.push(graph.clone(), territories.clone());
 
 function saveSnapshot() {
-  undoStack.push(graph.clone(), null);
+  undoStack.push(graph.clone(), territories.clone());
 }
 
 function restoreSnapshot(snapshot) {
@@ -24,6 +28,15 @@ function restoreSnapshot(snapshot) {
   graph.edges.clear();
   for (const [id, v] of snapshot.graph.vertices) graph.vertices.set(id, { ...v });
   for (const [id, e] of snapshot.graph.edges) graph.edges.set(id, { vertices: [...e.vertices] });
+  if (snapshot.territories) {
+    territories.territories.clear();
+    territories.continents.clear();
+    const s = snapshot.territories;
+    for (const [n, t] of s.territories) territories.territories.set(n, { ...t, labelPosition: { ...t.labelPosition } });
+    for (const [n, c] of s.continents) territories.continents.set(n, { bonus: c.bonus, territories: [...c.territories] });
+    territories.manualAdjacencies = s.manualAdjacencies.map(p => [...p]);
+    territories.manualNonAdjacencies = s.manualNonAdjacencies.map(p => [...p]);
+  }
   recomputeFaces();
 }
 
@@ -45,6 +58,8 @@ function createDrawTool() {
 
 function createSelectTool() { return new SelectTool(renderer, graph, () => { recomputeFaces(); saveSnapshot(); }); }
 
+function createTerritoryTool() { return new TerritoryTool(renderer, graph, faces, territories, () => { saveSnapshot(); }); }
+
 function setTool(tool) {
   activeTool = tool;
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
@@ -57,6 +72,7 @@ canvas.addEventListener('mousedown', e => activeTool.onMouseDown(e));
 canvas.addEventListener('mousemove', e => activeTool.onMouseMove(e));
 canvas.addEventListener('mouseup', e => activeTool.onMouseUp(e));
 canvas.addEventListener('dblclick', e => { if (activeTool.onDblClick) activeTool.onDblClick(e); });
+canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
@@ -70,7 +86,7 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
       case 'draw': setTool(createDrawTool()); break;
       case 'pan': setTool(new PanTool(renderer)); break;
       case 'select': setTool(createSelectTool()); break;
-      // territory added in later tasks
+      case 'territory': setTool(createTerritoryTool()); break;
     }
   });
 });
@@ -84,7 +100,7 @@ document.addEventListener('keydown', e => {
     switch (e.key) {
       case 'd': setTool(createDrawTool()); break;
       case 'v': setTool(createSelectTool()); break;
-      // t added in later tasks
+      case 't': setTool(createTerritoryTool()); break;
     }
   }
   activeTool.onKeyDown(e);
@@ -126,7 +142,7 @@ function updateStatus() {
   document.getElementById('status-canvas').textContent =
     `Canvas: ${renderer.mapWidth} × ${renderer.mapHeight} | Zoom: ${Math.round(renderer.zoom * 100)}%`;
   document.getElementById('status-counts').textContent =
-    `V: ${graph.vertices.size} | E: ${graph.edges.size} | F: ${faces.filter(f => !f.outer).length} | T: 0`;
+    `V: ${graph.vertices.size} | E: ${graph.edges.size} | F: ${faces.filter(f => !f.outer).length} | T: ${territories.territories.size}`;
   document.getElementById('status-tool').textContent =
     `Tool: ${activeTool.name} | Snap: ON`;
 }
@@ -134,7 +150,7 @@ function updateStatus() {
 // Render loop
 function frame() {
   snap = activeTool.getSnap?.() || null;
-  renderer.render(graph, faces, null, snap, activeTool);
+  renderer.render(graph, faces, territories, snap, activeTool);
 
   // Draw preview line if draw tool
   if (activeTool.getPreviewLine) {
