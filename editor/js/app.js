@@ -8,6 +8,7 @@ import { TerritoryTool } from './tools/territory-tool.js';
 import { findFaces } from './faces.js';
 import { UndoStack } from './history.js';
 import { TerritoryManager } from './territories.js';
+import { updateTerritoryList, updateContinentList, updateAdjacencyList, setupPanelEvents } from './ui-panel.js';
 
 const canvas = document.getElementById('editor-canvas');
 const renderer = new Renderer(canvas);
@@ -44,8 +45,15 @@ let activeTool = new PanTool(renderer);
 let snap = null;
 let faces = [];
 
+function updatePanel() {
+  updateTerritoryList(territories, faces, () => { saveSnapshot(); updatePanel(); });
+  updateContinentList(territories, () => { saveSnapshot(); updatePanel(); });
+  updateAdjacencyList(territories, faces, () => { saveSnapshot(); updatePanel(); });
+}
+
 function recomputeFaces() {
   faces = findFaces(graph);
+  updatePanel();
   updateStatus();
 }
 
@@ -58,7 +66,7 @@ function createDrawTool() {
 
 function createSelectTool() { return new SelectTool(renderer, graph, () => { recomputeFaces(); saveSnapshot(); }); }
 
-function createTerritoryTool() { return new TerritoryTool(renderer, graph, faces, territories, () => { saveSnapshot(); }); }
+function createTerritoryTool() { return new TerritoryTool(renderer, graph, faces, territories, () => { saveSnapshot(); updatePanel(); }); }
 
 function setTool(tool) {
   activeTool = tool;
@@ -109,6 +117,9 @@ document.addEventListener('keydown', e => {
 // Undo/Redo buttons
 document.getElementById('btn-undo').addEventListener('click', () => restoreSnapshot(undoStack.undo()));
 document.getElementById('btn-redo').addEventListener('click', () => restoreSnapshot(undoStack.redo()));
+
+// Right panel
+setupPanelEvents(territories, () => { saveSnapshot(); updatePanel(); });
 
 // Canvas size inputs
 document.getElementById('canvas-width').addEventListener('change', e => {
