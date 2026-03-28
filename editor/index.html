@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk Map Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toolbar">
+    <span class="brand">Risk Map Editor</span>
+    <div class="tool-group">
+      <button class="tool-btn" data-tool="draw" title="Draw (D)">&#9999; Draw</button>
+      <button class="tool-btn" data-tool="select" title="Select (V)">&#8598; Select</button>
+      <button class="tool-btn active" data-tool="pan" title="Pan (Space)">&#9995; Pan</button>
+      <button class="tool-btn" data-tool="territory" title="Territory (T)">&#127912; Territory</button>
+    </div>
+    <div class="tool-group right">
+      <button id="btn-undo" title="Undo (Ctrl+Z)">&#8617; Undo</button>
+      <button id="btn-redo" title="Redo (Ctrl+Y)">&#8618; Redo</button>
+    </div>
+    <div class="tool-group right">
+      <button id="btn-load">&#128194; Load</button>
+      <button id="btn-save">&#128190; Save</button>
+      <button id="btn-export">&#128228; Export</button>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="canvas-container">
+      <canvas id="editor-canvas"></canvas>
+    </div>
+    <div id="panel">
+      <section id="panel-background">
+        <h3>Background</h3>
+        <button id="btn-load-image">Load Image...</button>
+        <div class="slider-row">
+          <label>Opacity</label>
+          <input type="range" id="bg-opacity" min="0" max="100" value="50">
+          <span id="bg-opacity-val">50%</span>
+        </div>
+      </section>
+      <section id="panel-canvas">
+        <h3>Canvas</h3>
+        <div class="input-row">
+          <label>Width</label>
+          <input type="number" id="canvas-width" value="1200" min="100" max="4000">
+        </div>
+        <div class="input-row">
+          <label>Height</label>
+          <input type="number" id="canvas-height" value="700" min="100" max="4000">
+        </div>
+      </section>
+      <section id="panel-territories">
+        <h3>Territories</h3>
+        <div id="territory-list"></div>
+      </section>
+      <section id="panel-continents">
+        <h3>Continents</h3>
+        <div id="continent-list"></div>
+        <button id="btn-add-continent">+ Add Continent</button>
+      </section>
+      <section id="panel-adjacencies">
+        <h3>Adjacencies</h3>
+        <div id="adjacency-list"></div>
+        <button id="btn-add-adjacency">+ Add Adjacency</button>
+      </section>
+    </div>
+  </div>
+
+  <div id="statusbar">
+    <span id="status-canvas">Canvas: 1200 × 700</span>
+    <span id="status-counts">V: 0 | E: 0 | F: 0 | T: 0</span>
+    <span id="status-tool">Tool: Pan | Snap: ON</span>
+  </div>
+
+  <input type="file" id="file-image" accept="image/*" style="display:none">
+  <input type="file" id="file-load" accept=".risk.json" style="display:none">
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
