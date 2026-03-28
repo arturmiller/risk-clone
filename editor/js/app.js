@@ -3,6 +3,7 @@ import { Renderer } from './renderer.js';
 import { PlanarGraph } from './graph.js';
 import { PanTool } from './tools/pan-tool.js';
 import { DrawTool } from './tools/draw-tool.js';
+import { findFaces } from './faces.js';
 
 const canvas = document.getElementById('editor-canvas');
 const renderer = new Renderer(canvas);
@@ -10,10 +11,16 @@ const graph = new PlanarGraph();
 
 let activeTool = new PanTool(renderer);
 let snap = null;
+let faces = [];
+
+function recomputeFaces() {
+  faces = findFaces(graph);
+  updateStatus();
+}
 
 function createDrawTool() {
   return new DrawTool(renderer, graph, (vertices) => {
-    // Drawing complete callback — faces will be recomputed later
+    recomputeFaces();
   });
 }
 
@@ -90,7 +97,7 @@ function updateStatus() {
   document.getElementById('status-canvas').textContent =
     `Canvas: ${renderer.mapWidth} × ${renderer.mapHeight} | Zoom: ${Math.round(renderer.zoom * 100)}%`;
   document.getElementById('status-counts').textContent =
-    `V: ${graph.vertices.size} | E: ${graph.edges.size} | F: 0 | T: 0`;
+    `V: ${graph.vertices.size} | E: ${graph.edges.size} | F: ${faces.filter(f => !f.outer).length} | T: 0`;
   document.getElementById('status-tool').textContent =
     `Tool: ${activeTool.name} | Snap: ON`;
 }
@@ -98,7 +105,7 @@ function updateStatus() {
 // Render loop
 function frame() {
   snap = activeTool.getSnap?.() || null;
-  renderer.render(graph, null, null, snap, activeTool);
+  renderer.render(graph, faces, null, snap, activeTool);
 
   // Draw preview line if draw tool
   if (activeTool.getPreviewLine) {
