@@ -9,14 +9,39 @@ export function updateTerritoryList(territories, faces, onSelect) {
     return;
   }
 
+  const continentNames = [...territories.continents.keys()];
+
   for (const [name, t] of territories.territories) {
+    let currentContinent = '';
+    for (const [cname, cont] of territories.continents) {
+      if (cont.territories.includes(name)) { currentContinent = cname; break; }
+    }
+
     const item = document.createElement('div');
     item.className = 'territory-item';
     item.innerHTML = `
       <span class="color-dot" style="background:${t.color}"></span>
       <span class="name">${name}</span>
+      <select class="continent-select" style="background:#0f3460;color:#ccc;border:1px solid #333;border-radius:3px;font-size:10px;padding:1px;">
+        <option value="">—</option>
+        ${continentNames.map(c => `<option value="${c}" ${c === currentContinent ? 'selected' : ''}>${c}</option>`).join('')}
+      </select>
     `;
-    item.addEventListener('click', () => onSelect(name));
+
+    item.querySelector('.name').addEventListener('click', () => onSelect(name));
+
+    item.querySelector('.continent-select').addEventListener('change', (e) => {
+      for (const [, cont] of territories.continents) {
+        const idx = cont.territories.indexOf(name);
+        if (idx !== -1) cont.territories.splice(idx, 1);
+      }
+      if (e.target.value) {
+        const cont = territories.continents.get(e.target.value);
+        if (cont) cont.territories.push(name);
+      }
+      onSelect(name);
+    });
+
     container.appendChild(item);
   }
 }
