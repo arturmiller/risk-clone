@@ -5,10 +5,27 @@ import { PanTool } from './tools/pan-tool.js';
 import { DrawTool } from './tools/draw-tool.js';
 import { SelectTool } from './tools/select-tool.js';
 import { findFaces } from './faces.js';
+import { UndoStack } from './history.js';
 
 const canvas = document.getElementById('editor-canvas');
 const renderer = new Renderer(canvas);
 const graph = new PlanarGraph();
+
+const undoStack = new UndoStack();
+undoStack.push(graph.clone(), null);
+
+function saveSnapshot() {
+  undoStack.push(graph.clone(), null);
+}
+
+function restoreSnapshot(snapshot) {
+  if (!snapshot) return;
+  graph.vertices.clear();
+  graph.edges.clear();
+  for (const [id, v] of snapshot.graph.vertices) graph.vertices.set(id, { ...v });
+  for (const [id, e] of snapshot.graph.edges) graph.edges.set(id, { vertices: [...e.vertices] });
+  recomputeFaces();
+}
 
 let activeTool = new PanTool(renderer);
 let snap = null;
@@ -22,10 +39,11 @@ function recomputeFaces() {
 function createDrawTool() {
   return new DrawTool(renderer, graph, (vertices) => {
     recomputeFaces();
+    saveSnapshot();
   });
 }
 
-function createSelectTool() { return new SelectTool(renderer, graph, () => recomputeFaces()); }
+function createSelectTool() { return new SelectTool(renderer, graph, () => { recomputeFaces(); saveSnapshot(); }); }
 
 function setTool(tool) {
   activeTool = tool;
@@ -60,6 +78,8 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
+  if (e.ctrlKey && e.key === 'z') { e.preventDefault(); restoreSnapshot(undoStack.undo()); return; }
+  if (e.ctrlKey && e.key === 'y') { e.preventDefault(); restoreSnapshot(undoStack.redo()); return; }
   if (!e.ctrlKey) {
     switch (e.key) {
       case 'd': setTool(createDrawTool()); break;
@@ -69,6 +89,10 @@ document.addEventListener('keydown', e => {
   }
   activeTool.onKeyDown(e);
 });
+
+// Undo/Redo buttons
+document.getElementById('btn-undo').addEventListener('click', () => restoreSnapshot(undoStack.undo()));
+document.getElementById('btn-redo').addEventListener('click', () => restoreSnapshot(undoStack.redo()));
 
 // Canvas size inputs
 document.getElementById('canvas-width').addEventListener('change', e => {
