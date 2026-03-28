@@ -45,6 +45,8 @@ function restoreSnapshot(snapshot) {
 let activeTool = new PanTool(renderer);
 let snap = null;
 let faces = [];
+let spaceDown = false;
+let savedTool = null;
 
 function updatePanel() {
   updateTerritoryList(territories, faces, () => { saveSnapshot(); updatePanel(); });
@@ -69,10 +71,18 @@ function createSelectTool() { return new SelectTool(renderer, graph, () => { rec
 
 function createTerritoryTool() { return new TerritoryTool(renderer, graph, faces, territories, () => { saveSnapshot(); updatePanel(); }); }
 
+function updateCursor() {
+  const c = document.getElementById('canvas-container');
+  c.className = '';
+  if (activeTool.cursor === 'crosshair') c.classList.add('drawing');
+  else if (activeTool.cursor === 'default') c.classList.add('selecting');
+}
+
 function setTool(tool) {
   activeTool = tool;
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`[data-tool="${tool.name}"]`)?.classList.add('active');
+  updateCursor();
   updateStatus();
 }
 
@@ -103,6 +113,14 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
+  if (e.key === ' ' && !spaceDown) {
+    e.preventDefault();
+    spaceDown = true;
+    savedTool = activeTool;
+    activeTool = new PanTool(renderer);
+    updateCursor();
+    return;
+  }
   if (e.ctrlKey && e.key === 's') { e.preventDefault(); document.getElementById('btn-save').click(); return; }
   if (e.ctrlKey && e.key === 'e') { e.preventDefault(); document.getElementById('btn-export').click(); return; }
   if (e.ctrlKey && e.key === 'z') { e.preventDefault(); restoreSnapshot(undoStack.undo()); return; }
@@ -115,6 +133,14 @@ document.addEventListener('keydown', e => {
     }
   }
   activeTool.onKeyDown(e);
+});
+
+document.addEventListener('keyup', e => {
+  if (e.key === ' ' && spaceDown) {
+    spaceDown = false;
+    if (savedTool) { activeTool = savedTool; savedTool = null; }
+    updateCursor();
+  }
 });
 
 // Undo/Redo buttons
