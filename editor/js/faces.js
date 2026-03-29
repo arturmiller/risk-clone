@@ -93,7 +93,7 @@ export function findFaces(graph) {
         id: 'f' + (nextFaceId++),
         edgeRefs: cycle,
         points,
-        outer: area > 0,
+        outer: area < 0, // In screen coords (Y down), outer face has negative area
       });
     }
   }
