@@ -33,6 +33,11 @@ export class DrawTool {
     if (snap?.type === 'vertex') {
       vid = snap.vertexId;
       if (this.currentVertices.length >= 2 && vid === this.currentVertices[0]) {
+        // Add the closing edge from last vertex back to start
+        const prev = this.currentVertices[this.currentVertices.length - 1];
+        if (prev !== vid) {
+          this.graph.addEdge([prev, vid]);
+        }
         this.currentVertices.push(vid);
         this._finishPolyline();
         return;
