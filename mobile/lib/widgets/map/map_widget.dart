@@ -13,7 +13,12 @@ import 'territory_data.dart';
 
 class MapWidget extends ConsumerStatefulWidget {
   final GameMode gameMode;
-  const MapWidget({super.key, this.gameMode = GameMode.vsBot});
+  final String mapAsset;
+  const MapWidget({
+    super.key,
+    this.gameMode = GameMode.vsBot,
+    this.mapAsset = 'original',
+  });
 
   @override
   ConsumerState<MapWidget> createState() => _MapWidgetState();
@@ -32,30 +37,27 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
     TapUpDetails details,
     GameState gameState,
     MapGraph mapGraph,
+    Map<String, TerritoryGeometry> territoryData,
   ) {
-    // GestureDetector is INSIDE InteractiveViewer, so details.localPosition
-    // is in the child's local coordinate space (the 1200x700 SizedBox).
-    // toScene() inverts the zoom/pan transform to get the unscaled scene point.
-    final scenePoint = _controller.toScene(details.localPosition);
-    _selectTerritoryAt(scenePoint, gameState, mapGraph);
+    _selectTerritoryAt(
+        details.localPosition, gameState, mapGraph, territoryData);
   }
 
   void _selectTerritoryAt(
     Offset svgPoint,
     GameState gameState,
     MapGraph mapGraph,
+    Map<String, TerritoryGeometry> territoryData,
   ) {
-    const hitPadding = 6.0;
     final hits = <String>[];
 
-    for (final entry in kTerritoryData.entries) {
-      if (entry.value.rect.inflate(hitPadding).contains(svgPoint)) {
+    for (final entry in territoryData.entries) {
+      if (pointInPolygon(svgPoint, entry.value.polygon)) {
         hits.add(entry.key);
       }
     }
 
     if (hits.isEmpty) {
-      // Tapping empty space clears the selection (dismisses TerritoryInspector)
       ref.read(uIStateProvider.notifier).clearSelection();
       return;
     }
@@ -63,33 +65,27 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
     if (hits.length == 1) {
       final territory = hits.first;
 
-      // In vsBot reinforce phase, tapping own territory places an army
       if (widget.gameMode == GameMode.vsBot &&
           gameState.currentPlayerIndex == 0 &&
           gameState.turnPhase == TurnPhase.reinforce) {
         final ts = gameState.territories[territory];
         if (ts != null && ts.owner == 0) {
           ref.read(uIStateProvider.notifier).addProposedArmy(territory);
-          return;
         }
+        return;
       }
 
       final uiState = ref.read(uIStateProvider);
       final currentSelection = uiState.selectedTerritory;
 
-      // Toggle-off: if tapping already-selected territory, clear selection
       if (currentSelection == territory) {
         ref.read(uIStateProvider.notifier).clearSelection();
-      }
-      // In attack/fortify: if a source is selected and tap is on a valid target, select it as target
-      else if (currentSelection != null &&
+      } else if (currentSelection != null &&
           uiState.validTargets.contains(territory) &&
           (gameState.turnPhase == TurnPhase.attack ||
               gameState.turnPhase == TurnPhase.fortify)) {
         ref.read(uIStateProvider.notifier).selectTarget(territory);
-      }
-      // Otherwise select as new source
-      else {
+      } else {
         ref
             .read(uIStateProvider.notifier)
             .selectTerritory(territory, gameState, mapGraph);
@@ -130,7 +126,8 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
   @override
   Widget build(BuildContext context) {
     final gameAsync = ref.watch(gameProvider);
-    final mapAsync = ref.watch(mapGraphProvider);
+    final mapAsync =
+        ref.watch(loadedMapProvider(mapAsset: widget.mapAsset));
 
     return gameAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -142,28 +139,30 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
         return mapAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(child: Text('Map load error: $e')),
-          data: (mapGraph) {
+          data: (loadedMap) {
             final uiState = ref.watch(uIStateProvider);
+            final cs = loadedMap.canvasSize;
             return InteractiveViewer(
               transformationController: _controller,
-              minScale: 1.0,
+              minScale: 0.5,
               maxScale: 4.0,
               constrained: false,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTapUp: (details) =>
-                    _handleTap(details, gameState, mapGraph),
+                onTapUp: (details) => _handleTap(
+                    details, gameState, loadedMap.graph, loadedMap.territoryData),
                 child: SizedBox(
-                  width: 1200,
-                  height: 700,
+                  width: cs.width,
+                  height: cs.height,
                   child: Stack(
                     children: [
                       RepaintBoundary(
                         child: CustomPaint(
                           painter: MapBasePainter(
-                            territoryData: kTerritoryData,
+                            territoryData: loadedMap.territoryData,
+                            canvasSize: cs,
                           ),
-                          size: const Size(1200, 700),
+                          size: cs,
                           isComplex: true,
                           willChange: false,
                         ),
@@ -172,9 +171,10 @@ class _MapWidgetState extends ConsumerState<MapWidget> {
                         painter: MapOverlayPainter(
                           gameState: gameState,
                           uiState: uiState,
-                          territoryData: kTerritoryData,
+                          territoryData: loadedMap.territoryData,
+                          canvasSize: cs,
                         ),
-                        size: const Size(1200, 700),
+                        size: cs,
                       ),
                     ],
                   ),
