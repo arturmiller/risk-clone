@@ -21,7 +21,12 @@ import '../widgets/territory_inspector.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final GameMode gameMode;
-  const GameScreen({super.key, this.gameMode = GameMode.vsBot});
+  final String mapAsset;
+  const GameScreen({
+    super.key,
+    this.gameMode = GameMode.vsBot,
+    this.mapAsset = 'original',
+  });
 
   @override
   ConsumerState<GameScreen> createState() => _GameScreenState();
@@ -43,7 +48,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       _lastPhase = gameState.turnPhase;
       _lastPlayerIndex = gameState.currentPlayerIndex;
       debugPrint('[REINFORCE] scheduling mapGraph read...');
-      ref.read(mapGraphProvider.future).then((mapGraph) {
+      ref.read(mapGraphProvider(mapAsset: widget.mapAsset).future).then((mapGraph) {
         debugPrint('[REINFORCE] mapGraph resolved, mounted=$mounted');
         if (!mounted) return;
         final armies = calculateReinforcements(gameState, mapGraph, 0);
@@ -123,7 +128,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       onPopInvokedWithResult: _handlePop,
       child: Scaffold(
         body: SafeArea(
-          child: _PortraitLayout(gameMode: widget.gameMode),
+          child: _PortraitLayout(
+            gameMode: widget.gameMode,
+            mapAsset: widget.mapAsset,
+          ),
         ),
       ),
     );
@@ -182,7 +190,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
 class _PortraitLayout extends StatelessWidget {
   final GameMode gameMode;
-  const _PortraitLayout({required this.gameMode});
+  final String mapAsset;
+  const _PortraitLayout({required this.gameMode, required this.mapAsset});
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +202,7 @@ class _PortraitLayout extends StatelessWidget {
           Expanded(
             child: Stack(
               children: [
-                MapWidget(gameMode: gameMode),
+                MapWidget(gameMode: gameMode, mapAsset: mapAsset),
                 const Positioned(
                   bottom: 8,
                   left: 0,
@@ -211,7 +220,7 @@ class _PortraitLayout extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        MapWidget(gameMode: gameMode),
+        MapWidget(gameMode: gameMode, mapAsset: mapAsset),
         ...MobileGameOverlay.buildOverlayWidgets(),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/game_provider.dart';
+import '../providers/map_provider.dart';
 import '../providers/simulation_provider.dart';
 import '../engine/models/game_config.dart';
 import 'game_screen.dart';
@@ -29,8 +30,10 @@ class HomeScreen extends ConsumerWidget {
                     }
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (_) =>
-                              GameScreen(gameMode: config.gameMode)),
+                          builder: (_) => GameScreen(
+                                gameMode: config.gameMode,
+                                mapAsset: config.mapAsset,
+                              )),
                     );
                   }
                 }),
@@ -68,6 +71,7 @@ class _SetupFormState extends State<SetupForm> {
   int _playerCount = 3;
   Difficulty _difficulty = Difficulty.medium;
   GameMode _gameMode = GameMode.vsBot;
+  String _mapAsset = 'original';
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +122,24 @@ class _SetupFormState extends State<SetupForm> {
             selected: {_gameMode},
             onSelectionChanged: (s) => setState(() => _gameMode = s.first),
           ),
+          const SizedBox(height: 16),
+
+          // Map selection
+          const Text('Map'),
+          const SizedBox(height: 8),
+          DropdownButton<String>(
+            value: _mapAsset,
+            isExpanded: true,
+            items: kAvailableMaps.entries
+                .map((e) => DropdownMenuItem(
+                      value: e.key,
+                      child: Text(e.value),
+                    ))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) setState(() => _mapAsset = v);
+            },
+          ),
           const SizedBox(height: 32),
 
           ElevatedButton(
@@ -125,6 +147,7 @@ class _SetupFormState extends State<SetupForm> {
               playerCount: _playerCount,
               difficulty: _difficulty,
               gameMode: _gameMode,
+              mapAsset: _mapAsset,
             )),
             child: const Text('Start Game'),
           ),

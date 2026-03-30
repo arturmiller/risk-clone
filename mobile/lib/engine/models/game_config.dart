@@ -9,10 +9,12 @@ class GameConfig {
   final int playerCount;
   final Difficulty difficulty;
   final GameMode gameMode;
+  final String mapAsset;
 
   const GameConfig({
     required this.playerCount,
     required this.difficulty,
     this.gameMode = GameMode.vsBot,
+    this.mapAsset = 'original',
   });
 }
