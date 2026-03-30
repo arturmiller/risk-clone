@@ -45,7 +45,7 @@ ProviderContainer _makeContainer(Store store, {MapGraph? mapGraph}) {
   return ProviderContainer(
     overrides: [
       storeProvider.overrideWithValue(store),
-      mapGraphProvider.overrideWith((ref) => Future.value(graph)),
+      mapGraphProvider.overrideWith((ref, arg) => Future.value(graph)),
     ],
   );
 }
@@ -345,9 +345,15 @@ void main() {
 
     test('bot turn execution completes under 16ms average', () {
       // Direct engine test — no provider overhead, no Isolate
-      final mapJson = File('assets/classic.json').readAsStringSync();
-      final mapData =
-          MapData.fromJson(jsonDecode(mapJson) as Map<String, dynamic>);
+      // Use the same embedded classic map as other engine tests.
+      final mapJson = File('assets/original.json').readAsStringSync();
+      final decoded = jsonDecode(mapJson) as Map<String, dynamic>;
+      // original.json uses the new format: territories is a dict keyed by name.
+      // Convert to the list format that MapData expects.
+      final rawTerritories = decoded['territories'] as Map<String, dynamic>;
+      final normalized = Map<String, dynamic>.from(decoded);
+      normalized['territories'] = rawTerritories.keys.toList();
+      final mapData = MapData.fromJson(normalized);
       final mapGraph = MapGraph(mapData);
 
       // Setup a 4-player game

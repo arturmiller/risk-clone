@@ -6,6 +6,24 @@ import 'package:risk_mobile/widgets/map/map_overlay_painter.dart';
 import 'package:risk_mobile/engine/models/game_state.dart';
 import 'package:risk_mobile/engine/models/ui_state.dart';
 
+/// Build a minimal square TerritoryGeometry for use in tests.
+TerritoryGeometry _testGeometry(double x, double y, [double size = 50]) {
+  return TerritoryGeometry(
+    polygon: [
+      Offset(x, y),
+      Offset(x + size, y),
+      Offset(x + size, y + size),
+      Offset(x, y + size),
+    ],
+    labelOffset: Offset(x + size / 2, y + size / 2),
+  );
+}
+
+/// A minimal territory data map for use in tests (replaces the removed kTerritoryData).
+final Map<String, TerritoryGeometry> _testTerritoryData = {
+  'Alaska': _testGeometry(30, 60),
+};
+
 void main() {
   group('MapWidget rendering (MAPW-01, MAPW-03)', () {
     testWidgets(
@@ -30,7 +48,7 @@ void main() {
         final painter = MapOverlayPainter(
           gameState: gameState,
           uiState: uiState,
-          territoryData: kTerritoryData,
+          territoryData: _testTerritoryData,
         );
 
         // Verify owner color is player 0's color (red)
@@ -69,7 +87,7 @@ void main() {
         final painter = MapOverlayPainter(
           gameState: gameState,
           uiState: uiState,
-          territoryData: kTerritoryData,
+          territoryData: _testTerritoryData,
         );
 
         // Verify armies value is accessible
@@ -102,12 +120,12 @@ void main() {
       final painter1 = MapOverlayPainter(
         gameState: gameState,
         uiState: uiState,
-        territoryData: kTerritoryData,
+        territoryData: _testTerritoryData,
       );
       final painter2 = MapOverlayPainter(
         gameState: gameState,
         uiState: uiState,
-        territoryData: kTerritoryData,
+        territoryData: _testTerritoryData,
       );
 
       expect(painter1.shouldRepaint(painter2), false);
@@ -127,19 +145,15 @@ void main() {
       final painter1 = MapOverlayPainter(
         gameState: gameState1,
         uiState: uiState,
-        territoryData: kTerritoryData,
+        territoryData: _testTerritoryData,
       );
       final painter2 = MapOverlayPainter(
         gameState: gameState2,
         uiState: uiState,
-        territoryData: kTerritoryData,
+        territoryData: _testTerritoryData,
       );
 
       expect(painter1.shouldRepaint(painter2), true);
-    });
-
-    test('kTerritoryData contains exactly 42 territories', () {
-      expect(kTerritoryData.length, 42);
     });
 
     test('kPlayerColors contains exactly 6 colors', () {

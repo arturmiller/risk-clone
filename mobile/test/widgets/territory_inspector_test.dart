@@ -12,7 +12,6 @@ import 'package:risk_mobile/engine/map_graph.dart';
 import 'package:risk_mobile/engine/models/map_schema.dart';
 
 import 'dart:convert';
-import 'dart:io';
 
 class FakeGameNotifier extends GameNotifier {
   final GameState fakeState;
@@ -35,9 +34,23 @@ GameState _makeState() {
   );
 }
 
-Future<MapGraph> _loadMapGraph() async {
-  final json = jsonDecode(File('assets/classic.json').readAsStringSync())
-      as Map<String, dynamic>;
+/// Embedded minimal map for territory inspector tests.
+/// Uses the same territory names as the tests expect (Alaska, Alberta).
+const String _testMapJson = '''
+{
+  "name": "TestMap",
+  "territories": ["Alaska", "Alberta"],
+  "continents": [
+    {"name": "North America", "bonus": 5, "territories": ["Alaska", "Alberta"]}
+  ],
+  "adjacencies": [
+    ["Alaska", "Alberta"]
+  ]
+}
+''';
+
+MapGraph _loadMapGraph() {
+  final json = jsonDecode(_testMapJson) as Map<String, dynamic>;
   return MapGraph(MapData.fromJson(json));
 }
 
@@ -50,7 +63,7 @@ Widget _wrap({
     overrides: [
       uIStateProvider.overrideWithValue(uiState),
       gameProvider.overrideWith(() => FakeGameNotifier(gameState)),
-      mapGraphProvider.overrideWith((ref) => mapGraph),
+      mapGraphProvider.overrideWith((ref, arg) => mapGraph),
     ],
     child: const MaterialApp(
       home: Scaffold(body: TerritoryInspector()),
@@ -61,8 +74,8 @@ Widget _wrap({
 void main() {
   late MapGraph mapGraph;
 
-  setUpAll(() async {
-    mapGraph = await _loadMapGraph();
+  setUpAll(() {
+    mapGraph = _loadMapGraph();
   });
 
   group('TerritoryInspector', () {

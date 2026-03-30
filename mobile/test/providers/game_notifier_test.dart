@@ -50,7 +50,7 @@ ProviderContainer _makeContainer(Store store, {MapGraph? mapGraph}) {
   return ProviderContainer(
     overrides: [
       storeProvider.overrideWithValue(store),
-      mapGraphProvider.overrideWith((ref) => Future.value(graph)),
+      mapGraphProvider.overrideWith((ref, arg) => Future.value(graph)),
     ],
   );
 }

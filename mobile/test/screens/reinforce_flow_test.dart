@@ -108,7 +108,7 @@ void main() {
           overrides: [
             storeProvider.overrideWithValue(store),
             mapGraphProvider
-                .overrideWith((ref) => Future.value(_testMapGraph)),
+                .overrideWith((ref, arg) => Future.value(_testMapGraph)),
             gameProvider.overrideWith(
                 () => _FakeGameNotifier(fakeState: _makeReinforceState())),
           ],
@@ -146,7 +146,7 @@ void main() {
           overrides: [
             storeProvider.overrideWithValue(store),
             mapGraphProvider
-                .overrideWith((ref) => Future.value(_testMapGraph)),
+                .overrideWith((ref, arg) => Future.value(_testMapGraph)),
             gameProvider.overrideWith(
                 () => _FakeGameNotifier(fakeState: _makeReinforceState())),
           ],

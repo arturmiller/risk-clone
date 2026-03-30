@@ -27,7 +27,7 @@ class TerritoryInspector extends ConsumerWidget {
     final ownerColor = kPlayerColors[ownerIndex % kPlayerColors.length];
 
     // Look up continent from MapGraph (async provider)
-    final mapAsync = ref.watch(mapGraphProvider);
+    final mapAsync = ref.watch(mapGraphProvider());
     final continent = mapAsync.value?.continentOf(selectedTerritory);
 
     return Center(
