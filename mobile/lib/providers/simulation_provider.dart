@@ -153,7 +153,7 @@ class SimulationNotifier extends _$SimulationNotifier {
       }
 
       // Execute one turn in an isolate
-      final mapGraph = await ref.read(mapGraphProvider().future);
+      final mapGraph = await ref.read(mapGraphProvider(mapAsset: _config?.mapAsset ?? 'original').future);
       if (!ref.mounted) return;
       if (state.status != SimulationStatus.running) return;
 
@@ -226,7 +226,7 @@ class SimulationNotifier extends _$SimulationNotifier {
     final current = ref.read(gameProvider).value;
     if (current == null) return;
 
-    final mapGraph = await ref.read(mapGraphProvider().future);
+    final mapGraph = await ref.read(mapGraphProvider(mapAsset: _config?.mapAsset ?? 'original').future);
     if (!ref.mounted) return;
     if (state.status != SimulationStatus.running) return;
 

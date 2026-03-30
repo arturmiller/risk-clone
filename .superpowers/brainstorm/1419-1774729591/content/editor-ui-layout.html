@@ -1,0 +1,169 @@
+<h2>Risk Map Editor — UI Layout</h2>
+<p class="subtitle">Hauptansicht mit Toolbar, Canvas und Property Panel</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Editor Layout</div>
+    <div class="mockup-body" style="padding: 0; background: #1a1a2e; min-height: 450px; position: relative; overflow: hidden;">
+
+      <!-- Top Toolbar -->
+      <div style="background: #16213e; padding: 8px 16px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #333;">
+        <span style="color: #e94560; font-weight: bold; font-size: 14px;">Risk Map Editor</span>
+        <div style="display: flex; gap: 4px; margin-left: 20px;">
+          <div style="background: #0f3460; color: #ccc; padding: 6px 12px; border-radius: 4px; font-size: 12px; border: 2px solid #e94560;">✏️ Draw</div>
+          <div style="background: #0f3460; color: #888; padding: 6px 12px; border-radius: 4px; font-size: 12px;">↖ Select</div>
+          <div style="background: #0f3460; color: #888; padding: 6px 12px; border-radius: 4px; font-size: 12px;">✋ Pan</div>
+          <div style="background: #0f3460; color: #888; padding: 6px 12px; border-radius: 4px; font-size: 12px;">🪣 Territory</div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="display: flex; gap: 4px;">
+          <div style="background: #0f3460; color: #888; padding: 6px 12px; border-radius: 4px; font-size: 12px;">↩ Undo</div>
+          <div style="background: #0f3460; color: #888; padding: 6px 12px; border-radius: 4px; font-size: 12px;">↪ Redo</div>
+        </div>
+        <div style="display: flex; gap: 4px; margin-left: 12px;">
+          <div style="background: #0f3460; color: #888; padding: 6px 12px; border-radius: 4px; font-size: 12px;">📂 Load</div>
+          <div style="background: #0f3460; color: #888; padding: 6px 12px; border-radius: 4px; font-size: 12px;">💾 Save</div>
+          <div style="background: #0f3460; color: #888; padding: 6px 12px; border-radius: 4px; font-size: 12px;">📤 Export</div>
+        </div>
+      </div>
+
+      <!-- Main Area -->
+      <div style="display: flex; height: 400px;">
+
+        <!-- Canvas Area -->
+        <div style="flex: 1; position: relative; background: #1a1a2e;">
+          <!-- Grid -->
+          <div style="position: absolute; inset: 0; opacity: 0.1; background-image:
+            linear-gradient(#fff 1px, transparent 1px),
+            linear-gradient(90deg, #fff 1px, transparent 1px);
+            background-size: 40px 40px;">
+          </div>
+
+          <!-- Background image placeholder -->
+          <div style="position: absolute; inset: 40px 280px 40px 40px; opacity: 0.3; border: 1px dashed #555; display: flex; align-items: center; justify-content: center; color: #555; font-size: 12px;">
+            Hintergrundbild (50% Opacity)
+          </div>
+
+          <!-- Example drawn edges -->
+          <svg style="position: absolute; inset: 0; pointer-events: none;" viewBox="0 0 700 400">
+            <!-- Continent outline -->
+            <polyline points="80,60 120,50 200,55 260,80 280,140 260,200 200,240 140,250 80,220 60,160 80,60"
+              fill="none" stroke="#e94560" stroke-width="2" opacity="0.8"/>
+            <!-- Internal border -->
+            <line x1="180" y1="55" x2="180" y2="240" stroke="#4caf50" stroke-width="1.5" opacity="0.7"/>
+            <!-- Vertices -->
+            <circle cx="80" cy="60" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="120" cy="50" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="200" cy="55" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="260" cy="80" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="280" cy="140" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="260" cy="200" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="200" cy="240" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="140" cy="250" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="80" cy="220" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <circle cx="60" cy="160" r="4" fill="#fff" stroke="#e94560" stroke-width="2"/>
+            <!-- Split vertex on edge -->
+            <circle cx="180" cy="55" r="4" fill="#ff9800" stroke="#fff" stroke-width="2"/>
+            <circle cx="180" cy="240" r="4" fill="#ff9800" stroke="#fff" stroke-width="2"/>
+
+            <!-- Face labels -->
+            <text x="120" y="155" fill="#e91e63" font-size="11" text-anchor="middle" opacity="0.6">Face A</text>
+            <text x="230" y="155" fill="#4caf50" font-size="11" text-anchor="middle" opacity="0.6">Face B</text>
+
+            <!-- Snap indicator -->
+            <circle cx="200" cy="55" r="12" fill="none" stroke="#ff9800" stroke-width="1" stroke-dasharray="3,3" opacity="0.8"/>
+            <text x="215" y="45" fill="#ff9800" font-size="9" opacity="0.8">snap!</text>
+          </svg>
+
+          <!-- Status bar -->
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; background: #16213e; padding: 4px 12px; font-size: 11px; color: #888; display: flex; justify-content: space-between;">
+            <span>Canvas: 1200 × 700 | Zoom: 100%</span>
+            <span>Vertices: 12 | Edges: 11 | Faces: 2 | Territories: 0</span>
+            <span>Tool: Draw | Snap: ON (8px)</span>
+          </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div style="width: 240px; background: #16213e; border-left: 1px solid #333; padding: 12px; overflow-y: auto;">
+
+          <!-- Background section -->
+          <div style="margin-bottom: 16px;">
+            <div style="color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Hintergrund</div>
+            <div style="background: #0f3460; padding: 8px; border-radius: 4px; font-size: 12px; color: #ccc; text-align: center; cursor: pointer; margin-bottom: 6px;">📎 Bild laden...</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #888; font-size: 11px;">Opacity</span>
+              <div style="flex:1; height: 4px; background: #333; border-radius: 2px; position: relative;">
+                <div style="width: 50%; height: 100%; background: #e94560; border-radius: 2px;"></div>
+              </div>
+              <span style="color: #ccc; font-size: 11px;">50%</span>
+            </div>
+          </div>
+
+          <!-- Canvas Size -->
+          <div style="margin-bottom: 16px;">
+            <div style="color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Canvas</div>
+            <div style="display: flex; gap: 8px;">
+              <div style="flex:1;">
+                <div style="color:#666; font-size:10px;">Breite</div>
+                <div style="background: #0f3460; padding: 4px 8px; border-radius: 3px; color: #ccc; font-size: 12px;">1200</div>
+              </div>
+              <div style="flex:1;">
+                <div style="color:#666; font-size:10px;">Höhe</div>
+                <div style="background: #0f3460; padding: 4px 8px; border-radius: 3px; color: #ccc; font-size: 12px;">700</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Territories list -->
+          <div style="margin-bottom: 16px;">
+            <div style="color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Territorien (0/2 Faces)</div>
+            <div style="background: #0f3460; padding: 8px; border-radius: 4px; font-size: 11px; color: #666; text-align: center;">
+              Klicke mit 🪣 in eine Face um ein Territorium zu erstellen
+            </div>
+          </div>
+
+          <!-- Continents -->
+          <div style="margin-bottom: 16px;">
+            <div style="color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Kontinente</div>
+            <div style="background: #0f3460; padding: 8px; border-radius: 4px; font-size: 12px; color: #ccc; text-align: center; cursor: pointer;">+ Kontinent hinzufügen</div>
+          </div>
+
+          <!-- Adjacencies -->
+          <div>
+            <div style="color: #888; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Adjacencies</div>
+            <div style="background: #0f3460; padding: 8px; border-radius: 4px; font-size: 11px; color: #666; text-align: center;">
+              Wird automatisch aus geteilten Kanten berechnet
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Tools &amp; Keyboard Shortcuts</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <div class="mockup">
+      <div class="mockup-header">Tools</div>
+      <div class="mockup-body" style="font-size: 13px; line-height: 2;">
+        <div><strong>✏️ Draw (D)</strong> — Linksklick setzt Vertices, schließt mit Klick auf Start-Vertex oder Doppelklick</div>
+        <div><strong>↖ Select (V)</strong> — Vertices/Edges auswählen, verschieben, löschen (Del)</div>
+        <div><strong>✋ Pan (Space)</strong> — Canvas verschieben, Mausrad = Zoom</div>
+        <div><strong>🪣 Territory (T)</strong> — In Face klicken → Territorium erstellen, Name + Farbe vergeben</div>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">Shortcuts</div>
+      <div class="mockup-body" style="font-size: 13px; line-height: 2;">
+        <div><strong>Ctrl+Z</strong> — Undo</div>
+        <div><strong>Ctrl+Y</strong> — Redo</div>
+        <div><strong>Del</strong> — Ausgewähltes Element löschen</div>
+        <div><strong>Ctrl+S</strong> — Speichern (JSON)</div>
+        <div><strong>Ctrl+E</strong> — Export (Game-Format)</div>
+        <div><strong>Escape</strong> — Tool abbrechen / Auswahl aufheben</div>
+      </div>
+    </div>
+  </div>
+</div>

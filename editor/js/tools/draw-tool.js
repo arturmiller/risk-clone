@@ -84,6 +84,14 @@ export class DrawTool {
 
   onKeyUp() {}
 
+  deactivate() {
+    if (this.currentVertices.length >= 2) {
+      this._finishPolyline();
+    } else if (this.currentVertices.length > 0) {
+      this._cancel();
+    }
+  }
+
   _finishPolyline() {
     this.graphSnapshotBeforeDraw = null;
     if (this.onComplete) this.onComplete(this.currentVertices);

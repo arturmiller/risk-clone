@@ -1,0 +1,150 @@
+<h2>Risk Map Editor — Export & Integration</h2>
+<p class="subtitle">JSON-Format und wie die Flutter-App es nutzt</p>
+
+<div class="section">
+  <h3>Export JSON Format</h3>
+  <div class="split">
+    <div class="mockup">
+      <div class="mockup-header">Editor Save Format (vollständig, für Re-Import)</div>
+      <div class="mockup-body" style="font-family: monospace; font-size: 11px; line-height: 1.6; color: #ccc;">
+<pre style="margin:0; white-space: pre-wrap;">{
+  "name": "Classic",
+  "canvasSize": [1200, 700],
+
+  <span style="color:#e94560">"vertices"</span>: {
+    "v0": [120.0, 30.5],
+    "v1": [180.0, 45.0],
+    "v2": [200.0, 80.0]
+  },
+
+  <span style="color:#2196f3">"edges"</span>: {
+    "e0": ["v0", "v1"],
+    "e1": ["v1", "v2", "v5", "v8"],
+    <span style="color:#888">// ^ Polylinie: v1 → v2 → v5 → v8</span>
+  },
+
+  <span style="color:#4caf50">"territories"</span>: {
+    "Alaska": {
+      "edges": ["e0", "-e3", "e7"],
+      <span style="color:#888">// ^ "-" = Kante rückwärts traversieren</span>
+      "color": "#E53935",
+      "labelPosition": [60, 85]
+    }
+  },
+
+  <span style="color:#9c27b0">"continents"</span>: {
+    "North America": {
+      "bonus": 5,
+      "territories": ["Alaska", "NW Territory"]
+    }
+  },
+
+  <span style="color:#ff9800">"manualAdjacencies"</span>: [
+    ["Alaska", "Kamchatka"]
+  ],
+  <span style="color:#e94560">"manualNonAdjacencies"</span>: [
+    ["Brazil", "West Africa"]
+  ],
+
+  <span style="color:#888">"backgroundImage"</span>: null
+  <span style="color:#888">// ^ Wird NICHT exportiert, nur im Editor-Save</span>
+}</pre>
+      </div>
+    </div>
+
+    <div class="mockup">
+      <div class="mockup-header">Game Export (für Flutter-App)</div>
+      <div class="mockup-body" style="font-family: monospace; font-size: 11px; line-height: 1.6; color: #ccc;">
+<pre style="margin:0; white-space: pre-wrap;">{
+  "name": "Classic",
+  "canvasSize": [1200, 700],
+
+  <span style="color:#4caf50">"territories"</span>: {
+    "Alaska": {
+      <span style="color:#888">// Pfad als Punkt-Liste (aufgelöst)</span>
+      "path": [
+        [120, 30], [180, 45], [200, 80],
+        [260, 120], [240, 180], [180, 200],
+        [120, 180], [80, 120]
+      ],
+      "color": "#E53935",
+      "labelPosition": [160, 110]
+    }
+  },
+
+  <span style="color:#9c27b0">"continents"</span>: [
+    {
+      "name": "North America",
+      "bonus": 5,
+      "territories": ["Alaska", "NW Territory"]
+    }
+  ],
+
+  <span style="color:#ff9800">"adjacencies"</span>: [
+    ["Alaska", "NW Territory"],
+    ["Alaska", "Kamchatka"]
+  ]
+  <span style="color:#888">// ^ Auto + manuell, minus non-adj</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Zwei Export-Formate</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div class="mockup">
+      <div class="mockup-header">💾 Save (Editor-Format)</div>
+      <div class="mockup-body" style="font-size: 13px; line-height: 1.8;">
+        <div style="color: #4caf50; margin-bottom: 8px;">Für: Weiterbearbeiten im Editor</div>
+        <ul style="padding-left: 18px; color: #999;">
+          <li>Enthält Vertices, Edges, Faces (volle Topologie)</li>
+          <li>Hintergrundbild-Referenz (optional)</li>
+          <li>Alles was der Editor braucht zum Re-Import</li>
+          <li>Datei: <code>mapname.risk.json</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="mockup-header">📤 Export (Game-Format)</div>
+      <div class="mockup-body" style="font-size: 13px; line-height: 1.8;">
+        <div style="color: #ff9800; margin-bottom: 8px;">Für: Flutter-App als Asset</div>
+        <ul style="padding-left: 18px; color: #999;">
+          <li>Territories mit aufgelösten Punkt-Listen (kein Graph)</li>
+          <li>Adjacencies zusammengeführt (auto + manuell − non-adj)</li>
+          <li>Kontinente mit Bonus</li>
+          <li>Datei: <code>mapname.json</code> → <code>mobile/assets/</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Flutter-App Anpassungen</h3>
+  <div class="mockup">
+    <div class="mockup-header">Was sich in der Flutter-App ändern muss</div>
+    <div class="mockup-body" style="font-size: 13px; line-height: 1.8;">
+      <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px;">
+        <div style="color: #e94560; font-weight: bold;">territory_data.dart</div>
+        <div style="color: #999;">Rect → Path (aus Punkt-Liste). TerritoryGeometry bekommt <code>List&lt;Offset&gt; points</code> statt <code>Rect rect</code></div>
+
+        <div style="color: #e94560; font-weight: bold;">map_base_painter.dart</div>
+        <div style="color: #999;"><code>canvas.drawPath()</code> statt <code>canvas.drawRect()</code></div>
+
+        <div style="color: #e94560; font-weight: bold;">map_overlay_painter.dart</div>
+        <div style="color: #999;">Gleiche Änderung: Path statt Rect für Fills + Selection-Border</div>
+
+        <div style="color: #e94560; font-weight: bold;">map_widget.dart</div>
+        <div style="color: #999;">Hit-Testing: <code>path.contains(point)</code> statt <code>rect.contains()</code></div>
+
+        <div style="color: #e94560; font-weight: bold;">map_provider.dart</div>
+        <div style="color: #999;">Neues JSON-Format laden, Pfad-Daten parsen</div>
+
+        <div style="color: #e94560; font-weight: bold;">classic.json</div>
+        <div style="color: #999;">Ersetzt durch Game-Export aus dem Editor</div>
+      </div>
+    </div>
+  </div>
+</div>

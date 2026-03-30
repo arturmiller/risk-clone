@@ -6,12 +6,25 @@ export function findFaces(graph) {
   nextFaceId = 0;
   const faces = [];
 
-  const halfEdges = [];
+  // Deduplicate edges with same endpoints (keep first occurrence)
+  const seenEndpoints = new Set();
+  const validEdges = [];
   for (const [eid, edge] of graph.edges) {
     const verts = edge.vertices;
     const first = verts[0];
     const last = verts[verts.length - 1];
     if (first === last) continue;
+    const key = [first, last].sort().join('|');
+    if (seenEndpoints.has(key)) continue;
+    seenEndpoints.add(key);
+    validEdges.push([eid, edge]);
+  }
+
+  const halfEdges = [];
+  for (const [eid, edge] of validEdges) {
+    const verts = edge.vertices;
+    const first = verts[0];
+    const last = verts[verts.length - 1];
 
     const vFirst = graph.vertices.get(first);
     const vLast = graph.vertices.get(last);

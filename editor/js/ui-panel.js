@@ -20,13 +20,18 @@ export function updateTerritoryList(territories, faces, onSelect) {
     const item = document.createElement('div');
     item.className = 'territory-item';
     item.innerHTML = `
-      <span class="color-dot" style="background:${t.color}"></span>
+      <input type="color" class="color-picker" value="${t.color}" title="Change color" style="width:18px;height:18px;border:1px solid #555;border-radius:3px;background:none;cursor:pointer;padding:0;flex-shrink:0;">
       <span class="name">${name}</span>
       <select class="continent-select" style="background:#0f3460;color:#ccc;border:1px solid #333;border-radius:3px;font-size:10px;padding:1px;">
         <option value="">—</option>
         ${continentNames.map(c => `<option value="${c}" ${c === currentContinent ? 'selected' : ''}>${c}</option>`).join('')}
       </select>
     `;
+
+    item.querySelector('.color-picker').addEventListener('input', (e) => {
+      t.color = e.target.value;
+      onSelect(name);
+    });
 
     item.querySelector('.name').addEventListener('click', () => onSelect(name));
 

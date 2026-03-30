@@ -34,6 +34,18 @@ export class PlanarGraph {
     for (const vid of vertexIds) {
       if (!this.vertices.has(vid)) return null;
     }
+    // Reject duplicate edges between same endpoints (in either direction)
+    const first = vertexIds[0];
+    const last = vertexIds[vertexIds.length - 1];
+    if (first !== last) {
+      for (const [, edge] of this.edges) {
+        const ef = edge.vertices[0];
+        const el = edge.vertices[edge.vertices.length - 1];
+        if ((ef === first && el === last) || (ef === last && el === first)) {
+          return null;
+        }
+      }
+    }
     const id = 'e' + (nextEdgeId++);
     this.edges.set(id, { vertices: [...vertexIds] });
     return id;

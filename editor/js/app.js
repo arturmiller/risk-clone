@@ -100,6 +100,7 @@ function updateCursor() {
 }
 
 function setTool(tool) {
+  if (activeTool.deactivate) activeTool.deactivate();
   activeTool = tool;
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`[data-tool="${tool.name}"]`)?.classList.add('active');

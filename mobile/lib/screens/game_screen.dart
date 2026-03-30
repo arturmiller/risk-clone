@@ -229,7 +229,8 @@ class _PortraitLayout extends StatelessWidget {
 
 class _LandscapeLayout extends StatelessWidget {
   final GameMode gameMode;
-  const _LandscapeLayout({required this.gameMode});
+  final String mapAsset;
+  const _LandscapeLayout({required this.gameMode, this.mapAsset = 'original'});
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +241,7 @@ class _LandscapeLayout extends StatelessWidget {
             flex: 3,
             child: Stack(
               children: [
-                MapWidget(gameMode: gameMode),
+                MapWidget(gameMode: gameMode, mapAsset: mapAsset),
                 const Positioned(
                   bottom: 8,
                   left: 0,
@@ -273,7 +274,7 @@ class _LandscapeLayout extends StatelessWidget {
     }
     return Row(
       children: [
-        const Expanded(flex: 3, child: MapWidget()),
+        Expanded(flex: 3, child: MapWidget(mapAsset: mapAsset)),
         SizedBox(
           width: 280,
           child: Column(

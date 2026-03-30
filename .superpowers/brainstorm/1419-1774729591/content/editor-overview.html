@@ -1,0 +1,53 @@
+<h2>Risk Map Editor — Architektur-Überblick</h2>
+<p class="subtitle">Single-page Web-App (HTML/JS/Canvas), kein Framework</p>
+
+<div class="section">
+  <h3>Projekt-Struktur</h3>
+  <div class="mockup">
+    <div class="mockup-header">Verzeichnisstruktur</div>
+    <div class="mockup-body" style="font-family: monospace; font-size: 14px; line-height: 1.8;">
+      <div>risk/</div>
+      <div>&nbsp;&nbsp;editor/</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;index.html&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Entry point</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;style.css&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— UI Styles</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;js/</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;app.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Entry, Event-Wiring</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;canvas.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Render-Loop, Zoom/Pan</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;graph.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Planar Graph (Vertices, Edges, Faces)</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tools.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Draw, Select, Edit Tools</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;snap.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Vertex + Edge Snapping</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;faces.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Face Detection (Cycle Finding)</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;territories.js&nbsp;&nbsp;&nbsp;<span style="color:#888">— Territory/Continent Management</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;history.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Undo/Redo Stack</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;io.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">— Import/Export JSON</span></div>
+      <div>&nbsp;&nbsp;mobile/</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#888">... (bestehende Flutter-App)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Datenmodell (im Speicher)</h3>
+  <div class="mockup">
+    <div class="mockup-header">graph.js — Kern-Datenstruktur</div>
+    <div class="mockup-body" style="font-family: monospace; font-size: 13px; line-height: 1.7;">
+      <div style="color:#e91e63">vertices: Map&lt;id, {x, y}&gt;</div>
+      <div style="margin-left:20px; color:#888">Alle Eckpunkte, shared zwischen Kanten</div>
+      <br>
+      <div style="color:#2196f3">edges: Map&lt;id, {v1, v2, midpoints[]}&gt;</div>
+      <div style="margin-left:20px; color:#888">Kanten als Polylinien (v1 → midpoints → v2)</div>
+      <br>
+      <div style="color:#4caf50">faces: Map&lt;id, {edgeRefs[], territory?}&gt;</div>
+      <div style="margin-left:20px; color:#888">Automatisch erkannte geschlossene Flächen</div>
+      <br>
+      <div style="color:#ff9800">territories: Map&lt;name, {faceId, color, labelPos}&gt;</div>
+      <div style="margin-left:20px; color:#888">Bestätigte Territorien mit Metadaten</div>
+      <br>
+      <div style="color:#9c27b0">continents: Map&lt;name, {bonus, territories[]}&gt;</div>
+      <div style="margin-left:20px; color:#888">Kontinent-Gruppierungen</div>
+      <br>
+      <div style="color:#607d8b">adjacencies: Set&lt;[t1, t2]&gt;</div>
+      <div style="margin-left:20px; color:#888">Auto-generiert + manuelle Overrides</div>
+    </div>
+  </div>
+</div>
