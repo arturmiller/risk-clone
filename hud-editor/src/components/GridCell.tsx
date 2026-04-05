@@ -1,4 +1,4 @@
-import { useDroppable } from '@dnd-kit/core';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { useCallback } from 'react';
 import { GridElement, HudElement } from '../types';
 import { useEditorStore } from '../store';
@@ -155,14 +155,44 @@ export default function GridCell({ element, depth = 0 }: GridCellProps) {
   }
 
   return (
+    <DraggableLeafCell
+      element={element}
+      isSelected={isSelected}
+      onClick={handleClick}
+      onContextMenu={handleContextMenu}
+    />
+  );
+}
+
+function DraggableLeafCell({
+  element,
+  isSelected,
+  onClick,
+  onContextMenu,
+}: {
+  element: HudElement;
+  isSelected: boolean;
+  onClick: (e: React.MouseEvent) => void;
+  onContextMenu: (e: React.MouseEvent) => void;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: element.id,
+    data: { type: element.type, source: 'canvas' },
+  });
+
+  return (
     <div
-      className={`grid-cell leaf-cell ${isSelected ? 'selected' : ''}`}
+      ref={setNodeRef}
+      className={`grid-cell leaf-cell ${isSelected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
       style={{
         gridRow: element.row !== undefined ? element.row + 1 : undefined,
         gridColumn: element.col !== undefined ? element.col + 1 : undefined,
+        opacity: isDragging ? 0.4 : 1,
       }}
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+      {...listeners}
+      {...attributes}
     >
       <ElementRenderer element={element} />
     </div>

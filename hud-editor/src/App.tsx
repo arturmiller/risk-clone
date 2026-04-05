@@ -38,7 +38,7 @@ export default function App() {
     const dragData = active.data.current as { type: ElementType; source: string } | undefined;
     if (dragData?.source === 'library') {
       addElement(dropData.gridId, dragData.type);
-    } else {
+    } else if (dragData?.source === 'canvas') {
       moveElement(active.id as string, dropData.gridId);
     }
   };
