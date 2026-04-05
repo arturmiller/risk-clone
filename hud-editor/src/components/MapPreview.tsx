@@ -16,23 +16,13 @@ export default function MapPreview({ width, height }: { width: number; height: n
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Try proxy first, then fall back to direct file
-    fetch('/api/map/original')
+    fetch('/map/original.json')
       .then((r) => {
         if (r.ok) return r.json();
-        throw new Error(`API ${r.status}`);
+        throw new Error(`${r.status}`);
       })
       .then((data) => setMapData(data))
-      .catch(() => {
-        // Fallback: load from Vite public or relative path
-        fetch('/map/original.json')
-          .then((r) => {
-            if (r.ok) return r.json();
-            throw new Error(`Public ${r.status}`);
-          })
-          .then((data) => setMapData(data))
-          .catch((e) => setError(e.message));
-      });
+      .catch((e) => setError(e.message));
   }, []);
 
   useEffect(() => {
