@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { useEditorStore } from './store';
 import { ElementType, HudLayout } from './types';
@@ -9,11 +9,14 @@ import Canvas from './components/Canvas';
 import PropertiesPanel from './components/PropertiesPanel';
 import ChatPanel from './components/ChatPanel';
 import ContextMenu from './components/ContextMenu';
+import HelpDialog from './components/HelpDialog';
 
 export default function App() {
   const addElement = useEditorStore((s) => s.addElement);
   const moveElement = useEditorStore((s) => s.moveElement);
   const setLayout = useEditorStore((s) => s.setLayout);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const toggleHelp = useCallback(() => setHelpOpen((v) => !v), []);
 
   // Load default layout on startup
   useEffect(() => {
@@ -67,6 +70,10 @@ export default function App() {
       if (e.key === 'Escape') {
         state.selectElement(null);
       }
+      if (e.key === 'F1') {
+        e.preventDefault();
+        setHelpOpen((v) => !v);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -76,7 +83,7 @@ export default function App() {
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="app">
-        <Toolbar />
+        <Toolbar onHelp={toggleHelp} />
         <div className="app-body">
           <ElementLibrary />
           <Canvas />
@@ -85,6 +92,7 @@ export default function App() {
         <ChatPanel />
       </div>
       <ContextMenu />
+      <HelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
     </DndContext>
   );
 }

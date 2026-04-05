@@ -1,7 +1,11 @@
 import { useEditorStore } from '../store';
 import { saveLayout, loadLayout } from '../utils/json-io';
 
-export default function Toolbar() {
+interface ToolbarProps {
+  onHelp: () => void;
+}
+
+export default function Toolbar({ onHelp }: ToolbarProps) {
   const layout = useEditorStore((s) => s.layout);
   const layoutMode = useEditorStore((s) => s.layoutMode);
   const setLayout = useEditorStore((s) => s.setLayout);
@@ -27,6 +31,7 @@ export default function Toolbar() {
       <button className="toolbar-btn" onClick={handleLoad}>📂 Load</button>
       <div className="toolbar-spacer" />
       <button className="toolbar-btn toolbar-save" onClick={handleSave}>💾 Save</button>
+      <button className="toolbar-btn toolbar-help" onClick={onHelp} title="Hilfe (F1)">?</button>
     </div>
   );
 }
