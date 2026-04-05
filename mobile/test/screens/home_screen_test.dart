@@ -143,7 +143,7 @@ void main() {
         ProviderScope(
           overrides: [
             storeProvider.overrideWithValue(store),
-            mapGraphProvider.overrideWith((ref) => Future.value(_testMapGraph)),
+            mapGraphProvider.overrideWith((ref, arg) => Future.value(_testMapGraph)),
             gameProvider.overrideWith(() => fakeNotifier),
           ],
           child: const MaterialApp(home: HomeScreen()),
@@ -182,7 +182,7 @@ void main() {
         ProviderScope(
           overrides: [
             storeProvider.overrideWithValue(store),
-            mapGraphProvider.overrideWith((ref) => Future.value(_testMapGraph)),
+            mapGraphProvider.overrideWith((ref, arg) => Future.value(_testMapGraph)),
             gameProvider.overrideWith(
                 () => _FakeGameNotifier(initialState: _makeGameState())),
           ],

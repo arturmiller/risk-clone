@@ -47,7 +47,7 @@ Store _createStore(String tag) {
 ProviderContainer _makeContainer(Store store, MapGraph mapGraph) {
   return ProviderContainer(overrides: [
     storeProvider.overrideWithValue(store),
-    mapGraphProvider.overrideWith((ref) => Future.value(mapGraph)),
+    mapGraphProvider.overrideWith((ref, arg) => Future.value(mapGraph)),
   ]);
 }
 

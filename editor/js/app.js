@@ -1,0 +1,314 @@
+// editor/js/app.js
+import { Renderer } from './renderer.js';
+import { PlanarGraph } from './graph.js';
+import { PanTool } from './tools/pan-tool.js';
+import { DrawTool } from './tools/draw-tool.js';
+import { SelectTool } from './tools/select-tool.js';
+import { TerritoryTool } from './tools/territory-tool.js';
+import { findFaces } from './faces.js';
+import { UndoStack } from './history.js';
+import { TerritoryManager } from './territories.js';
+import { updateTerritoryList, updateContinentList, updateAdjacencyList, setupPanelEvents } from './ui-panel.js';
+import { saveEditorJson, loadEditorJson, exportGameJson, downloadJson } from './io.js';
+import { pointInPolygon } from './snap.js';
+
+const canvas = document.getElementById('editor-canvas');
+const renderer = new Renderer(canvas);
+const graph = new PlanarGraph();
+
+const territories = new TerritoryManager();
+
+const undoStack = new UndoStack();
+undoStack.push(graph.clone(), territories.clone());
+
+function saveSnapshot() {
+  undoStack.push(graph.clone(), territories.clone());
+}
+
+function restoreSnapshot(snapshot) {
+  if (!snapshot) return;
+  graph.vertices.clear();
+  graph.edges.clear();
+  for (const [id, v] of snapshot.graph.vertices) graph.vertices.set(id, { ...v });
+  for (const [id, e] of snapshot.graph.edges) graph.edges.set(id, { vertices: [...e.vertices] });
+  if (snapshot.territories) {
+    territories.territories.clear();
+    territories.continents.clear();
+    const s = snapshot.territories;
+    for (const [n, t] of s.territories) territories.territories.set(n, { ...t, labelPosition: { ...t.labelPosition } });
+    for (const [n, c] of s.continents) territories.continents.set(n, { bonus: c.bonus, territories: [...c.territories] });
+    territories.manualAdjacencies = s.manualAdjacencies.map(p => [...p]);
+    territories.manualNonAdjacencies = s.manualNonAdjacencies.map(p => [...p]);
+  }
+  recomputeFaces();
+}
+
+let activeTool = new PanTool(renderer);
+let snap = null;
+let faces = [];
+let spaceDown = false;
+let savedTool = null;
+
+function updatePanel() {
+  updateTerritoryList(territories, faces, () => { saveSnapshot(); updatePanel(); });
+  updateContinentList(territories, () => { saveSnapshot(); updatePanel(); });
+  updateAdjacencyList(territories, faces, () => { saveSnapshot(); updatePanel(); });
+}
+
+function recomputeFaces() {
+  faces = findFaces(graph);
+  // Re-resolve territory face IDs (faces get new IDs each time)
+  for (const [, t] of territories.territories) {
+    let resolved = false;
+    for (const face of faces) {
+      if (face.outer) continue;
+      if (pointInPolygon(t.labelPosition, face.points)) {
+        t.faceId = face.id;
+        resolved = true;
+        break;
+      }
+    }
+    if (!resolved) t.faceId = null;
+  }
+  updatePanel();
+  updateStatus();
+}
+
+function createDrawTool() {
+  return new DrawTool(renderer, graph, (vertices) => {
+    recomputeFaces();
+    saveSnapshot();
+  });
+}
+
+function createSelectTool() {
+  return new SelectTool(renderer, graph,
+    () => { recomputeFaces(); saveSnapshot(); },  // onChange (on mouseUp / delete)
+    () => { faces = findFaces(graph); }            // onDragMove (lightweight, no snapshot)
+  );
+}
+
+function createTerritoryTool() {
+  return new TerritoryTool(renderer, graph, () => faces, territories, () => { saveSnapshot(); updatePanel(); });
+}
+
+function updateCursor() {
+  const c = document.getElementById('canvas-container');
+  c.className = '';
+  if (activeTool.cursor === 'crosshair') c.classList.add('drawing');
+  else if (activeTool.cursor === 'default') c.classList.add('selecting');
+}
+
+function setTool(tool) {
+  if (activeTool.deactivate) activeTool.deactivate();
+  activeTool = tool;
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-tool="${tool.name}"]`)?.classList.add('active');
+  updateCursor();
+  updateStatus();
+}
+
+// Canvas events
+canvas.addEventListener('mousedown', e => activeTool.onMouseDown(e));
+canvas.addEventListener('mousemove', e => activeTool.onMouseMove(e));
+canvas.addEventListener('mouseup', e => activeTool.onMouseUp(e));
+canvas.addEventListener('dblclick', e => { if (activeTool.onDblClick) activeTool.onDblClick(e); });
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  renderer.zoomAt(e.clientX - rect.left, e.clientY - rect.top, e.deltaY);
+}, { passive: false });
+
+// Toolbar buttons
+document.querySelectorAll('.tool-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    switch (btn.dataset.tool) {
+      case 'draw': setTool(createDrawTool()); break;
+      case 'pan': setTool(new PanTool(renderer)); break;
+      case 'select': setTool(createSelectTool()); break;
+      case 'territory': setTool(createTerritoryTool()); break;
+    }
+  });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === ' ' && !spaceDown) {
+    e.preventDefault();
+    spaceDown = true;
+    savedTool = activeTool;
+    activeTool = new PanTool(renderer);
+    updateCursor();
+    return;
+  }
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); document.getElementById('btn-save').click(); return; }
+  if (e.ctrlKey && e.key === 'e') { e.preventDefault(); document.getElementById('btn-export').click(); return; }
+  if (e.ctrlKey && e.key === 'z') { e.preventDefault(); restoreSnapshot(undoStack.undo()); return; }
+  if (e.ctrlKey && e.key === 'y') { e.preventDefault(); restoreSnapshot(undoStack.redo()); return; }
+  if (!e.ctrlKey) {
+    switch (e.key) {
+      case 'd': setTool(createDrawTool()); break;
+      case 'v': setTool(createSelectTool()); break;
+      case 't': setTool(createTerritoryTool()); break;
+    }
+  }
+  activeTool.onKeyDown(e);
+});
+
+document.addEventListener('keyup', e => {
+  if (e.key === ' ' && spaceDown) {
+    spaceDown = false;
+    if (savedTool) { activeTool = savedTool; savedTool = null; }
+    updateCursor();
+  }
+});
+
+// Undo/Redo buttons
+document.getElementById('btn-undo').addEventListener('click', () => restoreSnapshot(undoStack.undo()));
+document.getElementById('btn-redo').addEventListener('click', () => restoreSnapshot(undoStack.redo()));
+
+// Right panel
+setupPanelEvents(territories, () => { saveSnapshot(); updatePanel(); });
+
+// Save / Load / Export
+document.getElementById('btn-save').addEventListener('click', () => {
+  downloadJson(saveEditorJson(graph, territories, renderer.mapWidth, renderer.mapHeight), 'map.risk.json');
+});
+document.getElementById('btn-export').addEventListener('click', () => {
+  downloadJson(exportGameJson(graph, faces, territories, renderer.mapWidth, renderer.mapHeight), 'map.json');
+});
+document.getElementById('btn-load').addEventListener('click', () => document.getElementById('file-load').click());
+document.getElementById('file-load').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const r = loadEditorJson(reader.result);
+      graph.vertices.clear(); graph.edges.clear();
+      for (const [id, v] of r.graph.vertices) graph.vertices.set(id, v);
+      for (const [id, e] of r.graph.edges) graph.edges.set(id, e);
+      territories.territories.clear(); territories.continents.clear();
+      for (const [n, t] of r.territories.territories) territories.territories.set(n, t);
+      for (const [n, c] of r.territories.continents) territories.continents.set(n, c);
+      territories.manualAdjacencies = r.territories.manualAdjacencies;
+      territories.manualNonAdjacencies = r.territories.manualNonAdjacencies;
+      renderer.setMapSize(r.mapWidth, r.mapHeight);
+      document.getElementById('canvas-width').value = r.mapWidth;
+      document.getElementById('canvas-height').value = r.mapHeight;
+      renderer.fitToView();
+      recomputeFaces();
+      saveSnapshot();
+    } catch (err) {
+      alert('Failed to load file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// Canvas size inputs
+document.getElementById('canvas-width').addEventListener('change', e => {
+  renderer.setMapSize(parseInt(e.target.value) || 1200, renderer.mapHeight);
+  updateStatus();
+});
+document.getElementById('canvas-height').addEventListener('change', e => {
+  renderer.setMapSize(renderer.mapWidth, parseInt(e.target.value) || 700);
+  updateStatus();
+});
+
+// Background image
+document.getElementById('btn-load-image').addEventListener('click', () => {
+  document.getElementById('file-image').click();
+});
+document.getElementById('file-image').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    renderer.setBackgroundImage(img);
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(file);
+});
+document.getElementById('bg-opacity').addEventListener('input', e => {
+  const val = parseInt(e.target.value);
+  renderer.setBackgroundOpacity(val / 100);
+  document.getElementById('bg-opacity-val').textContent = val + '%';
+});
+
+// Status bar
+function updateStatus() {
+  document.getElementById('status-canvas').textContent =
+    `Canvas: ${renderer.mapWidth} × ${renderer.mapHeight} | Zoom: ${Math.round(renderer.zoom * 100)}%`;
+  document.getElementById('status-counts').textContent =
+    `V: ${graph.vertices.size} | E: ${graph.edges.size} | F: ${faces.filter(f => !f.outer).length} | T: ${territories.territories.size}`;
+  document.getElementById('status-tool').textContent =
+    `Tool: ${activeTool.name} | Snap: ON`;
+}
+
+// Render loop
+function frame() {
+  snap = activeTool.getSnap?.() || null;
+  renderer.render(graph, faces, territories, snap, activeTool);
+
+  // Draw preview line if draw tool
+  if (activeTool.getPreviewLine) {
+    const line = activeTool.getPreviewLine();
+    if (line) {
+      const ctx = renderer.ctx;
+      ctx.save();
+      ctx.translate(renderer.offsetX, renderer.offsetY);
+      ctx.scale(renderer.zoom, renderer.zoom);
+      ctx.beginPath();
+      ctx.moveTo(line.from.x, line.from.y);
+      ctx.lineTo(line.to.x, line.to.y);
+      ctx.strokeStyle = '#e94560';
+      ctx.lineWidth = 1.5 / renderer.zoom;
+      ctx.setLineDash([6 / renderer.zoom, 4 / renderer.zoom]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+  }
+
+  // Selection highlight
+  if (activeTool.getSelection) {
+    const sel = activeTool.getSelection();
+    const ctx = renderer.ctx;
+    ctx.save();
+    ctx.translate(renderer.offsetX, renderer.offsetY);
+    ctx.scale(renderer.zoom, renderer.zoom);
+    if (sel.vertexId) {
+      const v = graph.vertices.get(sel.vertexId);
+      if (v) {
+        ctx.beginPath();
+        ctx.arc(v.x, v.y, 6 / renderer.zoom, 0, Math.PI * 2);
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 2 / renderer.zoom;
+        ctx.stroke();
+      }
+    }
+    if (sel.edgeId) {
+      const edge = graph.edges.get(sel.edgeId);
+      if (edge) {
+        const verts = edge.vertices.map(vid => graph.vertices.get(vid)).filter(Boolean);
+        ctx.beginPath();
+        ctx.moveTo(verts[0].x, verts[0].y);
+        for (let i = 1; i < verts.length; i++) ctx.lineTo(verts[i].x, verts[i].y);
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 3 / renderer.zoom;
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  updateStatus();
+  requestAnimationFrame(frame);
+}
+
+renderer.fitToView();
+requestAnimationFrame(frame);

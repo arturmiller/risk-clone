@@ -74,7 +74,7 @@ class GameNotifier extends _$GameNotifier {
   Future<void> setupGame(GameConfig config) async {
     _gameConfig = config;
     state = const AsyncLoading();
-    final mapGraph = await ref.read(mapGraphProvider.future);
+    final mapGraph = await ref.read(mapGraphProvider(mapAsset: config.mapAsset).future);
     state = await AsyncValue.guard(() async {
       return engine_setup.setupGame(mapGraph, config.playerCount, rng: Random());
     });
@@ -91,7 +91,7 @@ class GameNotifier extends _$GameNotifier {
     try {
       debugPrint('[runBotTurn] executing turn for player ${current.currentPlayerIndex}');
       // Read mapGraph BEFORE entering Isolate.run
-      final mapGraph = await ref.read(mapGraphProvider.future);
+      final mapGraph = await ref.read(mapGraphProvider(mapAsset: _gameConfig?.mapAsset ?? 'original').future);
       final config = _gameConfig;
 
       final newState = await runCompute(() {
@@ -151,7 +151,7 @@ class GameNotifier extends _$GameNotifier {
 
     _processing = true;
     try {
-      final mapGraph = await ref.read(mapGraphProvider.future);
+      final mapGraph = await ref.read(mapGraphProvider(mapAsset: _gameConfig?.mapAsset ?? 'original').future);
       final log = ref.read(gameLogProvider.notifier);
 
       GameState newState;

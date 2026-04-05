@@ -9,20 +9,19 @@ class MapOverlayPainter extends CustomPainter {
   final GameState gameState;
   final UIState uiState;
   final Map<String, TerritoryGeometry> territoryData;
+  final Size canvasSize;
 
   const MapOverlayPainter({
     required this.gameState,
     required this.uiState,
     required this.territoryData,
+    this.canvasSize = const Size(1200, 700),
   });
-
-  static const double _svgWidth = 1200;
-  static const double _svgHeight = 700;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final scaleX = size.width / _svgWidth;
-    final scaleY = size.height / _svgHeight;
+    final scaleX = size.width / canvasSize.width;
+    final scaleY = size.height / canvasSize.height;
     canvas.scale(scaleX, scaleY);
 
     for (final entry in territoryData.entries) {
@@ -31,18 +30,21 @@ class MapOverlayPainter extends CustomPainter {
       final ts = gameState.territories[name];
       if (ts == null) continue;
 
-      // Fill with owner color
-      canvas.drawRect(
-        geom.rect,
+      final path = geom.toPath();
+
+      // Fill with owner color (semi-transparent to show base color underneath)
+      canvas.drawPath(
+        path,
         Paint()
           ..color = kPlayerColors[ts.owner % kPlayerColors.length]
+              .withValues(alpha: 0.55)
           ..style = PaintingStyle.fill,
       );
 
-      // Selected attacker: thick white border (no color overlay)
+      // Selected attacker: thick border
       if (name == uiState.selectedTerritory) {
-        canvas.drawRect(
-          geom.rect,
+        canvas.drawPath(
+          path,
           Paint()
             ..color = const Color(0xFF000000)
             ..style = PaintingStyle.stroke
@@ -50,7 +52,17 @@ class MapOverlayPainter extends CustomPainter {
         );
       }
 
-      // Army count label (show proposed placements from reinforce phase)
+      // Valid target highlight
+      if (uiState.validTargets.contains(name)) {
+        canvas.drawPath(
+          path,
+          Paint()
+            ..color = const Color(0xFFFFFFFF).withValues(alpha: 0.3)
+            ..style = PaintingStyle.fill,
+        );
+      }
+
+      // Army count label
       final proposed = uiState.proposedPlacements[name] ?? 0;
       final tp = TextPainter(
         text: TextSpan(
@@ -90,7 +102,6 @@ class MapOverlayPainter extends CustomPainter {
       ..color = const Color(0xFFFF3D00)
       ..style = PaintingStyle.fill;
 
-    // Shorten the line slightly so it doesn't overlap the labels
     final direction = (to - from);
     final distance = direction.distance;
     if (distance < 1) return;
@@ -98,12 +109,10 @@ class MapOverlayPainter extends CustomPainter {
     final shortenedFrom = from + unit * 12;
     final shortenedTo = to - unit * 12;
 
-    // Draw line
     canvas.drawLine(shortenedFrom, shortenedTo, arrowPaint);
 
-    // Draw arrowhead
     const headLength = 12.0;
-    const headAngle = 0.45; // ~25 degrees
+    const headAngle = 0.45;
     final angle = math.atan2(unit.dy, unit.dx);
     final p1 = shortenedTo -
         Offset(
@@ -116,12 +125,12 @@ class MapOverlayPainter extends CustomPainter {
           headLength * math.sin(angle + headAngle),
         );
 
-    final path = Path()
+    final arrowPath = Path()
       ..moveTo(shortenedTo.dx, shortenedTo.dy)
       ..lineTo(p1.dx, p1.dy)
       ..lineTo(p2.dx, p2.dy)
       ..close();
-    canvas.drawPath(path, arrowHeadPaint);
+    canvas.drawPath(arrowPath, arrowHeadPaint);
   }
 
   @override

@@ -66,7 +66,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            mapGraphProvider.overrideWith((ref) => Future.value(fakeMap)),
+            mapGraphProvider.overrideWith((ref, arg) => Future.value(fakeMap)),
             gameProvider.overrideWith(() => _FakeGameNotifier(fakeState)),
           ],
           child: const MaterialApp(home: Scaffold(body: ContinentPanel())),
@@ -89,7 +89,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            mapGraphProvider.overrideWith((ref) => Future.value(fakeMap)),
+            mapGraphProvider.overrideWith((ref, arg) => Future.value(fakeMap)),
             gameProvider.overrideWith(() => _FakeGameNotifier(fakeState)),
           ],
           child: const MaterialApp(home: Scaffold(body: ContinentPanel())),
@@ -111,7 +111,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            mapGraphProvider.overrideWith((ref) => Future.value(fakeMap)),
+            mapGraphProvider.overrideWith((ref, arg) => Future.value(fakeMap)),
             gameProvider.overrideWith(() => _FakeGameNotifier(fakeState)),
           ],
           child: const MaterialApp(home: Scaffold(body: ContinentPanel())),

@@ -99,7 +99,7 @@ Widget _buildGameScreen(
   return ProviderScope(
     overrides: [
       storeProvider.overrideWithValue(store),
-      mapGraphProvider.overrideWith((ref) => Future.value(_testMapGraph)),
+      mapGraphProvider.overrideWith((ref, arg) => Future.value(_testMapGraph)),
       gameProvider.overrideWith(
           () => _FakeGameNotifier(fakeState: gameState ?? _makeGameState())),
     ],

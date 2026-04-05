@@ -10,7 +10,7 @@ class ContinentPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mapAsync = ref.watch(mapGraphProvider);
+    final mapAsync = ref.watch(mapGraphProvider());
     final gameAsync = ref.watch(gameProvider);
 
     return mapAsync.when(

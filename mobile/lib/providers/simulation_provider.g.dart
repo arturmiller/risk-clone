@@ -42,7 +42,7 @@ final class SimulationNotifierProvider
 }
 
 String _$simulationNotifierHash() =>
-    r'0934f1778b38b90041342f49abc3ee5ef017461c';
+    r'7fd201e45f61d255331672f0563fcf929208426f';
 
 abstract class _$SimulationNotifier extends $Notifier<SimulationState> {
   SimulationState build();

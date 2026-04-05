@@ -33,7 +33,7 @@ final class GameNotifierProvider
   GameNotifier create() => GameNotifier();
 }
 
-String _$gameNotifierHash() => r'807b00df431c84d785ecd25bd2553401f32dc85b';
+String _$gameNotifierHash() => r'9c1aec28c7553385d2f076be0dbdcb12b469ffae';
 
 abstract class _$GameNotifier extends $AsyncNotifier<GameState?> {
   FutureOr<GameState?> build();
