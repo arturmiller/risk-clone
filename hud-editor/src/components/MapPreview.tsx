@@ -1,0 +1,79 @@
+import { useEffect, useRef, useState } from 'react';
+
+interface Territory {
+  path: number[][];
+  color?: string;
+}
+
+interface MapData {
+  canvasSize: [number, number];
+  territories: Record<string, Territory>;
+}
+
+export default function MapPreview({ width, height }: { width: number; height: number }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [mapData, setMapData] = useState<MapData | null>(null);
+
+  useEffect(() => {
+    fetch('/api/map/original')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setMapData(data); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !mapData) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const [mapW, mapH] = mapData.canvasSize;
+    canvas.width = width;
+    canvas.height = height;
+
+    const scaleX = width / mapW;
+    const scaleY = height / mapH;
+
+    // Dark background
+    ctx.fillStyle = '#1a2a3a';
+    ctx.fillRect(0, 0, width, height);
+
+    // Draw territories
+    for (const [, territory] of Object.entries(mapData.territories)) {
+      if (!territory.path || territory.path.length < 3) continue;
+
+      ctx.beginPath();
+      ctx.moveTo(territory.path[0][0] * scaleX, territory.path[0][1] * scaleY);
+      for (let i = 1; i < territory.path.length; i++) {
+        ctx.lineTo(territory.path[i][0] * scaleX, territory.path[i][1] * scaleY);
+      }
+      ctx.closePath();
+
+      // Fill
+      ctx.fillStyle = territory.color || '#CFD8DC';
+      ctx.globalAlpha = 0.6;
+      ctx.fill();
+
+      // Border
+      ctx.strokeStyle = '#546E7A';
+      ctx.globalAlpha = 0.8;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+  }, [mapData, width, height]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+      }}
+    />
+  );
+}

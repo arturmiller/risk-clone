@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback } from 'react';
 import { useEditorStore } from '../store';
 import GridCell from './GridCell';
+import MapPreview from './MapPreview';
 
 type CanvasTool = 'pointer' | 'hand';
 
@@ -96,11 +97,7 @@ export default function Canvas() {
           pointerEvents: (tool === 'hand' || preview) ? 'none' : undefined,
         }}
       >
-        {preview && (
-          <div className="preview-map-bg">
-            <span className="preview-map-label">🗺️ Karte</span>
-          </div>
-        )}
+        {preview && <MapPreview width={frameWidth} height={frameHeight} />}
         <GridCell element={layout.root} />
       </div>
       <div className="canvas-controls">

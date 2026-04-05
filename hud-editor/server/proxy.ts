@@ -7,6 +7,7 @@ const app = express();
 app.use(express.json({ limit: '5mb' }));
 
 const HUD_DIR = join(import.meta.dirname, '..', '..', 'hud');
+const ASSETS_DIR = join(import.meta.dirname, '..', '..', 'mobile', 'assets');
 
 const SYSTEM_PROMPT = `Du bist ein HUD-Layout-Editor-Assistent für ein Risk-Spiel.
 Du bekommst das aktuelle Layout als JSON und eine User-Anweisung.
@@ -80,6 +81,20 @@ app.post('/api/save', async (req, res) => {
     res.json({ ok: true, path: join(HUD_DIR, filename) });
   } catch (error) {
     res.status(500).json({ error: String(error) });
+  }
+});
+
+app.get('/api/map/:name', async (req, res) => {
+  const { name } = req.params;
+  if (!/^[a-z0-9-]+$/.test(name)) {
+    res.status(400).json({ error: 'Invalid map name' });
+    return;
+  }
+  try {
+    const content = await readFile(join(ASSETS_DIR, `${name}.json`), 'utf-8');
+    res.json(JSON.parse(content));
+  } catch {
+    res.status(404).json({ error: 'Map not found' });
   }
 });
 
