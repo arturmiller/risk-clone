@@ -90,6 +90,7 @@ html, body, #root { height: 100%; }
   background: #111;
   flex-shrink: 0;
   transition: transform 0.05s ease-out;
+  position: relative;
 }
 .frame-mobile { border-radius: 20px; }
 .frame-desktop { border-radius: 8px; }

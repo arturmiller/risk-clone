@@ -68,11 +68,15 @@ export default function MapPreview({ width, height }: { width: number; height: n
   return (
     <canvas
       ref={canvasRef}
+      width={width}
+      height={height}
       style={{
         position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
+        top: 0,
+        left: 0,
+        width: `${width}px`,
+        height: `${height}px`,
+        zIndex: 0,
       }}
     />
   );

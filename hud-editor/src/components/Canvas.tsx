@@ -98,7 +98,9 @@ export default function Canvas() {
         }}
       >
         {preview && <MapPreview width={frameWidth} height={frameHeight} />}
-        <GridCell element={layout.root} />
+        <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%' }}>
+          <GridCell element={layout.root} />
+        </div>
       </div>
       <div className="canvas-controls">
         {!preview && (
