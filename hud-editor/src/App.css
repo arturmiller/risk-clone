@@ -125,6 +125,29 @@ html, body, #root { height: 100%; }
 .canvas-ctrl-divider { width: 1px; height: 20px; background: #444; margin: 0 4px; }
 .canvas-ctrl-zoom { font-size: 11px; color: #888; min-width: 36px; text-align: center; }
 
+/* Preview mode */
+.preview-map-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1a3a2a 0%, #1a2a3a 40%, #2a3a2a 70%, #1a3a3a 100%);
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.preview-map-label {
+  font-size: 48px;
+  opacity: 0.15;
+  pointer-events: none;
+  user-select: none;
+}
+.preview-mode .grid-container { border-color: transparent !important; }
+.preview-mode .grid-empty-cell { display: none !important; }
+.preview-mode .grid-cell.selected { outline: none !important; }
+.preview-mode .leaf-cell { border-color: transparent !important; }
+.preview-mode .leaf-cell:hover { border-color: transparent !important; }
+.preview-mode .resize-handle { display: none !important; }
+
 /* Grid cells */
 .grid-cell { position: relative; min-height: 20px; }
 .grid-container { border: 1px dashed rgba(100, 100, 255, 0.15); }

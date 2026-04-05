@@ -17,6 +17,7 @@ export default function Canvas() {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [tool, setTool] = useState<CanvasTool>('pointer');
+  const [preview, setPreview] = useState(false);
   const lastMouse = useRef({ x: 0, y: 0 });
 
   const zoomIn = useCallback(() => {
@@ -39,20 +40,18 @@ export default function Canvas() {
   }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Middle mouse always pans
     if (e.button === 1) {
       e.preventDefault();
       setIsPanning(true);
       lastMouse.current = { x: e.clientX, y: e.clientY };
       return;
     }
-    // Left mouse pans in hand mode, or with alt key
-    if (e.button === 0 && (tool === 'hand' || e.altKey)) {
+    if (e.button === 0 && (tool === 'hand' || e.altKey || preview)) {
       e.preventDefault();
       setIsPanning(true);
       lastMouse.current = { x: e.clientX, y: e.clientY };
     }
-  }, [tool]);
+  }, [tool, preview]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!isPanning) return;
@@ -67,12 +66,12 @@ export default function Canvas() {
   }, []);
 
   const handleCanvasClick = useCallback(() => {
-    if (tool === 'pointer') selectElement(null);
-  }, [tool, selectElement]);
+    if (tool === 'pointer' && !preview) selectElement(null);
+  }, [tool, preview, selectElement]);
 
   const cursor = isPanning
     ? 'grabbing'
-    : tool === 'hand'
+    : (tool === 'hand' || preview)
       ? 'grab'
       : undefined;
 
@@ -88,37 +87,54 @@ export default function Canvas() {
       style={{ cursor }}
     >
       <div
-        className={`canvas-frame ${isMobile ? 'frame-mobile' : 'frame-desktop'}`}
+        className={`canvas-frame ${isMobile ? 'frame-mobile' : 'frame-desktop'} ${preview ? 'preview-mode' : ''}`}
         style={{
           width: frameWidth,
           height: frameHeight,
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
           transformOrigin: 'center center',
-          pointerEvents: tool === 'hand' ? 'none' : undefined,
+          pointerEvents: (tool === 'hand' || preview) ? 'none' : undefined,
         }}
       >
+        {preview && (
+          <div className="preview-map-bg">
+            <span className="preview-map-label">🗺️ Karte</span>
+          </div>
+        )}
         <GridCell element={layout.root} />
       </div>
       <div className="canvas-controls">
-        <button
-          className={`canvas-ctrl-btn ${tool === 'pointer' ? 'active' : ''}`}
-          onClick={() => setTool('pointer')}
-          title="Pointer (V)"
-        >
-          ↖
-        </button>
-        <button
-          className={`canvas-ctrl-btn ${tool === 'hand' ? 'active' : ''}`}
-          onClick={() => setTool('hand')}
-          title="Hand (H)"
-        >
-          ✋
-        </button>
-        <div className="canvas-ctrl-divider" />
+        {!preview && (
+          <>
+            <button
+              className={`canvas-ctrl-btn ${tool === 'pointer' ? 'active' : ''}`}
+              onClick={() => setTool('pointer')}
+              title="Pointer"
+            >
+              ↖
+            </button>
+            <button
+              className={`canvas-ctrl-btn ${tool === 'hand' ? 'active' : ''}`}
+              onClick={() => setTool('hand')}
+              title="Hand"
+            >
+              ✋
+            </button>
+            <div className="canvas-ctrl-divider" />
+          </>
+        )}
         <button className="canvas-ctrl-btn" onClick={zoomIn} title="Zoom in">+</button>
         <button className="canvas-ctrl-btn" onClick={zoomOut} title="Zoom out">−</button>
         <button className="canvas-ctrl-btn" onClick={resetView} title="Reset view">⊡</button>
         <span className="canvas-ctrl-zoom">{Math.round(zoom * 100)}%</span>
+        <div className="canvas-ctrl-divider" />
+        <button
+          className={`canvas-ctrl-btn ${preview ? 'active' : ''}`}
+          onClick={() => setPreview((v) => !v)}
+          title="Preview"
+        >
+          👁
+        </button>
       </div>
     </div>
   );
