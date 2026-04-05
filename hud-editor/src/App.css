@@ -251,3 +251,28 @@ html, body, #root { height: 100%; }
 }
 .chat-send:hover { background: #4a6aca; }
 .chat-send:disabled { opacity: 0.5; cursor: default; }
+
+/* Resize Handles */
+.resize-handle {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.resize-handle:hover, .resize-handle:active {
+  opacity: 1;
+}
+.resize-handle-col {
+  width: 6px;
+  top: 0;
+  bottom: 0;
+  background: #ff8800;
+  cursor: col-resize;
+  border-radius: 2px;
+}
+.resize-handle-row {
+  height: 6px;
+  left: 0;
+  right: 0;
+  background: #ff8800;
+  cursor: row-resize;
+  border-radius: 2px;
+}
