@@ -13,12 +13,26 @@ interface MapData {
 export default function MapPreview({ width, height }: { width: number; height: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [mapData, setMapData] = useState<MapData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Try proxy first, then fall back to direct file
     fetch('/api/map/original')
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => { if (data) setMapData(data); })
-      .catch(() => {});
+      .then((r) => {
+        if (r.ok) return r.json();
+        throw new Error(`API ${r.status}`);
+      })
+      .then((data) => setMapData(data))
+      .catch(() => {
+        // Fallback: load from Vite public or relative path
+        fetch('/map/original.json')
+          .then((r) => {
+            if (r.ok) return r.json();
+            throw new Error(`Public ${r.status}`);
+          })
+          .then((data) => setMapData(data))
+          .catch((e) => setError(e.message));
+      });
   }, []);
 
   useEffect(() => {
@@ -29,18 +43,19 @@ export default function MapPreview({ width, height }: { width: number; height: n
     if (!ctx) return;
 
     const [mapW, mapH] = mapData.canvasSize;
-    canvas.width = width;
-    canvas.height = height;
 
     const scaleX = width / mapW;
     const scaleY = height / mapH;
 
-    // Dark background
+    ctx.clearRect(0, 0, width, height);
+
+    // Ocean background
     ctx.fillStyle = '#1a2a3a';
     ctx.fillRect(0, 0, width, height);
 
     // Draw territories
-    for (const [, territory] of Object.entries(mapData.territories)) {
+    const entries = Object.entries(mapData.territories);
+    for (const [, territory] of entries) {
       if (!territory.path || territory.path.length < 3) continue;
 
       ctx.beginPath();
@@ -50,20 +65,31 @@ export default function MapPreview({ width, height }: { width: number; height: n
       }
       ctx.closePath();
 
-      // Fill
+      ctx.globalAlpha = 0.7;
       ctx.fillStyle = territory.color || '#CFD8DC';
-      ctx.globalAlpha = 0.6;
       ctx.fill();
 
-      // Border
+      ctx.globalAlpha = 0.9;
       ctx.strokeStyle = '#546E7A';
-      ctx.globalAlpha = 0.8;
       ctx.lineWidth = 1;
       ctx.stroke();
     }
 
     ctx.globalAlpha = 1;
   }, [mapData, width, height]);
+
+  if (error) {
+    return (
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 0,
+        background: '#1a2a3a',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#666', fontSize: 12,
+      }}>
+        Karte nicht geladen: {error}
+      </div>
+    );
+  }
 
   return (
     <canvas
