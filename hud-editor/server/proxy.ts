@@ -1,6 +1,6 @@
 import express from 'express';
 import { execFile } from 'child_process';
-import { writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
 const app = express();
@@ -80,6 +80,20 @@ app.post('/api/save', async (req, res) => {
     res.json({ ok: true, path: join(HUD_DIR, filename) });
   } catch (error) {
     res.status(500).json({ error: String(error) });
+  }
+});
+
+app.get('/api/layout/:name', async (req, res) => {
+  const { name } = req.params;
+  if (!/^[a-z0-9-]+$/.test(name)) {
+    res.status(400).json({ error: 'Invalid layout name' });
+    return;
+  }
+  try {
+    const content = await readFile(join(HUD_DIR, `${name}.hud.json`), 'utf-8');
+    res.json(JSON.parse(content));
+  } catch {
+    res.status(404).json({ error: 'Layout not found' });
   }
 });
 

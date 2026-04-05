@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { useEditorStore } from './store';
-import { ElementType } from './types';
+import { ElementType, HudLayout } from './types';
 import { saveLayout } from './utils/json-io';
 import Toolbar from './components/Toolbar';
 import ElementLibrary from './components/ElementLibrary';
@@ -13,6 +13,17 @@ import ContextMenu from './components/ContextMenu';
 export default function App() {
   const addElement = useEditorStore((s) => s.addElement);
   const moveElement = useEditorStore((s) => s.moveElement);
+  const setLayout = useEditorStore((s) => s.setLayout);
+
+  // Load default layout on startup
+  useEffect(() => {
+    fetch('/api/layout/mobile-landscape')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data: HudLayout | null) => {
+        if (data) setLayout(data);
+      })
+      .catch(() => {});
+  }, [setLayout]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
