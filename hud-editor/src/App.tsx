@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { useEditorStore } from './store';
 import { ElementType } from './types';
@@ -6,6 +7,7 @@ import ElementLibrary from './components/ElementLibrary';
 import Canvas from './components/Canvas';
 import PropertiesPanel from './components/PropertiesPanel';
 import ChatPanel from './components/ChatPanel';
+import ContextMenu from './components/ContextMenu';
 
 export default function App() {
   const addElement = useEditorStore((s) => s.addElement);
@@ -26,6 +28,35 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const state = useEditorStore.getState();
+
+      if (e.key === 'Delete' && state.selectedId) {
+        e.preventDefault();
+        state.deleteElement(state.selectedId);
+      }
+      if (e.ctrlKey && e.key === 'd' && state.selectedId) {
+        e.preventDefault();
+        state.duplicateElement(state.selectedId);
+      }
+      if (e.ctrlKey && e.key === 'z') {
+        e.preventDefault();
+        state.undo();
+      }
+      if (e.ctrlKey && e.key === 'y') {
+        e.preventDefault();
+        state.redo();
+      }
+      if (e.key === 'Escape') {
+        state.selectElement(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="app">
@@ -37,6 +68,7 @@ export default function App() {
         </div>
         <ChatPanel />
       </div>
+      <ContextMenu />
     </DndContext>
   );
 }

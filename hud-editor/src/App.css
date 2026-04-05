@@ -139,3 +139,61 @@ html, body, #root { height: 100%; }
 }
 .layout-btn:hover { border-color: #666; }
 .layout-btn.active { background: #1a3a1a; border-color: #4a4; color: #8d8; }
+
+/* Properties Panel */
+.prop-editor { display: flex; flex-direction: column; gap: 8px; }
+.prop-header {
+  color: #88aaff;
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.prop-field { display: flex; flex-direction: column; gap: 2px; }
+.prop-label { font-size: 10px; color: #888; text-transform: uppercase; }
+.prop-input {
+  background: #111;
+  border: 1px solid #444;
+  border-radius: 3px;
+  padding: 4px 6px;
+  color: #ccc;
+  font-size: 12px;
+}
+.prop-input:focus { outline: none; border-color: #4488ff; }
+.prop-empty { color: #666; font-size: 12px; }
+
+/* Element Tree */
+.element-tree { font-size: 11px; }
+.tree-node {
+  padding: 3px 6px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.tree-node:hover { background: rgba(68, 136, 255, 0.1); }
+.tree-node-selected { background: rgba(68, 136, 255, 0.2); color: #88aaff; }
+
+/* Context Menu */
+.context-menu {
+  position: fixed;
+  background: #1e293b;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 4px 0;
+  z-index: 1000;
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.context-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #ccc;
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.context-menu button:hover:not(:disabled) { background: rgba(68, 136, 255, 0.1); }
+.context-menu button:disabled { opacity: 0.4; cursor: default; }
+.context-menu-divider { border-top: 1px solid #333; margin: 4px 0; }
+.context-menu-danger { color: #ff6666 !important; }
