@@ -45,7 +45,10 @@ export default function PropertiesPanel() {
         <div className="prop-editor">
           <div className="prop-header">{element.type}: {element.id}</div>
 
-          <PropertyField label="ID" value={element.id} onChange={(v) => update({ id: v })} />
+          <div className="prop-field">
+            <label className="prop-label">ID</label>
+            <input className="prop-input" value={element.id} readOnly style={{ opacity: 0.6 }} />
+          </div>
           <PropertyField label="Beschreibung" value={element.description} onChange={(v) => update({ description: v })} />
 
           {'text' in element && (

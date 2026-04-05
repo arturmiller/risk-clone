@@ -70,6 +70,10 @@ app.post('/api/chat', async (req, res) => {
 
 app.post('/api/save', async (req, res) => {
   const { filename, content } = req.body;
+  if (typeof filename !== 'string' || !/^[a-z0-9-]+\.hud\.json$/.test(filename)) {
+    res.status(400).json({ error: 'Invalid filename. Must match <name>.hud.json' });
+    return;
+  }
   try {
     await mkdir(HUD_DIR, { recursive: true });
     await writeFile(join(HUD_DIR, filename), content, 'utf-8');

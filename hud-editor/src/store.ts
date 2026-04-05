@@ -39,6 +39,8 @@ interface EditorState {
   // Actions
   selectElement: (id: string | null) => void;
   updateElement: (id: string, updates: Partial<HudElement>) => void;
+  updateElementSilent: (id: string, updates: Partial<HudElement>) => void;
+  pushCurrentToHistory: () => void;
   deleteElement: (id: string) => void;
   addElement: (parentGridId: string, type: ElementType) => void;
   moveElement: (elementId: string, targetGridId: string) => void;
@@ -127,6 +129,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       const layout = { ...state.layout, root };
       return { layout, ...pushHistory({ ...state, layout }) };
     }),
+
+  updateElementSilent: (id, updates) =>
+    set((state) => {
+      const element = findById(state.layout.root, id);
+      if (!element) return state;
+      const updated = { ...element, ...updates } as HudElement;
+      const root = replaceById(state.layout.root, id, updated) as GridElement;
+      return { layout: { ...state.layout, root } };
+    }),
+
+  pushCurrentToHistory: () =>
+    set((state) => pushHistory(state)),
 
   deleteElement: (id) =>
     set((state) => {

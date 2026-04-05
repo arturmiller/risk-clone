@@ -15,7 +15,8 @@ function ResizeHandle({
   index: number;
   tracks: string[];
 }) {
-  const updateElement = useEditorStore((s) => s.updateElement);
+  const updateElementSilent = useEditorStore((s) => s.updateElementSilent);
+  const pushCurrentToHistory = useEditorStore((s) => s.pushCurrentToHistory);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -41,18 +42,19 @@ function ResizeHandle({
         newTracks[index + 1] = `${newNext.toFixed(2)}fr`;
 
         const update = direction === 'col' ? { cols: newTracks } : { rows: newTracks };
-        updateElement(gridId, update as any);
+        updateElementSilent(gridId, update as any);
       };
 
       const handleMouseUp = () => {
         window.removeEventListener('mousemove', handleMouseMove);
         window.removeEventListener('mouseup', handleMouseUp);
+        pushCurrentToHistory();
       };
 
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
     },
-    [gridId, direction, index, tracks, updateElement],
+    [gridId, direction, index, tracks, updateElementSilent, pushCurrentToHistory],
   );
 
   const isCol = direction === 'col';
