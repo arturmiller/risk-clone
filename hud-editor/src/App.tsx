@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { useEditorStore } from './store';
 import { ElementType } from './types';
+import { saveLayout } from './utils/json-io';
 import Toolbar from './components/Toolbar';
 import ElementLibrary from './components/ElementLibrary';
 import Canvas from './components/Canvas';
@@ -47,6 +48,10 @@ export default function App() {
       if (e.ctrlKey && e.key === 'y') {
         e.preventDefault();
         state.redo();
+      }
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        saveLayout(useEditorStore.getState().layout);
       }
       if (e.key === 'Escape') {
         state.selectElement(null);
