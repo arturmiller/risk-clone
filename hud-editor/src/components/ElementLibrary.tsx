@@ -48,10 +48,10 @@ export default function ElementLibrary() {
       <h3 style={{ marginTop: 16 }}>Layout</h3>
       <div className="library-list">
         <button
-          className={`layout-btn ${layoutMode === 'mobile-portrait' ? 'active' : ''}`}
-          onClick={() => setLayoutMode('mobile-portrait')}
+          className={`layout-btn ${layoutMode === 'mobile-landscape' ? 'active' : ''}`}
+          onClick={() => setLayoutMode('mobile-landscape')}
         >
-          📱 Mobile Portrait
+          📱 Mobile Landscape
         </button>
         <button
           className={`layout-btn ${layoutMode === 'desktop-landscape' ? 'active' : ''}`}

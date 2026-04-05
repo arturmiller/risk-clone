@@ -6,9 +6,9 @@ export default function Canvas() {
   const layoutMode = useEditorStore((s) => s.layoutMode);
   const selectElement = useEditorStore((s) => s.selectElement);
 
-  const isMobile = layoutMode === 'mobile-portrait';
-  const frameWidth = isMobile ? 390 : 800;
-  const frameHeight = isMobile ? 844 : 500;
+  const isMobile = layoutMode === 'mobile-landscape';
+  const frameWidth = isMobile ? 844 : 800;
+  const frameHeight = isMobile ? 390 : 500;
   const scale = 0.65;
 
   return (

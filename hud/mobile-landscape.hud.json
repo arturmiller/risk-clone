@@ -1,6 +1,6 @@
 {
-  "name": "mobile-portrait",
-  "canvasSize": [390, 844],
+  "name": "mobile-landscape",
+  "canvasSize": [844, 390],
   "root": {
     "type": "grid",
     "id": "root",

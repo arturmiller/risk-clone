@@ -15,7 +15,7 @@ import {
   cloneElement,
 } from './utils/tree';
 
-export type LayoutMode = 'mobile-portrait' | 'desktop-landscape';
+export type LayoutMode = 'mobile-landscape' | 'desktop-landscape';
 
 interface ContextMenuState {
   x: number;
@@ -65,7 +65,7 @@ function createEmptyLayout(mode: LayoutMode): HudLayout {
   const isDesktop = mode === 'desktop-landscape';
   return {
     name: mode,
-    canvasSize: isDesktop ? [1200, 700] : [390, 844],
+    canvasSize: isDesktop ? [1200, 700] : [844, 390],
     root: {
       type: 'grid',
       id: 'root',
@@ -111,11 +111,11 @@ function pushHistory(state: EditorState): Partial<EditorState> {
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
-  layout: createEmptyLayout('mobile-portrait'),
-  layoutMode: 'mobile-portrait',
+  layout: createEmptyLayout('mobile-landscape'),
+  layoutMode: 'mobile-landscape',
   selectedId: null,
   contextMenu: null,
-  history: [structuredClone(createEmptyLayout('mobile-portrait'))],
+  history: [structuredClone(createEmptyLayout('mobile-landscape'))],
   historyIndex: 0,
 
   selectElement: (id) => set({ selectedId: id, contextMenu: null }),
