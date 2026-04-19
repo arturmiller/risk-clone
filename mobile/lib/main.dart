@@ -1,6 +1,6 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
 import 'persistence/app_store.dart';
@@ -8,6 +8,10 @@ import 'persistence/persistence.dart' as persistence;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
 
   FlutterError.onError = (details) {
     debugPrint('FlutterError: ${details.exceptionAsString()}');
