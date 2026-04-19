@@ -144,10 +144,18 @@ IconData _materialIconFromName(String name) {
   }
 }
 
+typedef ListWidgetFactory = Widget Function(HudList el, HudTheme theme);
+
+Widget _buildAttackLog(HudList el, HudTheme theme) =>
+    AttackLogWidget(element: el, theme: theme);
+
+const Map<String, ListWidgetFactory> _listWidgets = {
+  'game.battleLog': _buildAttackLog,
+};
+
 Widget _listWidget(HudList el, HudTheme theme) {
-  if (el.itemBinding == 'game.battleLog') {
-    return AttackLogWidget(element: el, theme: theme);
-  }
+  final factory = _listWidgets[el.itemBinding];
+  if (factory != null) return factory(el, theme);
   if (kDebugMode) {
     debugPrint('[hud.list] Unknown itemBinding: ${el.itemBinding} (id=${el.id})');
   }
