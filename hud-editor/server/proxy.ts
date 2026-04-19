@@ -70,17 +70,26 @@ app.post('/api/chat', async (req, res) => {
 });
 
 app.post('/api/save', async (req, res) => {
-  const { filename, content } = req.body;
-  if (typeof filename !== 'string' || !/^[a-z0-9-]+\.hud\.json$/.test(filename)) {
-    res.status(400).json({ error: 'Invalid filename. Must match <name>.hud.json' });
+  const { content } = req.body;
+  if (typeof content !== 'string') {
+    res.status(400).json({ error: 'Missing content' });
     return;
   }
   try {
     await mkdir(HUD_DIR, { recursive: true });
-    await writeFile(join(HUD_DIR, filename), content, 'utf-8');
-    res.json({ ok: true, path: join(HUD_DIR, filename) });
+    await writeFile(join(HUD_DIR, 'hud.json'), content, 'utf-8');
+    res.json({ ok: true, path: join(HUD_DIR, 'hud.json') });
   } catch (error) {
     res.status(500).json({ error: String(error) });
+  }
+});
+
+app.get('/api/hud', async (_req, res) => {
+  try {
+    const content = await readFile(join(HUD_DIR, 'hud.json'), 'utf-8');
+    res.json(JSON.parse(content));
+  } catch {
+    res.status(404).json({ error: 'hud.json not found' });
   }
 });
 
@@ -95,20 +104,6 @@ app.get('/api/map/:name', async (req, res) => {
     res.json(JSON.parse(content));
   } catch {
     res.status(404).json({ error: 'Map not found' });
-  }
-});
-
-app.get('/api/layout/:name', async (req, res) => {
-  const { name } = req.params;
-  if (!/^[a-z0-9-]+$/.test(name)) {
-    res.status(400).json({ error: 'Invalid layout name' });
-    return;
-  }
-  try {
-    const content = await readFile(join(HUD_DIR, `${name}.hud.json`), 'utf-8');
-    res.json(JSON.parse(content));
-  } catch {
-    res.status(404).json({ error: 'Layout not found' });
   }
 });
 

@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { GridElement, HudElement } from '../types';
 import { useEditorStore } from '../store';
 import ElementRenderer from './elements/ElementRenderer';
+import { applyStyle } from '../utils/style';
 
 function ResizeHandle({
   gridId,
@@ -76,11 +77,9 @@ interface GridCellProps {
   depth?: number;
 }
 
-function EmptyDropZone({ gridId }: { gridId: string }) {
-  const { setNodeRef, isOver } = useDroppable({ id: `drop-${gridId}`, data: { gridId } });
+function EmptyPlaceholder({ isOver }: { isOver: boolean }) {
   return (
     <div
-      ref={setNodeRef}
       className="grid-empty-cell"
       style={{ background: isOver ? 'rgba(68, 136, 255, 0.15)' : undefined }}
     >
@@ -108,49 +107,14 @@ export default function GridCell({ element, depth = 0 }: GridCellProps) {
   };
 
   if (element.type === 'grid') {
-    const grid = element as GridElement;
     return (
-      <div
-        className={`grid-cell grid-container ${isSelected ? 'selected' : ''}`}
-        style={{
-          display: 'grid',
-          gridTemplateRows: (grid.rows || ['1fr']).join(' '),
-          gridTemplateColumns: (grid.cols || ['1fr']).join(' '),
-          gap: 1,
-          minHeight: depth === 0 ? '100%' : 30,
-          gridRow: element.row !== undefined ? element.row + 1 : undefined,
-          gridColumn: element.col !== undefined ? element.col + 1 : undefined,
-          gridRowEnd: element.rowSpan ? `span ${element.rowSpan}` : undefined,
-          gridColumnEnd: element.colSpan ? `span ${element.colSpan}` : undefined,
-        }}
+      <DroppableGridContainer
+        grid={element as GridElement}
+        depth={depth}
+        isSelected={isSelected}
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-      >
-        {grid.children.map((child) => (
-          <GridCell key={child.id} element={child} depth={depth + 1} />
-        ))}
-        <EmptyDropZone gridId={grid.id} />
-        {(grid.cols || ['1fr']).length > 1 &&
-          (grid.cols || ['1fr']).slice(0, -1).map((_, i) => (
-            <ResizeHandle
-              key={`col-${i}`}
-              gridId={grid.id}
-              direction="col"
-              index={i}
-              tracks={grid.cols || ['1fr']}
-            />
-          ))}
-        {(grid.rows || ['1fr']).length > 1 &&
-          (grid.rows || ['1fr']).slice(0, -1).map((_, i) => (
-            <ResizeHandle
-              key={`row-${i}`}
-              gridId={grid.id}
-              direction="row"
-              index={i}
-              tracks={grid.rows || ['1fr']}
-            />
-          ))}
-      </div>
+      />
     );
   }
 
@@ -161,6 +125,77 @@ export default function GridCell({ element, depth = 0 }: GridCellProps) {
       onClick={handleClick}
       onContextMenu={handleContextMenu}
     />
+  );
+}
+
+function DroppableGridContainer({
+  grid,
+  depth,
+  isSelected,
+  onClick,
+  onContextMenu,
+}: {
+  grid: GridElement;
+  depth: number;
+  isSelected: boolean;
+  onClick: (e: React.MouseEvent) => void;
+  onContextMenu: (e: React.MouseEvent) => void;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `drop-${grid.id}`,
+    data: { gridId: grid.id },
+  });
+  const isEmpty = grid.children.length === 0;
+
+  const theme = useEditorStore((s) => s.theme);
+  const userStyle = applyStyle(grid.style, theme);
+  return (
+    <div
+      ref={setNodeRef}
+      className={`grid-cell grid-container ${isSelected ? 'selected' : ''}`}
+      style={{
+        display: 'grid',
+        gridTemplateRows: (grid.rows || ['1fr']).join(' '),
+        gridTemplateColumns: (grid.cols || ['1fr']).join(' '),
+        gap: grid.style?.gap ?? 1,
+        minHeight: depth === 0 ? '100%' : 30,
+        gridRow: grid.row !== undefined ? grid.row + 1 : undefined,
+        gridColumn: grid.col !== undefined ? grid.col + 1 : undefined,
+        gridRowEnd: grid.rowSpan ? `span ${grid.rowSpan}` : undefined,
+        gridColumnEnd: grid.colSpan ? `span ${grid.colSpan}` : undefined,
+        ...userStyle,
+        background: isOver && !isEmpty
+          ? 'rgba(68, 136, 255, 0.08)'
+          : userStyle.background,
+      }}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+    >
+      {grid.children.map((child) => (
+        <GridCell key={child.id} element={child} depth={depth + 1} />
+      ))}
+      {isEmpty && <EmptyPlaceholder isOver={isOver} />}
+      {(grid.cols || ['1fr']).length > 1 &&
+        (grid.cols || ['1fr']).slice(0, -1).map((_, i) => (
+          <ResizeHandle
+            key={`col-${i}`}
+            gridId={grid.id}
+            direction="col"
+            index={i}
+            tracks={grid.cols || ['1fr']}
+          />
+        ))}
+      {(grid.rows || ['1fr']).length > 1 &&
+        (grid.rows || ['1fr']).slice(0, -1).map((_, i) => (
+          <ResizeHandle
+            key={`row-${i}`}
+            gridId={grid.id}
+            direction="row"
+            index={i}
+            tracks={grid.rows || ['1fr']}
+          />
+        ))}
+    </div>
   );
 }
 
@@ -187,6 +222,10 @@ function DraggableLeafCell({
       style={{
         gridRow: element.row !== undefined ? element.row + 1 : undefined,
         gridColumn: element.col !== undefined ? element.col + 1 : undefined,
+        gridRowEnd: element.rowSpan ? `span ${element.rowSpan}` : undefined,
+        gridColumnEnd: element.colSpan ? `span ${element.colSpan}` : undefined,
+        alignSelf: element.style?.alignSelf,
+        justifySelf: element.style?.justifySelf,
         opacity: isDragging ? 0.4 : 1,
       }}
       onClick={onClick}
