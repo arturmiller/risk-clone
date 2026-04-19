@@ -89,13 +89,38 @@ TextAlign? textAlignFrom(Map<String, dynamic>? s) {
   }
 }
 
+/// Split [s] on commas that are NOT inside parentheses.
+List<String> _splitTopLevel(String s) {
+  final result = <String>[];
+  final buf = StringBuffer();
+  int depth = 0;
+  for (final ch in s.split('')) {
+    if (ch == '(') {
+      depth++;
+      buf.write(ch);
+    } else if (ch == ')') {
+      depth--;
+      buf.write(ch);
+    } else if (ch == ',' && depth == 0) {
+      result.add(buf.toString().trim());
+      buf.clear();
+    } else {
+      buf.write(ch);
+    }
+  }
+  final last = buf.toString().trim();
+  if (last.isNotEmpty) result.add(last);
+  return result;
+}
+
 LinearGradient parseGradient(String input, HudTheme theme) {
   final trimmed = input.trim();
-  final match = RegExp(r'^linear-gradient\(([^)]+)\)$').firstMatch(trimmed);
+  // Use a regex that allows nested parentheses inside the outer parens.
+  final match = RegExp(r'^linear-gradient\((.+)\)$', dotAll: true).firstMatch(trimmed);
   if (match == null) {
     throw FormatException('Not a linear-gradient: $trimmed');
   }
-  final parts = match.group(1)!.split(',').map((s) => s.trim()).toList();
+  final parts = _splitTopLevel(match.group(1)!);
   if (parts.isEmpty) {
     throw FormatException('Empty linear-gradient args');
   }
