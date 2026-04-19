@@ -9,6 +9,8 @@ import '../models.dart';
 import '../selected_when.dart';
 import '../style.dart';
 import '../style_box.dart';
+import '../widgets/attack_log.dart';
+import '../widgets/card_hand.dart';
 
 /// Top-level dispatch: given any HudElement, produce a widget.
 Widget renderElement(HudElement el, HudTheme theme) => switch (el) {
@@ -168,7 +170,13 @@ IconData _materialIconFromName(String name) {
   }
 }
 
-// Forward declarations for widgets in other files.
-// Task 13 defines _listWidget and _cardHandWidget as real imports.
-Widget _listWidget(HudList el, HudTheme theme) => const SizedBox();
-Widget _cardHandWidget(HudCardHand el, HudTheme theme) => const SizedBox();
+Widget _listWidget(HudList el, HudTheme theme) {
+  if (el.itemBinding == 'game.battleLog') {
+    return AttackLogWidget(element: el, theme: theme);
+  }
+  assert(false, 'Unknown itemBinding: ${el.itemBinding}');
+  return const SizedBox();
+}
+
+Widget _cardHandWidget(HudCardHand el, HudTheme theme) =>
+    CardHandWidget(element: el, theme: theme);

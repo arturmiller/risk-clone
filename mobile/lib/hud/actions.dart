@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../engine/actions.dart' as ga;
 import '../providers/game_provider.dart';
 import '../providers/ui_provider.dart';
+import 'widgets/card_hand_visibility_provider.dart';
 
 /// Dispatches a declarative action string to the appropriate game mutation.
 void dispatchAction(String action, WidgetRef ref) {
@@ -62,7 +63,5 @@ void _doEndPhase(WidgetRef ref) {
   ref.read(gameProvider.notifier).humanMove(null);
 }
 
-void _openCards(WidgetRef ref) {
-  // Implemented in Task 13 via cardHandVisibilityProvider.
-  // For now, a no-op; Task 13 replaces this body.
-}
+void _openCards(WidgetRef ref) =>
+    ref.read(cardHandVisibilityProvider.notifier).toggle();
