@@ -95,8 +95,8 @@ export default function HelpDialog({ open, onClose }: HelpDialogProps) {
             <h3>Speichern &amp; Laden</h3>
             <table>
               <tbody>
-                <tr><td className="help-key">💾 Save</td><td>Speichert als .hud.json in den hud/ Ordner (oder Download)</td></tr>
-                <tr><td className="help-key">📂 Load</td><td>Lädt eine .hud.json Datei vom Computer</td></tr>
+                <tr><td className="help-key">💾 Save</td><td>Speichert hud.json nach mobile/assets/hud.json (oder Download)</td></tr>
+                <tr><td className="help-key">📂 Load</td><td>Lädt eine hud.json Datei vom Computer</td></tr>
               </tbody>
             </table>
             <p style={{ marginTop: 8, color: '#888' }}>Beschreibungen pro Element helfen Claude CLI später bei der Datenbindung.</p>

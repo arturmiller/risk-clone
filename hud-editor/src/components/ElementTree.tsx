@@ -4,6 +4,7 @@ import { useEditorStore } from '../store';
 function TreeNode({ element, depth }: { element: HudElement; depth: number }) {
   const selectedId = useEditorStore((s) => s.selectedId);
   const selectElement = useEditorStore((s) => s.selectElement);
+  const setContextMenu = useEditorStore((s) => s.setContextMenu);
   const isSelected = selectedId === element.id;
 
   const icon =
@@ -16,12 +17,20 @@ function TreeNode({ element, depth }: { element: HudElement; depth: number }) {
     element.type === 'cardhand' ? '🃏' :
     element.type === 'container' ? '📦' : '↔️';
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    selectElement(element.id);
+    setContextMenu({ x: e.clientX, y: e.clientY, targetId: element.id });
+  };
+
   return (
     <>
       <div
         className={`tree-node ${isSelected ? 'tree-node-selected' : ''}`}
         style={{ paddingLeft: depth * 16 }}
         onClick={() => selectElement(element.id)}
+        onContextMenu={handleContextMenu}
       >
         {icon} {element.id}
       </div>

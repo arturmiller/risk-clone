@@ -2,3 +2,7 @@ node_modules/
 .playwright-mcp/
 dist/
 .superpowers/
+*.tsbuildinfo
+
+# Debug screenshots at repo root
+/*.png

@@ -1,12 +1,11 @@
 import express from 'express';
 import { execFile } from 'child_process';
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 
 const app = express();
 app.use(express.json({ limit: '5mb' }));
 
-const HUD_DIR = join(import.meta.dirname, '..', '..', 'hud');
 const ASSETS_DIR = join(import.meta.dirname, '..', '..', 'mobile', 'assets');
 
 const SYSTEM_PROMPT = `Du bist ein HUD-Layout-Editor-Assistent für ein Risk-Spiel.
@@ -70,17 +69,29 @@ app.post('/api/chat', async (req, res) => {
 });
 
 app.post('/api/save', async (req, res) => {
-  const { filename, content } = req.body;
-  if (typeof filename !== 'string' || !/^[a-z0-9-]+\.hud\.json$/.test(filename)) {
-    res.status(400).json({ error: 'Invalid filename. Must match <name>.hud.json' });
+  const { content } = req.body;
+  if (typeof content !== 'string') {
+    res.status(400).json({ error: 'Missing content' });
     return;
   }
   try {
-    await mkdir(HUD_DIR, { recursive: true });
-    await writeFile(join(HUD_DIR, filename), content, 'utf-8');
-    res.json({ ok: true, path: join(HUD_DIR, filename) });
+    await writeFile(join(ASSETS_DIR, 'hud.json'), content, 'utf-8');
+    res.json({ ok: true, path: join(ASSETS_DIR, 'hud.json') });
   } catch (error) {
     res.status(500).json({ error: String(error) });
+  }
+});
+
+app.get('/api/hud', async (_req, res) => {
+  try {
+    const content = await readFile(join(ASSETS_DIR, 'hud.json'), 'utf-8');
+    res.json(JSON.parse(content));
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      res.status(404).json({ error: 'hud.json not found — save a layout in the editor to create it.' });
+    } else {
+      res.status(500).json({ error: String(err) });
+    }
   }
 });
 
@@ -98,22 +109,8 @@ app.get('/api/map/:name', async (req, res) => {
   }
 });
 
-app.get('/api/layout/:name', async (req, res) => {
-  const { name } = req.params;
-  if (!/^[a-z0-9-]+$/.test(name)) {
-    res.status(400).json({ error: 'Invalid layout name' });
-    return;
-  }
-  try {
-    const content = await readFile(join(HUD_DIR, `${name}.hud.json`), 'utf-8');
-    res.json(JSON.parse(content));
-  } catch {
-    res.status(404).json({ error: 'Layout not found' });
-  }
-});
-
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`HUD Editor Proxy running on http://localhost:${PORT}`);
-  console.log(`Saving layouts to ${HUD_DIR}`);
+  console.log(`Saving layouts to ${ASSETS_DIR}`);
 });
