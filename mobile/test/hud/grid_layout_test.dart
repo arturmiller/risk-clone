@@ -114,4 +114,37 @@ void main() {
     final b = tester.getRect(find.byKey(const ValueKey('b')));
     expect(b.left - a.right, 10);
   });
+
+  testWidgets('auto tracks size to intrinsic child height', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 100,
+          height: 200,
+          child: HudGridLayout(
+            rows: const ['auto', '1fr'],
+            cols: const ['1fr'],
+            gap: 0,
+            children: [
+              _childAt(
+                  id: 'h',
+                  row: 0,
+                  col: 0,
+                  child: const SizedBox(key: ValueKey('h'), height: 40)),
+              _childAt(
+                  id: 'b',
+                  row: 1,
+                  col: 0,
+                  child: const SizedBox.expand(key: ValueKey('b'))),
+            ],
+          ),
+        ),
+      ),
+    ));
+    final h = tester.getRect(find.byKey(const ValueKey('h')));
+    final b = tester.getRect(find.byKey(const ValueKey('b')));
+    expect(h.height, 40); // auto row sized to child
+    expect(b.height, 160); // fr row gets the rest
+    expect(b.top, 40); // fr row starts below auto row
+  });
 }
