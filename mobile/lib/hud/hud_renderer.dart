@@ -16,7 +16,15 @@ class HudRenderer extends ConsumerWidget {
     final async = ref.watch(hudConfigProvider);
     return async.when(
       data: (config) => _HudRootLayout(config: config),
-      loading: () => const SizedBox(),
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'Loading HUD\u2026',
+            style: TextStyle(color: Colors.white60, fontSize: 12),
+          ),
+        ),
+      ),
       error: (e, st) => _HudErrorWidget(error: e),
     );
   }
