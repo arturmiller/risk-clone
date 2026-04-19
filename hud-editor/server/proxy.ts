@@ -6,7 +6,6 @@ import { join } from 'path';
 const app = express();
 app.use(express.json({ limit: '5mb' }));
 
-const HUD_DIR = join(import.meta.dirname, '..', '..', 'hud');
 const ASSETS_DIR = join(import.meta.dirname, '..', '..', 'mobile', 'assets');
 
 const SYSTEM_PROMPT = `Du bist ein HUD-Layout-Editor-Assistent für ein Risk-Spiel.
@@ -76,9 +75,9 @@ app.post('/api/save', async (req, res) => {
     return;
   }
   try {
-    await mkdir(HUD_DIR, { recursive: true });
-    await writeFile(join(HUD_DIR, 'hud.json'), content, 'utf-8');
-    res.json({ ok: true, path: join(HUD_DIR, 'hud.json') });
+    await mkdir(ASSETS_DIR, { recursive: true });
+    await writeFile(join(ASSETS_DIR, 'hud.json'), content, 'utf-8');
+    res.json({ ok: true, path: join(ASSETS_DIR, 'hud.json') });
   } catch (error) {
     res.status(500).json({ error: String(error) });
   }
@@ -86,7 +85,7 @@ app.post('/api/save', async (req, res) => {
 
 app.get('/api/hud', async (_req, res) => {
   try {
-    const content = await readFile(join(HUD_DIR, 'hud.json'), 'utf-8');
+    const content = await readFile(join(ASSETS_DIR, 'hud.json'), 'utf-8');
     res.json(JSON.parse(content));
   } catch {
     res.status(404).json({ error: 'hud.json not found' });
@@ -110,5 +109,5 @@ app.get('/api/map/:name', async (req, res) => {
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`HUD Editor Proxy running on http://localhost:${PORT}`);
-  console.log(`Saving layouts to ${HUD_DIR}`);
+  console.log(`Saving layouts to ${ASSETS_DIR}`);
 });
