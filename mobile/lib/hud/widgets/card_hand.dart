@@ -45,17 +45,11 @@ class _CardHandWidgetState extends ConsumerState<CardHandWidget> {
     final validSet =
         selectedCards.length == 3 && cards_engine.isValidSet(selectedCards);
 
-    return Container(
+    // Outer chrome (background, border, borderRadius, padding) is applied by
+    // HudStyleBox using element.style from hud.json. Only width is kept here
+    // as a structural layout constraint.
+    return SizedBox(
       width: 220,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.brown.shade900.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Colors.amber.shade700.withValues(alpha: 0.5),
-          width: 1,
-        ),
-      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
