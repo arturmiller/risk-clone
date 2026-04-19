@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,15 +11,14 @@ import '../style.dart';
 import '../style_box.dart';
 
 /// Top-level dispatch: given any HudElement, produce a widget.
-Widget renderElement(HudElement el, HudTheme theme) {
-  if (el is HudGrid) return _Grid(grid: el, theme: theme);
-  if (el is HudLabel) return _Label(label: el, theme: theme);
-  if (el is HudIcon) return _Icon(icon: el, theme: theme);
-  if (el is HudButton) return _Button(button: el, theme: theme);
-  if (el is HudList) return _listWidget(el, theme);
-  if (el is HudCardHand) return _cardHandWidget(el, theme);
-  return const SizedBox();
-}
+Widget renderElement(HudElement el, HudTheme theme) => switch (el) {
+      HudGrid() => _Grid(grid: el, theme: theme),
+      HudLabel() => _Label(label: el, theme: theme),
+      HudIcon() => _Icon(icon: el, theme: theme),
+      HudButton() => _Button(button: el, theme: theme),
+      HudList() => _listWidget(el, theme),
+      HudCardHand() => _cardHandWidget(el, theme),
+    };
 
 /// Wrap a child with grid placement data so HudGridLayout sees it.
 Widget _placed(HudElement el, Widget child) {
@@ -70,7 +70,7 @@ class _Label extends ConsumerWidget {
     return HudStyleBox(
       theme: theme,
       style: label.style,
-      child: Text(text, style: _textStyleFrom(label.style, theme)),
+      child: Text(text, style: _textStyleFrom(label.style, theme), textAlign: _textAlignFrom(label.style)),
     );
   }
 }
@@ -118,7 +118,7 @@ class _Button extends ConsumerWidget {
             ? () => dispatchAction(button.action!, ref)
             : null,
         child: Center(
-          child: Text(button.text ?? '', style: _textStyleFrom(style, theme)),
+          child: Text(button.text ?? '', style: _textStyleFrom(style, theme), textAlign: _textAlignFrom(style)),
         ),
       ),
     );
@@ -134,6 +134,24 @@ TextStyle _textStyleFrom(Map<String, dynamic>? s, HudTheme theme) {
   return TextStyle(color: color, fontSize: fontSize, fontWeight: fw);
 }
 
+TextAlign? _textAlignFrom(Map<String, dynamic>? s) {
+  if (s == null) return null;
+  switch (s['textAlign']) {
+    case 'left':
+      return TextAlign.left;
+    case 'right':
+      return TextAlign.right;
+    case 'center':
+      return TextAlign.center;
+    case 'start':
+      return TextAlign.start;
+    case 'end':
+      return TextAlign.end;
+    default:
+      return null;
+  }
+}
+
 IconData _materialIconFromName(String name) {
   switch (name) {
     case 'person':
@@ -143,6 +161,9 @@ IconData _materialIconFromName(String name) {
     case 'style':
       return Icons.style;
     default:
+      if (kDebugMode) {
+        debugPrint('[hud.icon] Unknown Material icon name: $name');
+      }
       return Icons.help_outline;
   }
 }
