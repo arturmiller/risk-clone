@@ -132,13 +132,13 @@ function validateElement(
   }
   if (el.type === 'button') {
     if (el.action !== undefined && typeof el.action !== 'string') {
-      errors.push(`${path}.action must be a string`);
+      errors.push(`${path}.action must be a string when present.`);
     }
     if (el.selectedWhen !== undefined && typeof el.selectedWhen !== 'string') {
-      errors.push(`${path}.selectedWhen must be a string`);
+      errors.push(`${path}.selectedWhen must be a string when present.`);
     }
     if (el.selectedStyle !== undefined && (typeof el.selectedStyle !== 'object' || el.selectedStyle === null)) {
-      errors.push(`${path}.selectedStyle must be an object`);
+      errors.push(`${path}.selectedStyle must be an object when present.`);
     }
   }
   if (el.type === 'grid' || el.type === 'container') {

@@ -128,6 +128,8 @@ export default function PropertiesPanel() {
               </div>
               <PropertyField label="Action" value={(element as any).action} onChange={(v) => update({ action: v || undefined } as any)} />
               <PropertyField label="Selected When" value={(element as any).selectedWhen} onChange={(v) => update({ selectedWhen: v || undefined } as any)} />
+              {/* TODO: Add a raw-JSON editor for `selectedStyle` in a follow-up. For now the
+                  field is preserved round-trip via hand-edited JSON. */}
             </>
           )}
 
