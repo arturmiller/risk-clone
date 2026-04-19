@@ -1,6 +1,6 @@
 import express from 'express';
 import { execFile } from 'child_process';
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 
 const app = express();
@@ -75,7 +75,6 @@ app.post('/api/save', async (req, res) => {
     return;
   }
   try {
-    await mkdir(ASSETS_DIR, { recursive: true });
     await writeFile(join(ASSETS_DIR, 'hud.json'), content, 'utf-8');
     res.json({ ok: true, path: join(ASSETS_DIR, 'hud.json') });
   } catch (error) {
@@ -87,8 +86,12 @@ app.get('/api/hud', async (_req, res) => {
   try {
     const content = await readFile(join(ASSETS_DIR, 'hud.json'), 'utf-8');
     res.json(JSON.parse(content));
-  } catch {
-    res.status(404).json({ error: 'hud.json not found' });
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      res.status(404).json({ error: 'hud.json not found — save a layout in the editor to create it.' });
+    } else {
+      res.status(500).json({ error: String(err) });
+    }
   }
 });
 
