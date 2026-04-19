@@ -157,7 +157,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         body: SafeArea(
           child: Stack(
             children: [
-              Positioned.fill(child: MapWidget(mapAsset: widget.mapAsset)),
+              Positioned.fill(child: MapWidget(mapAsset: widget.mapAsset, gameMode: widget.gameMode)),
               const Positioned.fill(child: HudRenderer()),
             ],
           ),
