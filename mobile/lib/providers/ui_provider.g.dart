@@ -41,7 +41,7 @@ final class UIStateNotifierProvider
   }
 }
 
-String _$uIStateNotifierHash() => r'2ba2292f0cb049b5df9c777555d1aff670c91de0';
+String _$uIStateNotifierHash() => r'd7a9dc05ed9ce2a9ae117b3e97d58aef427dbd40';
 
 abstract class _$UIStateNotifier extends $Notifier<UIState> {
   UIState build();

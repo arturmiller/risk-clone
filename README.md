@@ -62,7 +62,7 @@ npm run proxy
 
 Requires Node.js 18+. The Claude chat proxy requires [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI installed.
 
-The editor outputs `.hud.json` layout files to the `hud/` directory. These are later converted to Flutter widgets by Claude CLI.
+The editor outputs a merged `hud.json` (containing both mobile and desktop layouts) to the `hud/` directory. This is later converted to Flutter widgets by Claude CLI.
 
 ## Project Structure
 
@@ -79,6 +79,6 @@ mobile/          Flutter app (main project)
   test/          Unit and widget tests
 editor/          Web-based map polygon editor
 hud-editor/      Web-based HUD layout editor (React + TypeScript)
-hud/             HUD layout files (.hud.json)
+hud/             Merged HUD layout file (hud.json)
 maps/            Source map data files
 ```

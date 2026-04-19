@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { useEditorStore } from './store';
-import { ElementType, HudLayout } from './types';
-import { saveLayout } from './utils/json-io';
+import { ElementType, HUD_FILE_VERSION } from './types';
+import { saveFile } from './utils/json-io';
+import { validateHudFile } from './utils/validate';
 import Toolbar from './components/Toolbar';
 import ElementLibrary from './components/ElementLibrary';
 import Canvas from './components/Canvas';
@@ -14,19 +15,27 @@ import HelpDialog from './components/HelpDialog';
 export default function App() {
   const addElement = useEditorStore((s) => s.addElement);
   const moveElement = useEditorStore((s) => s.moveElement);
-  const setLayout = useEditorStore((s) => s.setLayout);
+  const setFile = useEditorStore((s) => s.setFile);
   const [helpOpen, setHelpOpen] = useState(false);
   const toggleHelp = useCallback(() => setHelpOpen((v) => !v), []);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
 
-  // Load default layout on startup
   useEffect(() => {
-    fetch('/api/layout/mobile-landscape')
-      .then((r) => r.ok ? r.json() : null)
-      .then((data: HudLayout | null) => {
-        if (data) setLayout(data);
+    fetch('/api/hud')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: unknown) => {
+        if (!data) return;
+        const result = validateHudFile(data);
+        if (result.ok) {
+          setFile(result.file);
+        } else {
+          console.warn('hud.json failed validation:\n', result.errors.join('\n'));
+        }
       })
       .catch(() => {});
-  }, [setLayout]);
+  }, [setFile]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -65,7 +74,8 @@ export default function App() {
       }
       if (e.ctrlKey && e.key === 's') {
         e.preventDefault();
-        saveLayout(useEditorStore.getState().layout);
+        const s = useEditorStore.getState();
+        saveFile({ version: HUD_FILE_VERSION, theme: s.theme, layouts: s.layouts });
       }
       if (e.key === 'Escape') {
         state.selectElement(null);
@@ -81,7 +91,7 @@ export default function App() {
   }, []);
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="app">
         <Toolbar onHelp={toggleHelp} />
         <div className="app-body">

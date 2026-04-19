@@ -9,17 +9,31 @@ export type ElementType =
   | 'container'
   | 'spacer';
 
+/**
+ * Unit convention:
+ * - Single-value length fields (fontSize, borderRadius, padding, gap) accept
+ *   either a number (interpreted as pixels) OR a CSS string ("6px", "2px 6px",
+ *   "4px 8px 4px 8px"). Use strings when you need shorthand or non-pixel units.
+ * - Compound fields (border) are always CSS strings: "1px solid #FFA000".
+ * - Enumerated fields (textAlign, alignSelf, justifySelf) are literal unions.
+ * - Color fields (color, background, border color component) may contain
+ *   {theme-token} placeholders like "{text}" resolved at render time.
+ */
+export type Length = number | string;
+
 export interface ElementStyle {
-  fontSize?: number;
+  fontSize?: Length;
   color?: string;
   background?: string;
   border?: string;
-  borderRadius?: number;
-  padding?: string;
+  borderRadius?: Length;
+  padding?: Length;
   fontWeight?: string;
-  textAlign?: string;
+  textAlign?: 'left' | 'center' | 'right';
   opacity?: number;
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  gap?: Length;
+  alignSelf?: 'start' | 'center' | 'end' | 'stretch';
+  justifySelf?: 'start' | 'center' | 'end' | 'stretch';
 }
 
 export interface HudElementBase {
@@ -42,12 +56,28 @@ export interface GridElement extends HudElementBase {
 
 export interface LabelElement extends HudElementBase {
   type: 'label';
+  /** Sample / fallback text shown in the editor preview. */
   text: string;
+  /** Data path resolved at runtime (e.g. "players[0].name"). When set, `text` is only a sample. */
+  binding?: string;
 }
 
 export interface ButtonElement extends HudElementBase {
   type: 'button';
+  /** Sample / fallback text shown in the editor preview. */
   text: string;
+  /** Data path resolved at runtime for the button's label. */
+  binding?: string;
+  /** Buttons sharing the same `group` are mutually exclusive (radio behavior). */
+  group?: string;
+  /** Initial / persistent selection state within the group. */
+  selected?: boolean;
+  /** Action name dispatched on tap by the Flutter runtime. */
+  action?: string;
+  /** Binding expression that resolves to true/false; when true the button renders in selectedStyle. */
+  selectedWhen?: string;
+  /** Style merged over the base style when selectedWhen is true. */
+  selectedStyle?: ElementStyle;
 }
 
 export interface SliderElement extends HudElementBase {
@@ -65,6 +95,8 @@ export interface IconElement extends HudElementBase {
 export interface ListElement extends HudElementBase {
   type: 'list';
   maxItems?: number;
+  /** Data path resolved at runtime producing list items (e.g. "game.battleLog"). */
+  itemBinding?: string;
 }
 
 export interface CardhandElement extends HudElementBase {
@@ -98,9 +130,17 @@ export interface HudTheme {
   borderRadius: number;
 }
 
+export type LayoutMode = 'mobile-landscape' | 'desktop-landscape';
+
 export interface HudLayout {
-  name: string;
   canvasSize: [number, number];
   root: GridElement;
+}
+
+export const HUD_FILE_VERSION = 1;
+
+export interface HudFile {
+  version: number;
   theme: HudTheme;
+  layouts: Record<LayoutMode, HudLayout>;
 }

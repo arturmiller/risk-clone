@@ -5,16 +5,13 @@ import '../engine/models/cards.dart';
 import '../engine/models/game_config.dart';
 import '../engine/models/game_state.dart';
 import '../engine/reinforcements.dart';
+import '../hud/hud_renderer.dart';
 import '../providers/game_provider.dart';
 import '../providers/map_provider.dart';
 import '../providers/simulation_provider.dart';
 import '../providers/ui_provider.dart';
-import '../widgets/action_panel.dart';
-import '../widgets/continent_panel.dart';
-import '../widgets/game_log.dart';
 import '../widgets/game_over_dialog.dart';
 import '../widgets/map/map_widget.dart';
-import '../widgets/mobile_game_overlay.dart';
 import '../widgets/simulation_control_bar.dart';
 import '../widgets/simulation_status_bar.dart';
 import '../widgets/territory_inspector.dart';
@@ -123,14 +120,46 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       }
     });
 
+    if (widget.gameMode == GameMode.simulation) {
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: _handlePop,
+        child: Scaffold(
+          body: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 48, child: SimulationStatusBar()),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      MapWidget(gameMode: widget.gameMode, mapAsset: widget.mapAsset),
+                      const Positioned(
+                        bottom: 8,
+                        left: 0,
+                        right: 0,
+                        child: TerritoryInspector(),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 80, child: SimulationControlBar()),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: _handlePop,
       child: Scaffold(
         body: SafeArea(
-          child: _PortraitLayout(
-            gameMode: widget.gameMode,
-            mapAsset: widget.mapAsset,
+          child: Stack(
+            children: [
+              Positioned.fill(child: MapWidget(mapAsset: widget.mapAsset, gameMode: widget.gameMode)),
+              const Positioned.fill(child: HudRenderer()),
+            ],
           ),
         ),
       ),
@@ -188,115 +217,3 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 }
 
-class _PortraitLayout extends StatelessWidget {
-  final GameMode gameMode;
-  final String mapAsset;
-  const _PortraitLayout({required this.gameMode, required this.mapAsset});
-
-  @override
-  Widget build(BuildContext context) {
-    if (gameMode == GameMode.simulation) {
-      return Column(
-        children: [
-          const SizedBox(height: 48, child: SimulationStatusBar()),
-          Expanded(
-            child: Stack(
-              children: [
-                MapWidget(gameMode: gameMode, mapAsset: mapAsset),
-                const Positioned(
-                  bottom: 8,
-                  left: 0,
-                  right: 0,
-                  child: TerritoryInspector(),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 80, child: SimulationControlBar()),
-        ],
-      );
-    }
-    // Mobile-optimized overlay layout for vsBot mode
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        MapWidget(gameMode: gameMode, mapAsset: mapAsset),
-        ...MobileGameOverlay.buildOverlayWidgets(),
-      ],
-    );
-  }
-}
-
-class _LandscapeLayout extends StatelessWidget {
-  final GameMode gameMode;
-  final String mapAsset;
-  const _LandscapeLayout({required this.gameMode, this.mapAsset = 'original'});
-
-  @override
-  Widget build(BuildContext context) {
-    if (gameMode == GameMode.simulation) {
-      return Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Stack(
-              children: [
-                MapWidget(gameMode: gameMode, mapAsset: mapAsset),
-                const Positioned(
-                  bottom: 8,
-                  left: 0,
-                  right: 0,
-                  child: TerritoryInspector(),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: 280,
-            child: Column(
-              children: [
-                const SizedBox(height: 48, child: SimulationStatusBar()),
-                const Divider(height: 1),
-                const Expanded(
-                  flex: 3,
-                  child: ClipRect(child: GameLogWidget()),
-                ),
-                const Divider(height: 1),
-                const Expanded(
-                  flex: 2,
-                  child: ClipRect(child: SimulationControlBar()),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-    return Row(
-      children: [
-        Expanded(flex: 3, child: MapWidget(mapAsset: mapAsset)),
-        SizedBox(
-          width: 280,
-          child: Column(
-            children: [
-              const Expanded(
-                flex: 2,
-                child: ClipRect(child: ActionPanel()),
-              ),
-              const Divider(height: 1),
-              const Expanded(
-                flex: 3,
-                child: ClipRect(child: GameLogWidget()),
-              ),
-              const Divider(height: 1),
-              const Expanded(
-                flex: 2,
-                child: ClipRect(child: ContinentPanel()),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}

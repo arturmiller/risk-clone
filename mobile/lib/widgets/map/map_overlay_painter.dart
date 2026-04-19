@@ -32,15 +32,6 @@ class MapOverlayPainter extends CustomPainter {
 
       final path = geom.toPath();
 
-      // Fill with owner color (semi-transparent to show base color underneath)
-      canvas.drawPath(
-        path,
-        Paint()
-          ..color = kPlayerColors[ts.owner % kPlayerColors.length]
-              .withValues(alpha: 0.55)
-          ..style = PaintingStyle.fill,
-      );
-
       // Selected attacker: thick border
       if (name == uiState.selectedTerritory) {
         canvas.drawPath(
@@ -62,7 +53,7 @@ class MapOverlayPainter extends CustomPainter {
         );
       }
 
-      // Army count label
+      // Army count label with player-colored circle background
       final proposed = uiState.proposedPlacements[name] ?? 0;
       final tp = TextPainter(
         text: TextSpan(
@@ -75,6 +66,25 @@ class MapOverlayPainter extends CustomPainter {
         ),
         textDirection: TextDirection.ltr,
       )..layout();
+
+      // Draw filled circle in player color behind the army count
+      final playerColor = kPlayerColors[ts.owner % kPlayerColors.length];
+      final circleRadius = math.max(tp.width, tp.height) / 2 + 4;
+      canvas.drawCircle(
+        geom.labelOffset,
+        circleRadius,
+        Paint()..color = playerColor,
+      );
+      // Circle border for contrast
+      canvas.drawCircle(
+        geom.labelOffset,
+        circleRadius,
+        Paint()
+          ..color = const Color(0xFF000000).withValues(alpha: 0.4)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0,
+      );
+
       tp.paint(
         canvas,
         geom.labelOffset - Offset(tp.width / 2, tp.height / 2),

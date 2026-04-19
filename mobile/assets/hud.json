@@ -1,0 +1,537 @@
+{
+  "version": 1,
+  "theme": {
+    "background": "rgba(62,39,12,0.9)",
+    "border": "rgba(255,193,7,0.3)",
+    "text": "#FFB300",
+    "borderRadius": 10
+  },
+  "layouts": {
+    "mobile-landscape": {
+      "canvasSize": [844, 390],
+      "root": {
+        "type": "grid",
+        "id": "root",
+        "rows": ["40px", "1fr", "auto"],
+        "cols": ["1fr"],
+        "children": [
+          {
+            "type": "grid",
+            "id": "player-bar",
+            "description": "Obere Leiste mit Spieler-Infos und RISK-Titel",
+            "row": 0,
+            "col": 0,
+            "rows": ["1fr"],
+            "cols": ["1fr", "auto", "1fr"],
+            "style": {
+              "background": "linear-gradient(90deg, #3E2723, #4E342E, #3E2723)"
+            },
+            "children": [
+              {
+                "type": "grid",
+                "id": "p1-chip",
+                "description": "Spieler 1: Avatar + Name/Stats (flach, 2x2)",
+                "row": 0,
+                "col": 0,
+                "rows": ["auto", "auto"],
+                "cols": ["auto", "1fr"],
+                "style": {
+                  "background": "rgba(0,0,0,0.3)",
+                  "borderRadius": 6,
+                  "padding": "2px 6px",
+                  "gap": 4
+                },
+                "children": [
+                  {
+                    "type": "icon",
+                    "id": "p1-avatar",
+                    "description": "Avatar Spieler 1 (Kreis in Spielerfarbe). Über beide Zeilen",
+                    "name": "person",
+                    "row": 0,
+                    "col": 0,
+                    "rowSpan": 2,
+                    "style": { "fontSize": 14, "color": "#E53935", "alignSelf": "center" }
+                  },
+                  {
+                    "type": "label",
+                    "id": "p1-name",
+                    "description": "Name von Spieler 1",
+                    "text": "Player 1",
+                    "binding": "players[0].name",
+                    "row": 0,
+                    "col": 1,
+                    "style": { "fontSize": 10, "fontWeight": "bold", "color": "#FFFFFF" }
+                  },
+                  {
+                    "type": "label",
+                    "id": "p1-stats",
+                    "description": "Territorien und Armeen von Spieler 1 (z.B. '🏴 5  🛡️ 12')",
+                    "text": "🏴 5  🛡️ 12",
+                    "binding": "players[0].stats",
+                    "row": 1,
+                    "col": 1,
+                    "style": { "fontSize": 9, "color": "rgba(255,255,255,0.7)" }
+                  }
+                ]
+              },
+              {
+                "type": "label",
+                "id": "title",
+                "description": "Spiel-Titel in der Mitte der oberen Leiste",
+                "text": "RISK",
+                "row": 0,
+                "col": 1,
+                "style": { "fontSize": 18, "fontWeight": "bold", "color": "#E57373" }
+              },
+              {
+                "type": "grid",
+                "id": "p2-chip",
+                "description": "Spieler 2 (Bot): Name/Stats + Avatar (flach, 2x2, Avatar rechts)",
+                "row": 0,
+                "col": 2,
+                "rows": ["auto", "auto"],
+                "cols": ["1fr", "auto"],
+                "style": {
+                  "background": "rgba(0,0,0,0.3)",
+                  "borderRadius": 6,
+                  "padding": "2px 6px",
+                  "gap": 4
+                },
+                "children": [
+                  {
+                    "type": "label",
+                    "id": "p2-name",
+                    "description": "Name von Spieler 2",
+                    "text": "Bot Player",
+                    "binding": "players[1].name",
+                    "row": 0,
+                    "col": 0,
+                    "style": { "fontSize": 10, "fontWeight": "bold", "color": "#FFFFFF", "textAlign": "right" }
+                  },
+                  {
+                    "type": "label",
+                    "id": "p2-stats",
+                    "description": "Territorien und Armeen von Spieler 2",
+                    "text": "🏴 3  🛡️ 8",
+                    "binding": "players[1].stats",
+                    "row": 1,
+                    "col": 0,
+                    "style": { "fontSize": 9, "color": "rgba(255,255,255,0.7)", "textAlign": "right" }
+                  },
+                  {
+                    "type": "icon",
+                    "id": "p2-avatar",
+                    "description": "Avatar Spieler 2 (Bot-Icon in Spielerfarbe). Über beide Zeilen",
+                    "name": "smart_toy",
+                    "row": 0,
+                    "col": 1,
+                    "rowSpan": 2,
+                    "style": { "fontSize": 14, "color": "#1E88E5", "alignSelf": "center" }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "grid",
+            "id": "map-area",
+            "description": "Mittlerer Bereich: Karte mit schwebenden Overlays",
+            "row": 1,
+            "col": 0,
+            "rows": ["1fr"],
+            "cols": ["1fr"],
+            "children": [
+              {
+                "type": "list",
+                "id": "attack-log",
+                "description": "Schwebende Attack-Log-Box oben rechts. Zeigt die letzten Kampf-Events.",
+                "maxItems": 4,
+                "itemBinding": "game.battleLog",
+                "row": 0,
+                "col": 0,
+                "style": {
+                  "background": "rgba(62,39,12,0.85)",
+                  "border": "1px solid rgba(255,160,0,0.4)",
+                  "borderRadius": 8,
+                  "padding": "4px 8px",
+                  "fontSize": 9,
+                  "color": "rgba(255,255,255,0.7)",
+                  "alignSelf": "start",
+                  "justifySelf": "end"
+                }
+              }
+            ]
+          },
+          {
+            "type": "grid",
+            "id": "bottom-bar",
+            "description": "Unterer Bereich mit Karten-Button und Aktionsleiste",
+            "row": 2,
+            "col": 0,
+            "rows": ["1fr"],
+            "cols": ["auto", "1fr"],
+            "children": [
+              {
+                "type": "grid",
+                "id": "cards-btn",
+                "description": "Karten-Button unten links. Zeigt Kartenanzahl, öffnet bei Klick die Kartenhand.",
+                "row": 0,
+                "col": 0,
+                "rows": ["auto"],
+                "cols": ["auto", "auto"],
+                "style": {
+                  "background": "rgba(62,39,12,0.9)",
+                  "border": "1px solid rgba(255,160,0,0.4)",
+                  "borderRadius": 8,
+                  "padding": "5px 8px",
+                  "alignSelf": "center",
+                  "gap": 6
+                },
+                "children": [
+                  {
+                    "type": "icon",
+                    "id": "cards-icon",
+                    "description": "Karten-Symbol",
+                    "name": "style",
+                    "row": 0,
+                    "col": 0,
+                    "style": { "fontSize": 14, "color": "{text}" }
+                  },
+                  {
+                    "type": "label",
+                    "id": "cards-count",
+                    "description": "Anzahl Karten auf der Hand (z.B. 'CARDS (3)')",
+                    "text": "CARDS (3)",
+                    "binding": "activePlayer.cardsLabel",
+                    "row": 0,
+                    "col": 1,
+                    "style": { "fontSize": 10, "fontWeight": "bold", "color": "{text}" }
+                  }
+                ]
+              },
+              {
+                "type": "grid",
+                "id": "action-bar",
+                "description": "Phasen-abhängige Aktionsleiste. Links: Phase-Label + Untertitel; rechts: Würfel-Auswahl + Attack/Blitz/End.",
+                "row": 0,
+                "col": 1,
+                "rows": ["auto"],
+                "cols": ["auto", "1fr"],
+                "style": {
+                  "background": "linear-gradient(180deg, rgba(62,39,12,0.95), rgba(78,52,30,0.95))",
+                  "border": "1px solid rgba(255,160,0,0.5)",
+                  "borderRadius": 10,
+                  "padding": "4px 8px",
+                  "gap": 8
+                },
+                "children": [
+                  {
+                    "type": "grid",
+                    "id": "phase-info",
+                    "description": "Phase-Label + Kontext-Untertitel, zwei Zeilen",
+                    "row": 0,
+                    "col": 0,
+                    "rows": ["auto", "auto"],
+                    "cols": ["1fr"],
+                    "style": { "alignSelf": "center" },
+                    "children": [
+                      {
+                        "type": "label",
+                        "id": "phase-label",
+                        "description": "Aktuelle Spielphase (REINFORCE PHASE / ATTACK PHASE / FORTIFY PHASE)",
+                        "text": "ATTACK PHASE",
+                        "binding": "game.phaseLabel",
+                        "row": 0,
+                        "col": 0,
+                        "style": { "fontSize": 11, "fontWeight": "bold", "color": "{text}" }
+                      },
+                      {
+                        "type": "label",
+                        "id": "phase-subtitle",
+                        "description": "Kontextabhängiger Untertitel (z.B. 'Select attacker, then target')",
+                        "text": "Select attacker, then target",
+                        "binding": "game.phaseHint",
+                        "row": 1,
+                        "col": 0,
+                        "style": { "fontSize": 9, "color": "rgba(255,255,255,0.7)" }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "grid",
+                    "id": "action-buttons",
+                    "description": "Aktions-Buttons, phasenabhängig. Attack-Phase: Würfel-Auswahl links, Attack/Blitz/End rechts. Die 1fr-Spalte trennt beide Gruppen.",
+                    "row": 0,
+                    "col": 1,
+                    "rows": ["1fr"],
+                    "cols": ["auto", "auto", "auto", "1fr", "auto", "auto", "auto"],
+                    "style": { "alignSelf": "center", "gap": 4 },
+                    "children": [
+                      {
+                        "type": "button",
+                        "id": "dice-1",
+                        "description": "Würfel-Auswahl: 1 Würfel",
+                        "text": "1",
+                        "group": "dice-count",
+                        "action": "selectDice:1",
+                        "selectedWhen": "ui.diceCount == 1",
+                        "selectedStyle": { "background": "#C62828", "color": "#FFFFFF" },
+                        "row": 0,
+                        "col": 0,
+                        "style": { "fontSize": 12, "fontWeight": "bold", "background": "rgba(255,255,255,0.15)", "color": "rgba(255,255,255,0.6)", "borderRadius": 4, "padding": "4px 6px" }
+                      },
+                      {
+                        "type": "button",
+                        "id": "dice-2",
+                        "description": "Würfel-Auswahl: 2 Würfel",
+                        "text": "2",
+                        "group": "dice-count",
+                        "action": "selectDice:2",
+                        "selectedWhen": "ui.diceCount == 2",
+                        "selectedStyle": { "background": "#C62828", "color": "#FFFFFF" },
+                        "row": 0,
+                        "col": 1,
+                        "style": { "fontSize": 12, "fontWeight": "bold", "background": "rgba(255,255,255,0.15)", "color": "rgba(255,255,255,0.6)", "borderRadius": 4, "padding": "4px 6px" }
+                      },
+                      {
+                        "type": "button",
+                        "id": "dice-3",
+                        "description": "Würfel-Auswahl: 3 Würfel (Standard, selektiert)",
+                        "text": "3",
+                        "group": "dice-count",
+                        "action": "selectDice:3",
+                        "selectedWhen": "ui.diceCount == 3",
+                        "selectedStyle": { "background": "#C62828", "color": "#FFFFFF" },
+                        "row": 0,
+                        "col": 2,
+                        "style": { "fontSize": 12, "fontWeight": "bold", "background": "rgba(255,255,255,0.15)", "color": "rgba(255,255,255,0.6)", "borderRadius": 4, "padding": "4px 6px" }
+                      },
+                      {
+                        "type": "button",
+                        "id": "attack-btn",
+                        "description": "Attack-Button: Führt einen einzelnen Angriff mit gewählter Würfelzahl aus",
+                        "text": "ATTACK",
+                        "action": "attack",
+                        "row": 0,
+                        "col": 4,
+                        "style": { "fontSize": 11, "fontWeight": "bold", "background": "#388E3C", "color": "#FFFFFF", "borderRadius": 6, "padding": "7px 12px" }
+                      },
+                      {
+                        "type": "button",
+                        "id": "blitz-btn",
+                        "description": "Blitz-Button: Greift wiederholt an bis Sieg oder Niederlage",
+                        "text": "BLITZ",
+                        "action": "blitz",
+                        "row": 0,
+                        "col": 5,
+                        "style": { "fontSize": 11, "fontWeight": "bold", "background": "#546E7A", "color": "#FFFFFF", "borderRadius": 6, "padding": "7px 12px" }
+                      },
+                      {
+                        "type": "button",
+                        "id": "end-btn",
+                        "description": "End-Button: Beendet die aktuelle Phase (Attack→Fortify, Fortify→nächster Spieler)",
+                        "text": "END",
+                        "action": "endPhase",
+                        "row": 0,
+                        "col": 6,
+                        "style": { "fontSize": 11, "fontWeight": "bold", "background": "#B71C1C", "color": "#FFFFFF", "borderRadius": 6, "padding": "7px 12px" }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "desktop-landscape": {
+      "canvasSize": [1200, 700],
+      "root": {
+        "type": "grid",
+        "id": "root",
+        "rows": ["1fr"],
+        "cols": ["1fr", "280px"],
+        "children": [
+          {
+            "type": "grid",
+            "id": "map-container",
+            "description": "Linker Bereich: Karte mit schwebendem Attack-Log oben rechts",
+            "row": 0,
+            "col": 0,
+            "rows": ["1fr"],
+            "cols": ["1fr"],
+            "children": [
+              {
+                "type": "list",
+                "id": "attack-log-desktop",
+                "description": "Schwebendes Attack-Log oben rechts über der Karte",
+                "maxItems": 8,
+                "itemBinding": "game.battleLog",
+                "row": 0,
+                "col": 0,
+                "style": {
+                  "background": "rgba(62,39,12,0.85)",
+                  "border": "1px solid rgba(255,160,0,0.4)",
+                  "borderRadius": 8,
+                  "fontSize": 11,
+                  "color": "rgba(255,255,255,0.8)",
+                  "padding": "6px 8px",
+                  "alignSelf": "start",
+                  "justifySelf": "end"
+                }
+              }
+            ]
+          },
+          {
+            "type": "grid",
+            "id": "sidebar",
+            "description": "Rechte Seitenleiste: Titel, beide Spieler, Phase, Kartenhand oben; Aktions-Buttons unten. Zeile 5 ('1fr') ist ein Spacer der Buttons nach unten drückt.",
+            "row": 0,
+            "col": 1,
+            "rows": ["auto", "auto", "auto", "auto", "auto", "1fr", "auto"],
+            "cols": ["1fr"],
+            "style": {
+              "background": "rgba(62,39,12,0.95)",
+              "border": "1px solid {border}",
+              "padding": "14px",
+              "borderRadius": 10,
+              "gap": 12
+            },
+            "children": [
+              {
+                "type": "label",
+                "id": "sidebar-title",
+                "description": "Spiel-Titel",
+                "text": "RISK",
+                "row": 0,
+                "col": 0,
+                "style": { "fontSize": 24, "fontWeight": "bold", "color": "#E57373", "textAlign": "center" }
+              },
+              {
+                "type": "grid",
+                "id": "p1-chip-desktop",
+                "description": "Spieler 1 Chip",
+                "row": 1,
+                "col": 0,
+                "rows": ["auto"],
+                "cols": ["auto", "1fr"],
+                "style": { "background": "rgba(0,0,0,0.3)", "borderRadius": 6, "padding": "6px 8px" },
+                "children": [
+                  {
+                    "type": "icon",
+                    "id": "p1-avatar-desktop",
+                    "description": "Avatar Spieler 1",
+                    "name": "person",
+                    "row": 0,
+                    "col": 0,
+                    "style": { "fontSize": 18, "color": "#E53935" }
+                  },
+                  {
+                    "type": "label",
+                    "id": "p1-info-desktop",
+                    "description": "Name und Stats Spieler 1",
+                    "text": "Player 1 — 🏴 5  🛡️ 12",
+                    "binding": "players[0].summary",
+                    "row": 0,
+                    "col": 1,
+                    "style": { "fontSize": 12, "fontWeight": "bold", "color": "#FFFFFF", "padding": "0 0 0 8px" }
+                  }
+                ]
+              },
+              {
+                "type": "grid",
+                "id": "p2-chip-desktop",
+                "description": "Spieler 2 (Bot) Chip",
+                "row": 2,
+                "col": 0,
+                "rows": ["auto"],
+                "cols": ["auto", "1fr"],
+                "style": { "background": "rgba(0,0,0,0.3)", "borderRadius": 6, "padding": "6px 8px" },
+                "children": [
+                  {
+                    "type": "icon",
+                    "id": "p2-avatar-desktop",
+                    "description": "Avatar Spieler 2",
+                    "name": "smart_toy",
+                    "row": 0,
+                    "col": 0,
+                    "style": { "fontSize": 18, "color": "#1E88E5" }
+                  },
+                  {
+                    "type": "label",
+                    "id": "p2-info-desktop",
+                    "description": "Name und Stats Spieler 2",
+                    "text": "Bot Player — 🏴 3  🛡️ 8",
+                    "binding": "players[1].summary",
+                    "row": 0,
+                    "col": 1,
+                    "style": { "fontSize": 12, "fontWeight": "bold", "color": "#FFFFFF", "padding": "0 0 0 8px" }
+                  }
+                ]
+              },
+              {
+                "type": "label",
+                "id": "phase-label-desktop",
+                "description": "Aktuelle Spielphase",
+                "text": "ATTACK PHASE",
+                "binding": "game.phaseLabel",
+                "row": 3,
+                "col": 0,
+                "style": { "fontSize": 14, "fontWeight": "bold", "color": "{text}", "textAlign": "center" }
+              },
+              {
+                "type": "cardhand",
+                "id": "cardhand-desktop",
+                "description": "Kartenhand: Eroberungskarten des aktiven Spielers",
+                "row": 4,
+                "col": 0
+              },
+              {
+                "type": "grid",
+                "id": "desktop-action-buttons",
+                "description": "Aktions-Buttons (Attack/Blitz/End). Am unteren Rand der Sidebar (Zeile 6 nach Spacer-Zeile 5).",
+                "row": 6,
+                "col": 0,
+                "rows": ["1fr"],
+                "cols": ["1fr", "1fr", "1fr"],
+                "children": [
+                  {
+                    "type": "button",
+                    "id": "attack-btn-desktop",
+                    "description": "Attack-Button",
+                    "text": "ATTACK",
+                    "action": "attack",
+                    "row": 0,
+                    "col": 0,
+                    "style": { "fontSize": 12, "fontWeight": "bold", "background": "#388E3C", "color": "#FFFFFF", "borderRadius": 6, "padding": "8px" }
+                  },
+                  {
+                    "type": "button",
+                    "id": "blitz-btn-desktop",
+                    "description": "Blitz-Button",
+                    "text": "BLITZ",
+                    "action": "blitz",
+                    "row": 0,
+                    "col": 1,
+                    "style": { "fontSize": 12, "fontWeight": "bold", "background": "#546E7A", "color": "#FFFFFF", "borderRadius": 6, "padding": "8px" }
+                  },
+                  {
+                    "type": "button",
+                    "id": "end-btn-desktop",
+                    "description": "End-Button: Beendet die aktuelle Phase",
+                    "text": "END",
+                    "action": "endPhase",
+                    "row": 0,
+                    "col": 2,
+                    "style": { "fontSize": 12, "fontWeight": "bold", "background": "#B71C1C", "color": "#FFFFFF", "borderRadius": 6, "padding": "8px" }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
