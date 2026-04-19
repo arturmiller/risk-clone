@@ -18,9 +18,8 @@ import 'package:risk_mobile/engine/models/game_config.dart';
 import 'package:risk_mobile/engine/models/game_state.dart';
 import 'package:risk_mobile/engine/models/map_schema.dart';
 import 'package:risk_mobile/engine/map_graph.dart';
+import 'package:risk_mobile/hud/hud_renderer.dart';
 import 'package:risk_mobile/screens/game_screen.dart';
-import 'package:risk_mobile/widgets/action_panel.dart';
-import 'package:risk_mobile/widgets/continent_panel.dart';
 import 'package:risk_mobile/widgets/simulation_control_bar.dart';
 import 'package:risk_mobile/widgets/simulation_status_bar.dart';
 
@@ -138,8 +137,8 @@ void main() {
       await tester.pumpWidget(_buildGameScreen(store));
       await tester.pump();
 
-      // ActionPanel should appear in the bottom panel
-      expect(find.byType(ActionPanel), findsOneWidget);
+      // HudRenderer is present (JSON-driven HUD replaces old ActionPanel)
+      expect(find.byType(HudRenderer), findsOneWidget);
       // No RenderFlex overflow
       expect(tester.takeException(), isNull);
     });
@@ -155,8 +154,8 @@ void main() {
       await tester.pumpWidget(_buildGameScreen(store));
       await tester.pump();
 
-      // ContinentPanel should appear in the sidebar
-      expect(find.byType(ContinentPanel), findsOneWidget);
+      // HudRenderer is present (JSON-driven HUD replaces old ContinentPanel sidebar)
+      expect(find.byType(HudRenderer), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -212,7 +211,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('simulation mode does NOT render ActionPanel', (tester) async {
+    testWidgets('simulation mode does NOT render HudRenderer', (tester) async {
       tester.view.physicalSize = const Size(375 * 3, 812 * 3);
       tester.view.devicePixelRatio = 3.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -222,10 +221,10 @@ void main() {
           _buildGameScreen(store, gameMode: GameMode.simulation));
       await tester.pump();
 
-      expect(find.byType(ActionPanel), findsNothing);
+      expect(find.byType(HudRenderer), findsNothing);
     });
 
-    testWidgets('vsBot mode still renders ActionPanel (no regression)',
+    testWidgets('vsBot mode still renders HudRenderer (no regression)',
         (tester) async {
       tester.view.physicalSize = const Size(375 * 3, 812 * 3);
       tester.view.devicePixelRatio = 3.0;
@@ -236,7 +235,7 @@ void main() {
           .pumpWidget(_buildGameScreen(store, gameMode: GameMode.vsBot));
       await tester.pump();
 
-      expect(find.byType(ActionPanel), findsOneWidget);
+      expect(find.byType(HudRenderer), findsOneWidget);
       expect(find.byType(SimulationControlBar), findsNothing);
       expect(find.byType(SimulationStatusBar), findsNothing);
     });
@@ -255,7 +254,7 @@ void main() {
 
       expect(find.byType(SimulationStatusBar), findsOneWidget);
       expect(find.byType(SimulationControlBar), findsOneWidget);
-      expect(find.byType(ActionPanel), findsNothing);
+      expect(find.byType(HudRenderer), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
