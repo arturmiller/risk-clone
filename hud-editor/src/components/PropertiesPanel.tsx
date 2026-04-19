@@ -126,6 +126,8 @@ export default function PropertiesPanel() {
                   style={{ width: 'auto' }}
                 />
               </div>
+              <PropertyField label="Action" value={(element as any).action} onChange={(v) => update({ action: v || undefined } as any)} />
+              <PropertyField label="Selected When" value={(element as any).selectedWhen} onChange={(v) => update({ selectedWhen: v || undefined } as any)} />
             </>
           )}
 

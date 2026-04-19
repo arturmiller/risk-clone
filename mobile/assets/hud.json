@@ -273,6 +273,9 @@
                         "description": "Würfel-Auswahl: 1 Würfel",
                         "text": "1",
                         "group": "dice-count",
+                        "action": "selectDice:1",
+                        "selectedWhen": "ui.diceCount == 1",
+                        "selectedStyle": { "background": "#C62828", "color": "#FFFFFF" },
                         "row": 0,
                         "col": 0,
                         "style": { "fontSize": 12, "fontWeight": "bold", "background": "rgba(255,255,255,0.15)", "color": "rgba(255,255,255,0.6)", "borderRadius": 4, "padding": "4px 6px" }
@@ -283,6 +286,9 @@
                         "description": "Würfel-Auswahl: 2 Würfel",
                         "text": "2",
                         "group": "dice-count",
+                        "action": "selectDice:2",
+                        "selectedWhen": "ui.diceCount == 2",
+                        "selectedStyle": { "background": "#C62828", "color": "#FFFFFF" },
                         "row": 0,
                         "col": 1,
                         "style": { "fontSize": 12, "fontWeight": "bold", "background": "rgba(255,255,255,0.15)", "color": "rgba(255,255,255,0.6)", "borderRadius": 4, "padding": "4px 6px" }
@@ -293,16 +299,19 @@
                         "description": "Würfel-Auswahl: 3 Würfel (Standard, selektiert)",
                         "text": "3",
                         "group": "dice-count",
-                        "selected": true,
+                        "action": "selectDice:3",
+                        "selectedWhen": "ui.diceCount == 3",
+                        "selectedStyle": { "background": "#C62828", "color": "#FFFFFF" },
                         "row": 0,
                         "col": 2,
-                        "style": { "fontSize": 12, "fontWeight": "bold", "background": "#C62828", "color": "#FFFFFF", "borderRadius": 4, "padding": "4px 6px" }
+                        "style": { "fontSize": 12, "fontWeight": "bold", "background": "rgba(255,255,255,0.15)", "color": "rgba(255,255,255,0.6)", "borderRadius": 4, "padding": "4px 6px" }
                       },
                       {
                         "type": "button",
                         "id": "attack-btn",
                         "description": "Attack-Button: Führt einen einzelnen Angriff mit gewählter Würfelzahl aus",
                         "text": "ATTACK",
+                        "action": "attack",
                         "row": 0,
                         "col": 4,
                         "style": { "fontSize": 11, "fontWeight": "bold", "background": "#388E3C", "color": "#FFFFFF", "borderRadius": 6, "padding": "7px 12px" }
@@ -312,6 +321,7 @@
                         "id": "blitz-btn",
                         "description": "Blitz-Button: Greift wiederholt an bis Sieg oder Niederlage",
                         "text": "BLITZ",
+                        "action": "blitz",
                         "row": 0,
                         "col": 5,
                         "style": { "fontSize": 11, "fontWeight": "bold", "background": "#546E7A", "color": "#FFFFFF", "borderRadius": 6, "padding": "7px 12px" }
@@ -321,6 +331,7 @@
                         "id": "end-btn",
                         "description": "End-Button: Beendet die aktuelle Phase (Attack→Fortify, Fortify→nächster Spieler)",
                         "text": "END",
+                        "action": "endPhase",
                         "row": 0,
                         "col": 6,
                         "style": { "fontSize": 11, "fontWeight": "bold", "background": "#B71C1C", "color": "#FFFFFF", "borderRadius": 6, "padding": "7px 12px" }
@@ -490,6 +501,7 @@
                     "id": "attack-btn-desktop",
                     "description": "Attack-Button",
                     "text": "ATTACK",
+                    "action": "attack",
                     "row": 0,
                     "col": 0,
                     "style": { "fontSize": 12, "fontWeight": "bold", "background": "#388E3C", "color": "#FFFFFF", "borderRadius": 6, "padding": "8px" }
@@ -499,6 +511,7 @@
                     "id": "blitz-btn-desktop",
                     "description": "Blitz-Button",
                     "text": "BLITZ",
+                    "action": "blitz",
                     "row": 0,
                     "col": 1,
                     "style": { "fontSize": 12, "fontWeight": "bold", "background": "#546E7A", "color": "#FFFFFF", "borderRadius": 6, "padding": "8px" }
@@ -508,6 +521,7 @@
                     "id": "end-btn-desktop",
                     "description": "End-Button: Beendet die aktuelle Phase",
                     "text": "END",
+                    "action": "endPhase",
                     "row": 0,
                     "col": 2,
                     "style": { "fontSize": 12, "fontWeight": "bold", "background": "#B71C1C", "color": "#FFFFFF", "borderRadius": 6, "padding": "8px" }

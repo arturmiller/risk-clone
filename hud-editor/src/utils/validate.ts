@@ -130,6 +130,17 @@ function validateElement(
   if (el.itemBinding !== undefined && typeof el.itemBinding !== 'string') {
     errors.push(`${path}.itemBinding must be a string when present.`);
   }
+  if (el.type === 'button') {
+    if (el.action !== undefined && typeof el.action !== 'string') {
+      errors.push(`${path}.action must be a string`);
+    }
+    if (el.selectedWhen !== undefined && typeof el.selectedWhen !== 'string') {
+      errors.push(`${path}.selectedWhen must be a string`);
+    }
+    if (el.selectedStyle !== undefined && (typeof el.selectedStyle !== 'object' || el.selectedStyle === null)) {
+      errors.push(`${path}.selectedStyle must be an object`);
+    }
+  }
   if (el.type === 'grid' || el.type === 'container') {
     const children = el.children;
     if (children !== undefined && !Array.isArray(children)) {

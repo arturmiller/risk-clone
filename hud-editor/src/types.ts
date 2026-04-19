@@ -72,6 +72,12 @@ export interface ButtonElement extends HudElementBase {
   group?: string;
   /** Initial / persistent selection state within the group. */
   selected?: boolean;
+  /** Action name dispatched on tap by the Flutter runtime. */
+  action?: string;
+  /** Binding expression that resolves to true/false; when true the button renders in selectedStyle. */
+  selectedWhen?: string;
+  /** Style merged over the base style when selectedWhen is true. */
+  selectedStyle?: ElementStyle;
 }
 
 export interface SliderElement extends HudElementBase {
