@@ -18,12 +18,7 @@ class AttackLogWidget extends ConsumerWidget {
     final recent = items.length > element.maxItems
         ? items.sublist(items.length - element.maxItems)
         : items;
-    final fontSize = (element.style?['fontSize'] is num)
-        ? (element.style!['fontSize'] as num).toDouble()
-        : 10.0;
-    final color = (element.style?['color'] is String)
-        ? parseColor(element.style!['color'] as String, theme)
-        : Colors.white70;
+    final textStyle = textStyleFrom(element.style, theme);
 
     return HudStyleBox(
       theme: theme,
@@ -31,10 +26,7 @@ class AttackLogWidget extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
-        children: recent
-            .map((line) => Text(line,
-                style: TextStyle(fontSize: fontSize, color: color)))
-            .toList(),
+        children: recent.map((line) => Text(line, style: textStyle)).toList(),
       ),
     );
   }

@@ -62,6 +62,33 @@ Color parseColor(String input, HudTheme theme) {
   throw FormatException('Unrecognized color: $trimmed');
 }
 
+TextStyle textStyleFrom(Map<String, dynamic>? s, HudTheme theme) {
+  if (s == null) return const TextStyle();
+  final color = s['color'] is String ? parseColor(s['color'] as String, theme) : null;
+  final fontSize = s['fontSize'] is num ? (s['fontSize'] as num).toDouble() : null;
+  FontWeight? fw;
+  if (s['fontWeight'] == 'bold') fw = FontWeight.bold;
+  return TextStyle(color: color, fontSize: fontSize, fontWeight: fw);
+}
+
+TextAlign? textAlignFrom(Map<String, dynamic>? s) {
+  if (s == null) return null;
+  switch (s['textAlign']) {
+    case 'left':
+      return TextAlign.left;
+    case 'right':
+      return TextAlign.right;
+    case 'center':
+      return TextAlign.center;
+    case 'start':
+      return TextAlign.start;
+    case 'end':
+      return TextAlign.end;
+    default:
+      return null;
+  }
+}
+
 LinearGradient parseGradient(String input, HudTheme theme) {
   final trimmed = input.trim();
   final match = RegExp(r'^linear-gradient\(([^)]+)\)$').firstMatch(trimmed);
