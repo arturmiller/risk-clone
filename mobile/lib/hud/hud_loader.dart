@@ -21,7 +21,10 @@ HudConfig parseHudConfig(String raw) {
   } on FormatException {
     rethrow;
   } catch (e, st) {
-    throw FormatException('Failed to build HudConfig: $e\n$st');
+    Error.throwWithStackTrace(
+      FormatException('Failed to build HudConfig: $e'),
+      st,
+    );
   }
 }
 
