@@ -96,6 +96,12 @@ class UIStateNotifier extends _$UIStateNotifier {
     );
   }
 
+  /// Set the dice count for the attack phase (1, 2, or 3).
+  void setDiceCount(int count) {
+    if (count < 1 || count > 3) return;
+    state = state.copyWith(diceCount: count);
+  }
+
   /// Set pending advance state after conquest.
   void setPendingAdvance(String source, String target, int min, int max) {
     state = state.copyWith(
