@@ -36,24 +36,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   void _maybeInitReinforce(GameState gameState) {
     if (widget.gameMode == GameMode.simulation) return;
-    debugPrint('[REINFORCE] check: player=${gameState.currentPlayerIndex} '
-        'phase=${gameState.turnPhase} lastPhase=$_lastPhase lastPlayer=$_lastPlayerIndex');
     if (gameState.currentPlayerIndex == 0 &&
         gameState.turnPhase == TurnPhase.reinforce &&
         (gameState.turnPhase != _lastPhase ||
             gameState.currentPlayerIndex != _lastPlayerIndex)) {
       _lastPhase = gameState.turnPhase;
       _lastPlayerIndex = gameState.currentPlayerIndex;
-      debugPrint('[REINFORCE] scheduling mapGraph read...');
       ref.read(mapGraphProvider(mapAsset: widget.mapAsset).future).then((mapGraph) {
-        debugPrint('[REINFORCE] mapGraph resolved, mounted=$mounted');
         if (!mounted) return;
         final armies = calculateReinforcements(gameState, mapGraph, 0);
-        debugPrint('[REINFORCE] armies=$armies, calling initReinforce');
         ref.read(uIStateProvider.notifier).initReinforce(armies);
-      }).catchError((e) {
-        debugPrint('[REINFORCE] ERROR: $e');
-      });
+      }).catchError((_) {});
     } else if (gameState.turnPhase != TurnPhase.reinforce) {
       _lastPhase = gameState.turnPhase;
       _lastPlayerIndex = gameState.currentPlayerIndex;
@@ -68,7 +61,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
     // Initialize reinforce on every build where conditions match
     // (idempotent: _lastPhase/_lastPlayerIndex guard prevents re-init)
-    debugPrint('[BUILD] gameAsync=${gameAsync.runtimeType} gameState=${gameState != null ? "present(player=${gameState.currentPlayerIndex}, phase=${gameState.turnPhase})" : "null"}');
     if (gameState != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
